@@ -229,7 +229,7 @@
             title: runs(section + version),
             dialogMessages: [
                 runs(t("about.repository")),
-                runs("github.com/birdy/birdy-patches"),
+                runs("github.com/SEIFELDEEN15/Birdy-Patches"),
                 runs(t("about.manager"))
             ],
             confirmButton: { buttonRenderer: { style: "STYLE_PRIMARY", text: runs(t("common.close")),
@@ -241,11 +241,11 @@
         items.unshift(
             { settingActionRenderer: {
                 itemId: "BIRDY_CREATOR",
-                title: runs("Birdy"),
+                title: runs("SEIFELDEEN15"),
                 summary: runs(t("about.creator", { section: section })),
                 thumbnail: { thumbnails: [{ url: GSTATIC_PICTURE + "creator" }] },
                 serviceEndpoint: repository,
-                actionButton: button("github.com/birdy/birdy-patches")
+                actionButton: button("github.com/SEIFELDEEN15")
             } },
             { settingActionRenderer: {
                 itemId: "BIRDY_ABOUT",

@@ -2,12 +2,12 @@ group = "app.tvpatches"
 
 patches {
     about {
-        name = "FaroTV Patches"
-        description = "FaroTV: unofficial patches for YouTube on Android TV, compatible with Morphe. MicroG-RE support, ad blocking, settings inside the app, player customization."
-        source = "git@github.com:KyVexo/farotv-patches.git"
-        author = "KyVexo"
-        contact = "https://github.com/KyVexo/farotv-patches/issues"
-        website = "https://github.com/KyVexo/farotv-patches"
+        name = "Birdy Patches"
+        description = "Birdy: unofficial patches for YouTube on Android TV, compatible with Morphe. MicroG-RE support, ad blocking, SponsorBlock with skip/prompt options, settings inside the app, player customization."
+        source = "git@github.com:SEIFELDEEN15/Birdy-Patches.git"
+        author = "SEIFELDEEN15"
+        contact = "https://github.com/SEIFELDEEN15/Birdy-Patches/issues"
+        website = "https://github.com/SEIFELDEEN15/Birdy-Patches"
         license = "GPLv3"
     }
 }

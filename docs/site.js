@@ -4,8 +4,8 @@
   var catalogs = {}, loading = {}, language = 'es', sequence = 0, languageReady = false;
   var releases = [], filter = 'stable', releaseStatus = 'loading', refreshed = null;
   var select = document.getElementById('site-language');
-  var storageKey = 'farotv.site.language';
-  var REPO = 'KyVexo/farotv-patches';
+  var storageKey = 'birdytv.site.language';
+  var REPO = 'SEIFELDEEN15/Birdy-Patches';
   function $(id) { return document.getElementById(id); }
 
   function normalize(value) {

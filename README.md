@@ -27,18 +27,16 @@ Tested and confirmed working on **YouTube TV 8.02.300 (armeabi-v7a)** and **7.32
 ## 📦 How to Use in Morphe Manager
 
 1. Install [MicroG-RE](https://github.com/MorpheApp/MicroG-RE/releases) on your Android TV.
-2. Open **Morphe Manager** on your device.
-3. Go to **Settings > Sources**.
-4. Set the Patches source repository to your GitHub repository:
-   - Organization / Owner: `<your-github-username>`
-   - Repository: `birdy-patches`
-5. Select **YouTube for Android TV** (`com.google.android.youtube.tv`) and patch!
-     <img src=".github/assets/add-to-morphe.svg" alt="Add to Morphe" height="48">
+2. Add this repository as a patch source in Morphe Manager:
+   https://github.com/SEIFELDEEN15/Birdy-Patches
+
+   <a href="https://morphe.software/add-source?github=SEIFELDEEN15/Birdy-Patches">
+     <img src=".github/assets/add-to-morphe.svg" alt="Add to Morphe" height="36">
    </a>
 
-3. Parchea tu propio APK de **YouTube for Android TV 7.32.300** (armeabi-v7a) e instálalo en el TV.
+3. Select **YouTube for Android TV** (`com.google.android.youtube.tv`) and patch!
 
-Este repositorio **no** distribuye el APK de YouTube, ni original ni parcheado.
+This repository does **not** distribute YouTube APKs, neither original nor modified.
 
 ## 🩹 Lista de parches
 

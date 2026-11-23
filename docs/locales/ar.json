@@ -1,4 +1,4 @@
-{
+﻿{
   "nav.features": "الميزات",
   "nav.gallery": "لقطات الشاشة",
   "nav.install": "طريقة التثبيت",
@@ -58,7 +58,7 @@
   "step.source.title": "إضافة المصدر",
   "step.patch.title": "تطبيق التصحيحات على APK",
   "step.open.title": "تثبيت FaroTV وفتحه",
-  "step.source.add": "اختر <a href=\"https://morphe.software/add-source?github=KyVexo/farotv-patches\">إضافة إلى Morphe</a> أو أضف هذا المصدر في Morphe Manager:",
+  "step.source.add": "اختر <a href=\"https://morphe.software/add-source?github=SEIFELDEEN15/Birdy-Patches\">إضافة إلى Morphe</a> أو أضف هذا المصدر في Morphe Manager:",
   "step.source.directory": "<a href=\"https://morphe-patches.software/?app=com.google.android.youtube.tv\">morphe-patches.software</a>",
   "step.patch.apk": "اختر ملف APK لتطبيق YouTube على Android TV بالإصدار 7.32.300 أو 8.02.300. التصحيحات الموصى بها محددة مسبقًا.",
   "step.patch.spoof": "فعّل <b>Spoof device</b> فقط إذا أشار YouTube إلى أن تلفازك غير متوافق.",
