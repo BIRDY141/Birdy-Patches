@@ -38,7 +38,7 @@ set /p "msg=Enter commit message (press Enter for default): "
 if "%msg%"=="" set "msg=feat: update patches"
 
 git add .
-git commit -m "%msg%"
+git commit -m "%msg%" >nul 2>&1
 
 echo.
 echo [3/3] Pushing changes to GitHub...
