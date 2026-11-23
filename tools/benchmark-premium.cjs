@@ -1,12 +1,21 @@
 // Comparación controlada de CPU y operaciones; no mide la red ni los FPS del TV.
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const {performance}=require('node:perf_hooks');
 const {execFileSync}=require('node:child_process');
 const baseline=process.argv[2]||'v1.7.0-dev.9';
 if(!/^[A-Za-z0-9._/-]+$/.test(baseline))throw Error('Referencia no válida');
 const file='extensions/extension/src/main/js/premium.js';
+function loadRef(ref, targetFile) {
+    try {
+        return execFileSync('git', ['show', ref + ':' + targetFile], { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
+    } catch {
+        const fixture = path.resolve(__dirname, 'tests/fixtures', ref, path.basename(targetFile));
+        if (fs.existsSync(fixture)) return fs.readFileSync(fixture, 'utf8');
+        throw new Error('Could not load ' + ref + ':' + targetFile);
+    }
+}
 function measure(ref){
-    const source=ref?execFileSync('git',['show',ref+':'+file],{encoding:'utf8'}):fs.readFileSync(file,'utf8');
+    const source=ref?loadRef(ref,file):fs.readFileSync(file,'utf8');
     let feature;const p=vm.createContext({youtv:{feature:f=>feature=f,mentions:(t,m)=>m.some(x=>t.includes(x)),report(){}}});
     vm.runInContext('window=this; regexTests=0; splices=0; const test=RegExp.prototype.test; RegExp.prototype.test=function(s){regexTests++;return test.call(this,s);}; const splice=Array.prototype.splice; Array.prototype.splice=function(...args){splices++;return splice.apply(this,args);};',p);
     vm.runInContext(fs.readFileSync('extensions/extension/src/main/js/response-tree.js','utf8'),p);

@@ -41,8 +41,8 @@ git add .
 git commit -m "%msg%" >nul 2>&1
 
 echo.
-echo [3/3] Pushing changes to GitHub...
-git push origin main
+echo [3/3] Pushing changes and tags to GitHub...
+git push origin main --tags
 if %errorlevel% equ 0 (
     echo.
     echo ===================================================

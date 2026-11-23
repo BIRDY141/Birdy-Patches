@@ -8,6 +8,16 @@ const main = path.resolve(__dirname, '../../extensions/extension/src/main');
 const catalogs = Object.fromEntries(fs.readdirSync(path.join(main, 'locales')).filter(f => f.endsWith('.json'))
     .map(f => [f.slice(0, -5), JSON.parse(fs.readFileSync(path.join(main, 'locales', f), 'utf8'))]));
 
+function loadRef(ref, targetFile) {
+    try {
+        return execFileSync('git', ['show', ref + ':' + targetFile], { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
+    } catch {
+        const fixture = path.resolve(__dirname, 'fixtures', ref, path.basename(targetFile));
+        if (fs.existsSync(fixture)) return fs.readFileSync(fixture, 'utf8');
+        throw new Error('Could not load ' + ref + ':' + targetFile);
+    }
+}
+
 function page(language = 'es-PE', browser = 'en-US', diagnostics = false, sourceRef = null) {
     const intervals = [];
     const styleWrites = [];
@@ -37,7 +47,7 @@ function page(language = 'es-PE', browser = 'en-US', diagnostics = false, source
         _yttv = { registry: { ENABLE_PREVIEWS_WITH_SOUND: true }, defaults: new Map([['ENABLE_PREVIEWS_WITH_SOUND', true]]) };`, context);
     for (const name of ['i18n', 'runtime', 'diagnostics', 'response-tree', 'ads', 'player', 'premium', 'ryd', 'shorts', 'sponsorblock', 'topics']) {
         if (sourceRef && name === 'response-tree') continue;
-        const source = sourceRef ? execFileSync('git', ['show', sourceRef + ':extensions/extension/src/main/js/' + name + '.js'], {encoding:'utf8'})
+        const source = sourceRef ? loadRef(sourceRef, 'extensions/extension/src/main/js/' + name + '.js')
             : fs.readFileSync(path.join(main, 'js', name + '.js'), 'utf8');
         vm.runInContext(source, context, { filename: name + '.js' });
     }

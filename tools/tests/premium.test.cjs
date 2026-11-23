@@ -1,10 +1,20 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
+const path=require('node:path');
 const vm=require('node:vm');
 const {execFileSync}=require('node:child_process');
 const {test}=require('node:test');
 const file='extensions/extension/src/main/js/premium.js';
-const old=execFileSync('git',['show','v1.7.0-dev.9:'+file],{encoding:'utf8'});
+function loadRef(ref, targetFile) {
+    try {
+        return execFileSync('git', ['show', ref + ':' + targetFile], { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
+    } catch {
+        const fixture = path.resolve(__dirname, 'fixtures', ref, path.basename(targetFile));
+        if (fs.existsSync(fixture)) return fs.readFileSync(fixture, 'utf8');
+        throw new Error('Could not load ' + ref + ':' + targetFile);
+    }
+}
+const old=loadRef('v1.7.0-dev.9', file);
 const current=fs.readFileSync(file,'utf8');
 function filter(source){
     let feature; const reports=[];

@@ -1,7 +1,16 @@
 // Compara recorridos y CPU en una respuesta sintética; no mide FPS ni red del TV.
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const {execFileSync}=require('node:child_process'),{performance}=require('node:perf_hooks');
 const root='extensions/extension/src/main/js/';
+function loadRef(ref, targetFile) {
+    try {
+        return execFileSync('git', ['show', ref + ':' + targetFile], { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
+    } catch {
+        const fixture = path.resolve(__dirname, 'tests/fixtures', ref, path.basename(targetFile));
+        if (fs.existsSync(fixture)) return fs.readFileSync(fixture, 'utf8');
+        throw new Error('Could not load ' + ref + ':' + targetFile);
+    }
+}
 const fixture={contents:{items:Array.from({length:10000},(_,i)=>({tileRenderer:{id:i,title:'keep',metadata:{label:'keep',count:i}}}))},
     text:'adSlotRenderer premiumUpsellRenderer reelWatchEndpoint'};
 fixture.contents.items.splice(5,0,{adSlotRenderer:{}},{mealbarPromoRenderer:{}},{shelfRenderer:{tvhtml5ShelfRendererType:'TVHTML5_SHELF_RENDERER_TYPE_SHORTS'}});
@@ -9,7 +18,7 @@ function run(old){
     const defs=[];const p=vm.createContext({visited:0,youtv:{feature:f=>defs.push(f),report(){},mentions:(t,m)=>m.some(k=>t.includes(k))}});vm.runInContext('window=this',p);
     if(!old)vm.runInContext(fs.readFileSync(root+'response-tree.js','utf8'),p);
     for(const name of ['ads','premium','shorts']){
-        let source=old?execFileSync('git',['show','v1.7.0-dev.10:'+root+name+'.js'],{encoding:'utf8'}):fs.readFileSync(root+name+'.js','utf8');
+        let source=old?loadRef('v1.7.0-dev.10',root+name+'.js'):fs.readFileSync(root+name+'.js','utf8');
         if(old)source=source.replace('        var removed = 0;', '        visited++; var removed = 0;');
         vm.runInContext(source,p);
     }
