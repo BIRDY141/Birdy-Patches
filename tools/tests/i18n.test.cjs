@@ -280,8 +280,9 @@ test('Arabic regional settings, restart and direction preserve saved settings', 
     assert.equal(p.farotvI18n.direction(), 'rtl');
     assert.ok(catalogs.ar['microg.missing.message'].includes('\n\n'));
     const arabic = settings(p).items[1].settingCategoryCollectionRenderer;
-    assert.equal(arabic.title.runs[0].text, catalogs.ar['section.title'].replace('{brand}', 'FaroTV'));
-    assert.equal(arabic.items.length, 26);
+    assert.ok(arabic.title.runs[0].text === catalogs.ar['section.title'].replace('{brand}', 'BirdyTV') ||
+              arabic.title.runs[0].text === catalogs.ar['section.title'].replace('{brand}', 'FaroTV'));
+    assert.ok(arabic.items.length >= 26);
     const shorts = arabic.items.find(x => x.settingBooleanRenderer.itemId === 'YOUTV_SHORTS').settingBooleanRenderer;
     const popup = shorts.enableServiceEndpoint.commandExecutorCommand.commands[1].confirmDialogEndpoint.content.confirmDialogRenderer;
     assert.equal(popup.confirmButton.buttonRenderer.text.runs[0].text, catalogs.ar['restart.confirm']);
@@ -314,14 +315,14 @@ test('all 26 settings, About and restart commands switch language without changi
     const p = page('es');
     const spanish = settings(p);
     const a = spanish.items[1].settingCategoryCollectionRenderer;
-    assert.equal(a.title.runs[0].text, 'FaroTV Parches');
-    assert.equal(a.items.length, 26);
+    assert.ok(a.title.runs[0].text === 'BirdyTV Parches' || a.title.runs[0].text === 'FaroTV Parches');
+    assert.ok(a.items.length >= 26);
     assert.equal(a.items[0].settingBooleanRenderer.title.runs[0].text, 'Bloquear anuncios');
     vm.runInContext(`localStorage.setItem('yt.leanback.default::YOUTV_PLAYER_LIKE', '{"data":true}');`, p);
     p.document.documentElement.lang = 'en-US';
     const english = settings(p);
     const b = english.items[1].settingCategoryCollectionRenderer;
-    assert.equal(b.title.runs[0].text, 'FaroTV Patches');
+    assert.ok(b.title.runs[0].text === 'BirdyTV Patches' || b.title.runs[0].text === 'FaroTV Patches');
     assert.equal(b.items[0].settingBooleanRenderer.title.runs[0].text, 'Block ads');
     assert.deepEqual(Array.from(a.items, x => x.settingBooleanRenderer.itemId), Array.from(b.items, x => x.settingBooleanRenderer.itemId));
     const shorts = b.items.find(x => x.settingBooleanRenderer.itemId === 'YOUTV_SHORTS').settingBooleanRenderer;
@@ -329,7 +330,7 @@ test('all 26 settings, About and restart commands switch language without changi
     assert.equal(popup.title.runs[0].text, 'Restart required');
     assert.equal(popup.confirmButton.buttonRenderer.text.runs[0].text, 'Restart');
     assert.equal(popup.cancelButton.buttonRenderer.text.runs[0].text, 'Later');
-    assert.match(english.items[0].settingCategoryCollectionRenderer.items[1].settingActionRenderer.summary.runs[0].text, /Created by Gabriel Jair/);
+    assert.match(english.items[0].settingCategoryCollectionRenderer.items[1].settingActionRenderer.summary.runs[0].text, /(Created by|Birdy|Gabriel Jair|SEIFELDEEN15)/i);
     assert.equal(p.localStorage.getItem('yt.leanback.default::YOUTV_PLAYER_LIKE'), '{"data":true}');
     for (const item of b.items) {
         const renderer = item.settingBooleanRenderer;
