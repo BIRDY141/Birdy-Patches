@@ -19,9 +19,13 @@ function Assert-Test($condition, $description) {
 }
 
 # 1. Parse all locale catalogs
-$enRaw = Get-Content "farotv-patches/farotv-patches-main/extensions/extension/src/main/locales/en.json" -Raw -Encoding UTF8
-$esRaw = Get-Content "farotv-patches/farotv-patches-main/extensions/extension/src/main/locales/es.json" -Raw -Encoding UTF8
-$arRaw = Get-Content "farotv-patches/farotv-patches-main/extensions/extension/src/main/locales/ar.json" -Raw -Encoding UTF8
+$baseDir = $PSScriptRoot
+if (-not (Test-Path "$baseDir\extensions")) {
+    $baseDir = "$PSScriptRoot\birdy-patches"
+}
+$enRaw = Get-Content "$baseDir\extensions\extension\src\main\locales\en.json" -Raw -Encoding UTF8
+$esRaw = Get-Content "$baseDir\extensions\extension\src\main\locales\es.json" -Raw -Encoding UTF8
+$arRaw = Get-Content "$baseDir\extensions\extension\src\main\locales\ar.json" -Raw -Encoding UTF8
 
 $en = $enRaw | ConvertFrom-Json
 $es = $esRaw | ConvertFrom-Json
@@ -84,7 +88,7 @@ foreach ($k in $requiredKeys) {
 }
 
 # 3. Verify sponsorblock.js structural integrity
-$sbJs = Get-Content "farotv-patches/farotv-patches-main/extensions/extension/src/main/js/sponsorblock.js" -Raw -Encoding UTF8
+$sbJs = Get-Content "$baseDir\extensions\extension\src\main\js\sponsorblock.js" -Raw -Encoding UTF8
 
 Assert-Test ($sbJs -match "prompt_all") "Contains master 'prompt_all' setting"
 Assert-Test ($sbJs -match "getCategoryMode") "Contains 3-mode resolver 'getCategoryMode'"
