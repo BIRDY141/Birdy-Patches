@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-11-21T11:32:27",
+  "description": "## [1.7.0] Birdy Patches for YouTube on Android TV\n\n### ✨ New Features\n\n* **sponsorblock:** 3-mode Skip / Prompt to Skip / Off support with TV remote OK key interaction and countdown pill\n* **branding:** Birdy TV red theme and logo\n* **settings:** BirdyTV settings section in YouTube TV settings",
+  "download_url": "https://github.com/birdy/birdy-patches/releases/download/v1.7.0/patches-1.7.0.mpp",
+  "signature_download_url": "",
+  "version": "1.7.0",
+  "public_key": "B+w9LCwCheqTn0XZycE7F2wZPc5CBoaYxCExWOrB0sg="
+}
