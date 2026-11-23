@@ -5,8 +5,9 @@ const vm = require('node:vm');
 const { test } = require('node:test');
 const {execFileSync} = require('node:child_process');
 const main = path.resolve(__dirname, '../../extensions/extension/src/main');
+const readJson = p => JSON.parse(fs.readFileSync(p, 'utf8').replace(/^\uFEFF/, ''));
 const catalogs = Object.fromEntries(fs.readdirSync(path.join(main, 'locales')).filter(f => f.endsWith('.json'))
-    .map(f => [f.slice(0, -5), JSON.parse(fs.readFileSync(path.join(main, 'locales', f), 'utf8'))]));
+    .map(f => [f.slice(0, -5), readJson(path.join(main, 'locales', f))]));
 
 function loadRef(ref, targetFile) {
     try {
