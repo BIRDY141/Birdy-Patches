@@ -115,5 +115,22 @@
   "microg.status": "estado {status}",
   "microg.done.title": "MicroG-RE instalado",
   "microg.done.message": "Listo. Reinicia la app para empezar a usarla.",
-  "microg.restart": "Reiniciar app"
+  "microg.restart": "Reiniciar app",
+  "hub.title": "Ajustes de BirdyTV",
+  "hub.open": "Abrir Ajustes de BirdyTV",
+  "hub.open.summary": "Configura SponsorBlock, colores de barra, bloqueo de anuncios y más",
+  "hub.tab.sponsorblock": "SponsorBlock",
+  "hub.tab.seekbar": "Colores de barra",
+  "hub.tab.ads": "Bloqueo de anuncios",
+  "hub.tab.player": "Botones del reproductor",
+  "hub.tab.shorts": "Shorts",
+  "hub.tab.ryd": "No me gusta (RYD)",
+  "hub.tab.about": "Acerca de",
+  "hub.nav.hint": "[▲/▼/◄/►] Navegar  •  [OK] Seleccionar  •  [Atrás] Cerrar",
+  "hub.action.skip": "Auto-saltar",
+  "hub.action.prompt": "Avisar con OK",
+  "hub.action.off": "Desactivado",
+  "hub.enabled": "Activado",
+  "hub.disabled": "Desactivado",
+  "hub.restart_app": "Reiniciar YouTube para aplicar cambios"
 }

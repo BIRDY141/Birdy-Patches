@@ -307,20 +307,36 @@
             isSettings = true;
         }
         if (!isSettings) return;
+        var hubAction = { signalAction: { signal: "BIRDY_OPEN_SETTINGS" } };
+        var hubItem = { settingActionRenderer: {
+            itemId: "BIRDY_SETTINGS_HUB",
+            title: runs(t("hub.open")),
+            summary: runs(t("hub.open.summary")),
+            thumbnail: { thumbnails: [{ url: GSTATIC_PICTURE + "brand" }] },
+            serviceEndpoint: hubAction,
+            actionButton: { buttonRenderer: {
+                text: runs(t("hub.open")),
+                serviceEndpoint: hubAction,
+                command: hubAction
+            } }
+        } };
+
+        var categoryItems = [hubItem].concat(settings.map(function (setting) {
+            return { settingBooleanRenderer: {
+                thumbnail: settingThumbnail(setting),
+                title: runs(setting.titleKey ? t(setting.titleKey) : setting.title),
+                summary: runs(setting.summaryKey ? t(setting.summaryKey) : (setting.summary || "")),
+                enableServiceEndpoint: settingCommand(setting, true),
+                disableServiceEndpoint: settingCommand(setting, false),
+                itemId: setting.key
+            } };
+        }));
+
         items.splice(1, 0, { settingCategoryCollectionRenderer: {
             title: runs(sectionTitle()),
             categoryId: CATEGORY_ID,
             focused: false,
-            items: settings.map(function (setting) {
-                return { settingBooleanRenderer: {
-                    thumbnail: settingThumbnail(setting),
-                    title: runs(setting.titleKey ? t(setting.titleKey) : setting.title),
-                    summary: runs(setting.summaryKey ? t(setting.summaryKey) : (setting.summary || "")),
-                    enableServiceEndpoint: settingCommand(setting, true),
-                    disableServiceEndpoint: settingCommand(setting, false),
-                    itemId: setting.key
-                } };
-            })
+            items: categoryItems
         } });
     }
 

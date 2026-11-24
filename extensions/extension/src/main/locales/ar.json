@@ -115,5 +115,22 @@
   "microg.status": "الحالة {status}",
   "microg.done.title": "تم تثبيت MicroG-RE",
   "microg.done.message": "جاهز. أعد تشغيل التطبيق لبدء استخدامه.",
-  "microg.restart": "إعادة تشغيل التطبيق"
+  "microg.restart": "إعادة تشغيل التطبيق",
+  "hub.title": "إعدادات BirdyTV",
+  "hub.open": "فتح إعدادات BirdyTV",
+  "hub.open.summary": "تخصيص SponsorBlock وألوان شريط التقدم وحظر الإعلانات وأزرار المشغل والمزيد",
+  "hub.tab.sponsorblock": "SponsorBlock",
+  "hub.tab.seekbar": "ألوان شريط التقدم",
+  "hub.tab.ads": "حظر الإعلانات",
+  "hub.tab.player": "أزرار المشغل",
+  "hub.tab.shorts": "مقاطع Shorts",
+  "hub.tab.ryd": "عدم الإعجاب (RYD)",
+  "hub.tab.about": "حول",
+  "hub.nav.hint": "[▲/▼/◄/►] تنقل  •  [OK] اختيار  •  [رجوع] إغلاق",
+  "hub.action.skip": "تخطي تلقائي",
+  "hub.action.prompt": "تنبيه مع زر OK",
+  "hub.action.off": "إيقاف",
+  "hub.enabled": "مفعّل",
+  "hub.disabled": "معطّل",
+  "hub.restart_app": "إعادة تشغيل YouTube لتطبيق التغييرات"
 }
