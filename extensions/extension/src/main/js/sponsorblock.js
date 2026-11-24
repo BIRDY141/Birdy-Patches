@@ -180,13 +180,30 @@
     } catch (e) {}
 
     function createSkipIcon() {
-        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("viewBox", "0 0 24 24");
-        svg.setAttribute("class", "birdy-skip-icon");
-        var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", "M5 4v16l12-8zm13 0v16h2V4z");
-        svg.appendChild(path);
-        return svg;
+        if (!document) return null;
+        if (typeof document.createElementNS === "function") {
+            try {
+                var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                if (svg && svg.setAttribute) {
+                    svg.setAttribute("viewBox", "0 0 24 24");
+                    svg.setAttribute("class", "birdy-skip-icon");
+                }
+                var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                if (path && path.setAttribute) {
+                    path.setAttribute("d", "M5 4v16l12-8zm13 0v16h2V4z");
+                }
+                if (svg && svg.appendChild && path) svg.appendChild(path);
+                return svg;
+            } catch (e) {}
+        }
+        if (typeof document.createElement === "function") {
+            try {
+                var span = document.createElement("span");
+                span.className = "birdy-skip-icon";
+                return span;
+            } catch (e) {}
+        }
+        return null;
     }
 
     // Feedback notice: identical sleek dark pill design
@@ -210,7 +227,8 @@
         labelSpan.textContent = youtv.t(label);
         notice.appendChild(labelSpan);
 
-        notice.appendChild(createSkipIcon());
+        var icon = createSkipIcon();
+        if (icon && notice.appendChild) notice.appendChild(icon);
 
         notice.className = "birdy-skip-notice farotv-skip-notice show";
         clearTimeout(noticeTimer);
@@ -268,7 +286,8 @@
         textSpan.textContent = actionText;
         prompt.appendChild(textSpan);
 
-        prompt.appendChild(createSkipIcon());
+        var icon = createSkipIcon();
+        if (icon && prompt.appendChild) prompt.appendChild(icon);
     }
 
     function showPrompt(s) {

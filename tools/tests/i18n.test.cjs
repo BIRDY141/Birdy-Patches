@@ -36,7 +36,7 @@ function page(language = 'es-PE', browser = 'en-US', diagnostics = false, source
             constructor(callback) { this.callback = callback; observers.push(this); }
             observe(options) { this.types = options.entryTypes; }
         },
-        document: { documentElement: { lang: language }, title: 'YouTube', adoptedStyleSheets: [], querySelector: () => null, querySelectorAll: () => [] },
+        document: { documentElement: { lang: language }, title: 'YouTube', adoptedStyleSheets: [], querySelector: () => null, querySelectorAll: () => [], createElementNS: () => ({ children: [], appendChild(node) { this.children.push(node); }, setAttribute: () => {} }) },
         navigator: { language: browser }, location: { hostname: 'www.youtube.com', href: 'https://www.youtube.com/tv', hash: '' },
         setTimeout: (fn, ms) => { const id = nextTimer++; timers.set(id, { fn, ms }); return id; },
         clearTimeout: id => timers.delete(id), setInterval: (fn, ms) => { intervals.push({ fn, ms }); return 0; },
@@ -255,7 +255,8 @@ test('SponsorBlock keeps skipping behavior and translates the visible notice', (
         const video = { paused: false, duration: 300, currentTime: 22 };
         const body = { children: [], appendChild(node) { this.children.push(node); node.parentNode = this; } };
         p.document.body = body;
-        p.document.createElement = () => ({ children: [], appendChild(node) { this.children.push(node); } });
+        p.document.createElement = () => ({ children: [], appendChild(node) { this.children.push(node); }, setAttribute: () => {} });
+        p.document.createElementNS = () => ({ children: [], appendChild(node) { this.children.push(node); }, setAttribute: () => {} });
         p.document.createTextNode = text => ({ textContent: text });
         p.document.querySelector = () => video;
         p.location.hash = '#/watch?v=edkymo3w4Ms';
