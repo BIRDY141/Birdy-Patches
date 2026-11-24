@@ -9,9 +9,9 @@ echo.
 
 rem 1. Setup PATH for tools (Git, ADB, Java)
 if exist "%~dp0tools\git\cmd\git.exe" (
-    set "PATH=%~dp0tools\git\cmd;%PATH%"
+    set "PATH=%~dp0tools\git\cmd;!PATH!"
 ) else if exist "%~dp0..\git\cmd\git.exe" (
-    set "PATH=%~dp0..\git\cmd;%PATH%"
+    set "PATH=%~dp0..\git\cmd;!PATH!"
 )
 
 if exist "%~dp0tools\platform-tools\adb.exe" (
@@ -23,13 +23,13 @@ if exist "%~dp0tools\platform-tools\adb.exe" (
 )
 
 set "JAVA_EXE="
-if defined JAVA_HOME if exist "%JAVA_HOME%\bin\java.exe" set "JAVA_EXE=%JAVA_HOME%\bin\java.exe"
-if not defined JAVA_EXE (
+if exist "%~dp0tools\jdk\bin\java.exe" (
+    set "JAVA_EXE=%~dp0tools\jdk\bin\java.exe"
+) else if defined JAVA_HOME if exist "%JAVA_HOME%\bin\java.exe" (
+    set "JAVA_EXE=%JAVA_HOME%\bin\java.exe"
+) else (
     where java >nul 2>&1
     if !errorlevel! equ 0 set "JAVA_EXE=java"
-)
-if not defined JAVA_EXE if exist "C:\Program Files\Android\Android Studio\jbr\bin\java.exe" (
-    set "JAVA_EXE=C:\Program Files\Android\Android Studio\jbr\bin\java.exe"
 )
 
 rem 2. TV IP Configuration
@@ -61,8 +61,9 @@ if exist "sync.bat" (
     call "sync.bat"
 )
 
-rem 4. Step 2: Locate or Download Morphe CLI & Base APK
+rem 4. Step 2: Locate or Download Morphe CLI, Patches Bundle & Base APK
 set "MORPHE_CLI=morphe-cli.jar"
+set "PATCHES_MPP=patches.mpp"
 set "BASE_APK=youtube-tv.apk"
 set "OUTPUT_APK=birdytv-patched.apk"
 
@@ -74,6 +75,18 @@ if not exist "%MORPHE_CLI%" (
     if not exist "%MORPHE_CLI%" (
         echo [ERROR] Could not download morphe-cli.jar.
         echo Please download it manually and place 'morphe-cli.jar' in this folder.
+        pause
+        exit /b 1
+    )
+)
+
+if not exist "%PATCHES_MPP%" (
+    echo.
+    echo [Notice] '%PATCHES_MPP%' not found.
+    echo Downloading latest patch bundle...
+    powershell -NoProfile -Command "$url = (Get-Content '%~dp0patches-bundle.json' | ConvertFrom-Json).download_url; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri $url -OutFile '%PATCHES_MPP%'"
+    if not exist "%PATCHES_MPP%" (
+        echo [ERROR] Could not download patches.mpp.
         pause
         exit /b 1
     )
@@ -97,13 +110,13 @@ echo.
 echo [2/4] Patching YouTube TV using Morphe CLI...
 if not defined JAVA_EXE (
     echo [ERROR] Java runtime not found!
-    echo Please install Java 17+ or add Java to your PATH.
+    echo Please install Java 21+ or keep portable Java in tools\jdk\.
     pause
     exit /b 1
 )
 
 echo Using Java: "!JAVA_EXE!"
-"!JAVA_EXE!" -jar "%MORPHE_CLI%" patch -p "patches-bundle.json" -a "%BASE_APK%" -o "%OUTPUT_APK%"
+"!JAVA_EXE!" -jar "%MORPHE_CLI%" patch --patches "%PATCHES_MPP%" -o "%OUTPUT_APK%" "%BASE_APK%"
 if %errorlevel% neq 0 (
     echo [ERROR] Morphe CLI patching failed!
     pause

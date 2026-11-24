@@ -139,6 +139,10 @@ local.properties
 # Local deployment tools and TV config
 tv_ip.txt
 morphe-cli.jar
+patches.mpp
+morphe-data/
 tools/git/
 tools/platform-tools/
+tools/jdk/
+
 
