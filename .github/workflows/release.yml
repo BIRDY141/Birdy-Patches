@@ -47,6 +47,9 @@ jobs:
       - name: Verify translations
         run: node --test tools/tests/i18n.test.cjs tools/tests/site-locales.test.cjs tools/tests/premium.test.cjs tools/tests/tree-filters.test.cjs
 
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       # Semantic release runs its own Gradle build command.
       # Only dev and main branch will generate a release as specified by .releaserc
       - name: Release
