@@ -9,6 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: read
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_ACTOR: ${{ github.actor }}
 
     steps:
       - name: Checkout repository
@@ -26,7 +31,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run generateSigningKey
-        run: ./gradlew generateSigningKey
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: ./gradlew generateSigningKey --stacktrace
 
       - name: Commit and push public key
         run: |
