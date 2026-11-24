@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.1.0...v1.1.1) (2026-11-24)
+
+### 🐛 Bug Fixes
+
+* **ci:** grant packages read and supply GITHUB_TOKEN credentials for Morphe plugin resolution ([0278779](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/0278779e9d67eb3dfbd4ce7dd287578116f1d69c))
+
 ## [1.1.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.0.1...v1.1.0) (2026-11-24)
 
 ### ✨ New Features
