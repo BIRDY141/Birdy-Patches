@@ -1,22 +1,33 @@
 // SponsorBlock: skips sponsored parts, self-promotion, "subscribe" reminders and other segments
 // marked by the SponsorBlock community (https://sponsor.ajay.app, data under CC BY-NC-SA 4.0).
 // Supports three modes per category: automatically skip, prompt to skip (with OK on TV remote), or off.
-// The video ID comes from the page address (#/watch?v=ID); the segments are fetched through the
-// app (youtv.request) and the <video> element is moved past each segment.
+// Also supports custom seekbar segment colors for each category.
 (function () {
     if (!window.youtv || !youtv.request) return;
 
     var CATEGORIES = [
-        { key: "sponsor", titleKey: "sponsor.sponsor.title", promptTitleKey: "sponsor.sponsor.prompt.title", labelKey: "sponsor.sponsor.label", default: true },
-        { key: "selfpromo", titleKey: "sponsor.selfpromo.title", promptTitleKey: "sponsor.selfpromo.prompt.title", labelKey: "sponsor.selfpromo.label", default: true },
-        { key: "interaction", titleKey: "sponsor.interaction.title", promptTitleKey: "sponsor.interaction.prompt.title", labelKey: "sponsor.interaction.label", default: true },
-        { key: "intro", titleKey: "sponsor.intro.title", promptTitleKey: "sponsor.intro.prompt.title", labelKey: "sponsor.intro.label", default: false },
-        { key: "outro", titleKey: "sponsor.outro.title", promptTitleKey: "sponsor.outro.prompt.title", labelKey: "sponsor.outro.label", default: false },
-        { key: "preview", titleKey: "sponsor.preview.title", promptTitleKey: "sponsor.preview.prompt.title", labelKey: "sponsor.preview.label", default: false },
-        { key: "music_offtopic", titleKey: "sponsor.music_offtopic.title", promptTitleKey: "sponsor.music_offtopic.prompt.title", labelKey: "sponsor.music_offtopic.label", default: false },
-        { key: "filler", titleKey: "sponsor.filler.title", promptTitleKey: "sponsor.filler.prompt.title", labelKey: "sponsor.filler.label", default: false }
+        { key: "sponsor", titleKey: "sponsor.sponsor.title", promptTitleKey: "sponsor.sponsor.prompt.title", labelKey: "sponsor.sponsor.label", actionKey: "sponsor.sponsor.action", default: true },
+        { key: "selfpromo", titleKey: "sponsor.selfpromo.title", promptTitleKey: "sponsor.selfpromo.prompt.title", labelKey: "sponsor.selfpromo.label", actionKey: "sponsor.selfpromo.action", default: true },
+        { key: "interaction", titleKey: "sponsor.interaction.title", promptTitleKey: "sponsor.interaction.prompt.title", labelKey: "sponsor.interaction.label", actionKey: "sponsor.interaction.action", default: true },
+        { key: "intro", titleKey: "sponsor.intro.title", promptTitleKey: "sponsor.intro.prompt.title", labelKey: "sponsor.intro.label", actionKey: "sponsor.intro.action", default: false },
+        { key: "outro", titleKey: "sponsor.outro.title", promptTitleKey: "sponsor.outro.prompt.title", labelKey: "sponsor.outro.label", actionKey: "sponsor.outro.action", default: false },
+        { key: "preview", titleKey: "sponsor.preview.title", promptTitleKey: "sponsor.preview.prompt.title", labelKey: "sponsor.preview.label", actionKey: "sponsor.preview.action", default: false },
+        { key: "music_offtopic", titleKey: "sponsor.music_offtopic.title", promptTitleKey: "sponsor.music_offtopic.prompt.title", labelKey: "sponsor.music_offtopic.label", actionKey: "sponsor.music_offtopic.action", default: false },
+        { key: "filler", titleKey: "sponsor.filler.title", promptTitleKey: "sponsor.filler.prompt.title", labelKey: "sponsor.filler.label", actionKey: "sponsor.filler.action", default: false }
     ];
 
+    var CATEGORY_COLORS = {
+        sponsor: "#00D400",       // Green
+        selfpromo: "#FFD600",     // Yellow
+        interaction: "#CC00FF",   // Magenta
+        intro: "#00E5FF",         // Cyan
+        outro: "#304FFE",         // Blue
+        preview: "#00B0FF",       // Light Blue
+        music_offtopic: "#FF6D00",// Orange
+        filler: "#9C27B0"         // Purple
+    };
+
+    // 1. Feature: SponsorBlock skipping (3 options per category: Auto, Manual/Prompt, Off)
     var featureSettings = [
         { key: "prompt_all", titleKey: "sponsor.prompt_all.title", summaryKey: "sponsor.prompt_all.summary", default: false }
     ];
@@ -34,27 +45,49 @@
     });
     if (!feature) return;
 
+    // 2. Feature: SponsorBlock seekbar colors (Dedicated setting entry with per-category toggles)
+    var seekbarSettings = [];
+    CATEGORIES.forEach(function (c) {
+        seekbarSettings.push({
+            key: c.key + "_seekbar",
+            titleKey: "sponsor." + c.key + ".seekbar.title",
+            summaryKey: "sponsor." + c.key + ".seekbar.summary",
+            default: true
+        });
+    });
+
+    var seekbarFeature = youtv.feature({
+        id: "sponsorblock-colors",
+        nameKey: "feature.sponsorblock_colors.name",
+        summaryKey: "feature.sponsorblock_colors.summary",
+        defaultEnabled: true,
+        settings: seekbarSettings
+    });
+
     var videoId = null;
-    var segments = [];      // { start, end, category, label, skipped, prompted }
+    var segments = [];      // { start, end, category, label, actionKey, skipped, prompted }
 
     function currentVideoId() {
         var match = /[?&]v=([A-Za-z0-9_-]{11})/.exec(location.hash || "");
         return match ? match[1] : null;
     }
 
+    // 3 options per category: "skip" (automatic), "prompt" (manual overlay), "off" (disabled)
     function getCategoryMode(key) {
         if (!feature.enabled()) return "off";
-        var isEnabled = feature.settings.get(key);
-        var isPrompt = feature.settings.get(key + "_prompt");
+        var isManual = feature.settings.get(key + "_prompt");
+        var isAuto = feature.settings.get(key);
         var globalPrompt = feature.settings.get("prompt_all");
-        if (isPrompt || (isEnabled && globalPrompt)) return "prompt";
-        if (isEnabled) return "skip";
+        if (isManual || (isAuto && globalPrompt)) return "prompt";
+        if (isAuto) return "skip";
         return "off";
     }
 
     function enabledCategories() {
         return CATEGORIES.filter(function (c) {
-            return getCategoryMode(c.key) !== "off";
+            var skipMode = getCategoryMode(c.key);
+            var seekbarOn = seekbarFeature && seekbarFeature.enabled() && seekbarFeature.settings.get(c.key + "_seekbar");
+            return skipMode !== "off" || seekbarOn;
         });
     }
 
@@ -96,7 +129,11 @@
             try { list = youtv.rawParse(body); } catch (e) { return; }
             if (!Array.isArray(list)) return;
             var labels = {};
-            CATEGORIES.forEach(function (c) { labels[c.key] = c.labelKey; });
+            var actions = {};
+            CATEGORIES.forEach(function (c) {
+                labels[c.key] = c.labelKey;
+                actions[c.key] = c.actionKey;
+            });
             segments = list.filter(function (s) {
                 return s && Array.isArray(s.segment) && (s.actionType || "skip") === "skip" && s.segment[1] > s.segment[0];
             }).map(function (s) {
@@ -105,38 +142,54 @@
                     end: s.segment[1],
                     category: s.category,
                     label: labels[s.category] || s.category,
+                    actionKey: actions[s.category] || "sponsor.prompt.action",
                     skipped: false,
                     prompted: false
                 };
             });
             youtv.report("sponsorblock: " + segments.length + " segment(s) for " + id);
+            updateSeekbarMarkers();
         });
     }
 
-    // ---- notices and prompts ------------------------------------------------------------------
+    // ---- notices, prompts and seekbar styles --------------------------------------------------
     var sheet = new CSSStyleSheet();
     try {
         sheet.replaceSync(
-            ".birdy-skip-notice, .farotv-skip-notice { position: fixed; left: 4.5rem; bottom: 4rem; z-index: 2147483647;" +
-            " padding: 0.9rem 1.6rem; border-radius: 1.5rem; background: rgba(18, 7, 10, 0.95);" +
-            " color: #f1f1f1; font: 500 1.4rem Roboto, Arial, sans-serif; opacity: 0;" +
-            " transition: opacity 250ms; pointer-events: none; border: 1.5px solid rgba(255, 32, 40, 0.4); }" +
-            ".birdy-skip-notice.show, .farotv-skip-notice.show { opacity: 1; }" +
-            ".birdy-skip-notice b, .farotv-skip-notice b { color: #FF3741; font-weight: 600; }" +
-            ".birdy-skip-prompt, .farotv-skip-prompt { position: fixed; right: 4.5rem; bottom: 4rem; z-index: 2147483647;" +
-            " display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1.6rem; border-radius: 1.5rem;" +
-            " background: rgba(20, 8, 11, 0.96); border: 2px solid #FF2028; box-shadow: 0 4px 20px rgba(0,0,0,0.8);" +
-            " color: #f1f1f1; font: 500 1.4rem Roboto, Arial, sans-serif; opacity: 0; transform: translateY(1rem);" +
-            " transition: opacity 250ms, transform 250ms; pointer-events: none; }" +
-            ".birdy-skip-prompt.show, .farotv-skip-prompt.show { opacity: 1; transform: translateY(0); }" +
+            ".birdy-skip-notice, .farotv-skip-notice," +
+            ".birdy-skip-prompt, .farotv-skip-prompt {" +
+            " position: fixed; right: 4.5rem; bottom: 5.5rem; z-index: 2147483647;" +
+            " display: inline-flex; align-items: center; justify-content: center;" +
+            " padding: 0.7rem 1.6rem; border-radius: 9999px;" +
+            " background: rgba(18, 18, 18, 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);" +
+            " border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);" +
+            " color: #ffffff; font: 500 1.4rem Roboto, 'YouTube Sans', Arial, sans-serif;" +
+            " opacity: 0; transform: translateY(0.8rem); transition: opacity 250ms ease, transform 250ms ease;" +
+            " pointer-events: none; cursor: pointer; }" +
+            ".birdy-skip-notice.show, .farotv-skip-notice.show," +
+            ".birdy-skip-prompt.show, .farotv-skip-prompt.show { opacity: 1; transform: translateY(0); pointer-events: auto; }" +
+            "[dir='rtl'] .birdy-skip-notice, [dir='rtl'] .farotv-skip-notice," +
             "[dir='rtl'] .birdy-skip-prompt, [dir='rtl'] .farotv-skip-prompt { right: auto; left: 4.5rem; }" +
-            ".birdy-skip-prompt b, .farotv-skip-prompt b { color: #FF3741; font-weight: 600; }" +
-            ".birdy-skip-prompt .farotv-key-badge, .birdy-skip-prompt .birdy-key-badge { background: #FF2028; color: #FFFFFF; font-weight: 700;" +
-            " font-size: 1.2rem; padding: 0.2rem 0.7rem; border-radius: 0.5rem; margin-right: 0.3rem; }" +
-            ".birdy-skip-prompt .farotv-countdown, .birdy-skip-prompt .birdy-countdown { color: #aaaaaa; font-size: 1.2rem; margin-left: 0.3rem; }");
+            ".birdy-skip-notice b, .farotv-skip-notice b { color: #ffffff; font-weight: 500; margin-left: 0.3rem; }" +
+            ".birdy-skip-icon { width: 1.4rem; height: 1.4rem; fill: #ffffff; margin-left: 0.6rem; vertical-align: middle; flex-shrink: 0; }" +
+            "[dir='rtl'] .birdy-skip-icon { margin-left: 0; margin-right: 0.6rem; transform: scaleX(-1); }" +
+            ".birdy-sb-track-markers { position: absolute; left: 0; top: 0; width: 100%; height: 100%;" +
+            " pointer-events: none; z-index: 6; overflow: hidden; border-radius: inherit; }" +
+            ".birdy-sb-marker { position: absolute; top: 0; height: 100%; border-radius: 1px; opacity: 0.95; pointer-events: none; }");
         document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
     } catch (e) {}
 
+    function createSkipIcon() {
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("class", "birdy-skip-icon");
+        var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", "M5 4v16l12-8zm13 0v16h2V4z");
+        svg.appendChild(path);
+        return svg;
+    }
+
+    // Feedback notice: identical sleek dark pill design
     var notice = null;
     var noticeTimer = null;
     function showNotice(label) {
@@ -148,20 +201,28 @@
         if (!notice.parentNode) document.body.appendChild(notice);
         notice.dir = window.farotvI18n.direction();
         notice.textContent = "";
-        notice.appendChild(document.createTextNode(youtv.t("sponsor.skipped")));
-        var b = document.createElement("b");
-        b.textContent = youtv.t(label);
-        notice.appendChild(b);
+
+        var prefixSpan = document.createElement("span");
+        prefixSpan.textContent = youtv.t("sponsor.skipped");
+        notice.appendChild(prefixSpan);
+
+        var labelSpan = document.createElement("b");
+        labelSpan.textContent = youtv.t(label);
+        notice.appendChild(labelSpan);
+
+        notice.appendChild(createSkipIcon());
+
         notice.className = "birdy-skip-notice farotv-skip-notice show";
         clearTimeout(noticeTimer);
-        noticeTimer = setTimeout(function () { notice.className = "birdy-skip-notice farotv-skip-notice"; }, 2500);
+        noticeTimer = setTimeout(function () {
+            notice.className = "birdy-skip-notice farotv-skip-notice";
+        }, 2500);
     }
 
+    // Manual Skip Prompt: sleek dark pill with "Skip sponsor |>" matching Picture 1 & 2
     var prompt = null;
     var promptTimer = null;
-    var promptInterval = null;
     var activePromptSegment = null;
-    var remainingSeconds = 0;
 
     function isPromptShowing() {
         return prompt && prompt.className.indexOf("show") !== -1;
@@ -171,7 +232,6 @@
         if (!prompt) return;
         prompt.className = "birdy-skip-prompt farotv-skip-prompt";
         activePromptSegment = null;
-        clearInterval(promptInterval);
         clearTimeout(promptTimer);
         window.removeEventListener("keydown", onPromptKeyDown, true);
     }
@@ -199,21 +259,16 @@
         if (!prompt || !activePromptSegment) return;
         prompt.textContent = "";
 
-        var badge = document.createElement("span");
-        badge.className = "birdy-key-badge farotv-key-badge";
-        badge.textContent = "OK";
-        prompt.appendChild(badge);
+        var actionText = youtv.t(activePromptSegment.actionKey);
+        if (!actionText || actionText === activePromptSegment.actionKey) {
+            actionText = youtv.t("sponsor.prompt.action") + youtv.t(activePromptSegment.label);
+        }
 
-        prompt.appendChild(document.createTextNode(youtv.t("sponsor.prompt.action")));
+        var textSpan = document.createElement("span");
+        textSpan.textContent = actionText;
+        prompt.appendChild(textSpan);
 
-        var b = document.createElement("b");
-        b.textContent = youtv.t(activePromptSegment.label);
-        prompt.appendChild(b);
-
-        var countdownSpan = document.createElement("span");
-        countdownSpan.className = "birdy-countdown farotv-countdown";
-        countdownSpan.textContent = " (" + remainingSeconds + "s)";
-        prompt.appendChild(countdownSpan);
+        prompt.appendChild(createSkipIcon());
     }
 
     function showPrompt(s) {
@@ -221,6 +276,17 @@
         if (!prompt) {
             prompt = document.createElement("div");
             prompt.className = "birdy-skip-prompt farotv-skip-prompt";
+            prompt.onclick = function () {
+                if (!activePromptSegment) return;
+                var target = activePromptSegment;
+                hidePrompt();
+                var video = document.querySelector("video");
+                if (video && isFinite(video.duration)) {
+                    target.skipped = true;
+                    video.currentTime = Math.min(target.end, video.duration - 0.1);
+                    showNotice(target.label);
+                }
+            };
         }
         if (!prompt.parentNode) document.body.appendChild(prompt);
 
@@ -228,9 +294,8 @@
         prompt.dir = window.farotvI18n.direction();
 
         var video = document.querySelector("video");
-        var timeLeftInSegment = video ? Math.floor(s.end - video.currentTime) : 5;
-        remainingSeconds = Math.max(2, Math.min(6, timeLeftInSegment));
-        if (remainingSeconds <= 0) remainingSeconds = 5;
+        var timeLeft = video ? Math.floor(s.end - video.currentTime) : 6;
+        var displaySeconds = Math.max(3, Math.min(8, timeLeft));
 
         updatePromptView();
         prompt.className = "birdy-skip-prompt farotv-skip-prompt show";
@@ -238,33 +303,91 @@
         window.removeEventListener("keydown", onPromptKeyDown, true);
         window.addEventListener("keydown", onPromptKeyDown, true);
 
-        clearInterval(promptInterval);
         clearTimeout(promptTimer);
-
-        promptInterval = setInterval(function () {
-            remainingSeconds--;
-            if (remainingSeconds <= 0) {
-                hidePrompt();
-            } else {
-                updatePromptView();
-            }
-        }, 1000);
-
         promptTimer = setTimeout(function () {
             hidePrompt();
-        }, remainingSeconds * 1000);
+        }, displaySeconds * 1000);
     }
 
-    // ---- skipping -----------------------------------------------------------------------------
+    // ---- seekbar colored markers (Picture 3) --------------------------------------------------
+    function findProgressBar() {
+        return document.querySelector("ytlr-progress-bar [idomkey='progress-bar']") ||
+               document.querySelector("ytlr-progress-bar ytlr-multi-markers-player-bar-renderer") ||
+               document.querySelector("ytlr-progress-bar") ||
+               document.querySelector("[idomkey='progress-bar']") ||
+               document.querySelector(".ytlr-progress-bar") ||
+               document.querySelector(".ytp-progress-bar");
+    }
+
+    function clearSeekbarMarkers() {
+        var existing = document.querySelectorAll(".birdy-sb-track-markers");
+        for (var i = 0; i < existing.length; i++) {
+            existing[i].remove();
+        }
+    }
+
+    function updateSeekbarMarkers() {
+        if (!seekbarFeature || !seekbarFeature.enabled()) {
+            clearSeekbarMarkers();
+            return;
+        }
+        var bar = findProgressBar();
+        if (!bar) return;
+        var video = document.querySelector("video");
+        if (!video || !isFinite(video.duration) || video.duration <= 0 || !segments.length) {
+            clearSeekbarMarkers();
+            return;
+        }
+        var duration = video.duration;
+
+        var container = bar.querySelector(".birdy-sb-track-markers");
+        if (!container) {
+            container = document.createElement("div");
+            container.className = "birdy-sb-track-markers";
+            bar.appendChild(container);
+        }
+        try {
+            if (window.getComputedStyle(bar).position === "static") {
+                bar.style.position = "relative";
+            }
+        } catch (e) {}
+
+        container.textContent = "";
+        for (var i = 0; i < segments.length; i++) {
+            var s = segments[i];
+            var isCategorySeekbar = seekbarFeature.settings.get(s.category + "_seekbar");
+            if (isCategorySeekbar === false) continue;
+            var color = CATEGORY_COLORS[s.category];
+            if (!color) continue;
+
+            var startPct = Math.max(0, Math.min(100, (s.start / duration) * 100));
+            var endPct = Math.max(0, Math.min(100, (s.end / duration) * 100));
+            var widthPct = endPct - startPct;
+            if (widthPct <= 0.05) continue;
+
+            var marker = document.createElement("div");
+            marker.className = "birdy-sb-marker";
+            marker.style.left = startPct.toFixed(2) + "%";
+            marker.style.width = widthPct.toFixed(2) + "%";
+            marker.style.backgroundColor = color;
+            container.appendChild(marker);
+        }
+    }
+
+    // ---- main playback tick -------------------------------------------------------------------
     setInterval(function () {
-        var id = feature.enabled() ? currentVideoId() : null;
+        var id = (feature.enabled() || (seekbarFeature && seekbarFeature.enabled())) ? currentVideoId() : null;
         if (id !== videoId) {
             videoId = id;
             segments = [];
             hidePrompt();
+            clearSeekbarMarkers();
             if (id) load(id);
         }
-        if (!segments.length) return;
+
+        updateSeekbarMarkers();
+
+        if (!segments.length || !feature.enabled()) return;
         var video = document.querySelector("video");
         if (!video || video.paused || !isFinite(video.duration)) {
             if (isPromptShowing()) hidePrompt();
@@ -272,7 +395,7 @@
         }
         var t = video.currentTime;
 
-        // If a prompt is active and playback has moved outside the segment range, dismiss it
+        // Dismiss prompt if playback moves outside the active segment range
         if (activePromptSegment && (t < activePromptSegment.start || t >= activePromptSegment.end)) {
             hidePrompt();
         }
@@ -284,7 +407,6 @@
                 if (mode === "off") continue;
 
                 if (mode === "skip") {
-                    // Once per segment: if the user goes back into it, let it play.
                     if (s.skipped) continue;
                     s.skipped = true;
                     if (activePromptSegment === s) hidePrompt();

@@ -103,7 +103,7 @@
     }
     youtv.setIcons({
         ads: "ads", player: "player", "player.related": "related", "premium-promos": "premium",
-        shorts: "shorts", topics: "topics", sponsorblock: "sponsorblock", ryd: "ryd"
+        shorts: "shorts", topics: "topics", sponsorblock: "sponsorblock", "sponsorblock-colors": "sponsorblock", ryd: "ryd"
     });
     // For the preview page (branding/icons-preview.html).
     youtv.iconUrls = Object.keys(ICONS).map(url);
