@@ -131,6 +131,13 @@ echo [3/4] Connecting to TV at !TV_IP!:5555...
 echo.
 echo [4/4] Installing %OUTPUT_APK% on your TV...
 "!ADB_EXE!" -s !TV_IP!:5555 install -r "%OUTPUT_APK%"
+if %errorlevel% neq 0 (
+    echo [Notice] Update failed (signature mismatch with previously installed version).
+    echo Reinstalling fresh copy...
+    "!ADB_EXE!" -s !TV_IP!:5555 uninstall app.tvpatches.android.youtube.tv >nul 2>&1
+    "!ADB_EXE!" -s !TV_IP!:5555 install "%OUTPUT_APK%"
+)
+
 if %errorlevel% equ 0 (
     echo.
     echo ======================================================================
@@ -138,7 +145,7 @@ if %errorlevel% equ 0 (
     echo ======================================================================
     echo.
     echo Launching BirdyTV on TV screen...
-    "!ADB_EXE!" -s !TV_IP!:5555 shell monkey -p com.google.android.youtube.tv 1 >nul 2>&1
+    "!ADB_EXE!" -s !TV_IP!:5555 shell monkey -p app.tvpatches.android.youtube.tv 1 >nul 2>&1
 ) else (
     echo.
     echo [ERROR] ADB installation failed.
