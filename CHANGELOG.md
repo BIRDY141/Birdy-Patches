@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.0.1...v1.1.0) (2026-11-24)
+
+### ✨ New Features
+
+* **signing:** add automated key generation workflow and refine sync script ([174cbdd](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/174cbdd78d77e4525f3fffdc413a19942ad9f0a7))
+
 ## [1.0.1](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.0.0...v1.0.1) (2026-11-24)
 
 ### 🐛 Bug Fixes
