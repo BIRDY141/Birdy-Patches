@@ -1,8 +1,8 @@
 {
-  "created_at": "2026-11-21T11:32:27",
-  "description": "## [1.7.0] Birdy Patches for YouTube on Android TV\n\n### ✨ New Features\n\n* **sponsorblock:** 3-mode Skip / Prompt to Skip / Off support with TV remote OK key interaction and countdown pill\n* **branding:** Birdy TV red theme and logo\n* **settings:** BirdyTV settings section in YouTube TV settings",
-  "download_url": "https://github.com/birdy/birdy-patches/releases/download/v1.7.0/patches-1.7.0.mpp",
+  "created_at": "2026-11-24T00:08:35",
+  "description": "## 1.0.0 (2026-11-24)\n\n### ✨ New Features\n\n* Birdy Patches for Android TV with red branding and 3-mode SponsorBlock ([f4d0008](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/f4d0008c3915b5c53a5e9c66fa813973682fb99e))\n* initial release of Birdy Patches for Android TV with red branding and 3-mode SponsorBlock ([0425dc8](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/0425dc872f795bf2f8ac47d2907d4724d2d61caf))\n\n### 🐛 Bug Fixes\n\n* **ci:** grant executable permissions to gradlew wrapper ([8499b4a](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/8499b4abbcfee0f1f1bbd8d3f47863c57081e3be))\n* **locales:** strip UTF-8 BOM from docs locales and guard test parsers ([fd19ca0](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/fd19ca0edea130057ac89f1c51dd2c4c68300aa6))\n* **sync:** allow push even when working tree is already committed ([c73ccbb](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/c73ccbbd94a535c031222c1cdf5866a05941229a))\n* **tests:** provide fallback fixtures and fetch tags for regression baselines ([08c305d](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/08c305d709ce170bd7f4db1709641cce6ce2ff5b))\n* **tests:** resolve relative paths dynamically in verify_tests.ps1 ([87ae3ad](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/87ae3ad8e64358f0926bab4536a9c5cea472d5d4))",
+  "download_url": "https://github.com/SEIFELDEEN15/Birdy-Patches/releases/download/v1.0.0/patches-1.0.0.mpp",
   "signature_download_url": "",
-  "version": "1.7.0",
+  "version": "1.0.0",
   "public_key": "B+w9LCwCheqTn0XZycE7F2wZPc5CBoaYxCExWOrB0sg="
 }

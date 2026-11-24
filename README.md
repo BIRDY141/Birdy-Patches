@@ -41,7 +41,7 @@ This repository does **not** distribute YouTube APKs, neither original nor modif
 ## 🩹 Lista de parches
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.7.0](https://github.com/KyVexo/farotv-patches/releases/tag/v1.7.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;9 patches total
+> **[v1.0.0](https://github.com/SEIFELDEEN15/Birdy-Patches/releases/tag/v1.0.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;9 patches total
 <details open>
 <summary>📦 YouTube for Android TV&nbsp;&nbsp;•&nbsp;&nbsp;8 patches</summary>
 <br>
@@ -55,9 +55,9 @@ This repository does **not** distribute YouTube APKs, neither original nor modif
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Custom branding](#custom-branding) | Changes the app name, icon, TV banner and the logo inside the app to FaroTV's (or another name). | • App name |
+| [BirdyTV settings and scripts](#birdytv-settings-and-scripts) | Adds a "BirdyTV" section to YouTube's Settings with switches to hide Shorts, hide the topic tabs and block video ads. |  |
+| [Custom branding](#custom-branding) | Changes the app name, icon, TV banner and the logo inside the app to BirdyTV's (or another name). | • App name |
 | [Disable start on boot](#disable-start-on-boot) | Keeps the app (and MicroG-RE) from starting in the background when the TV is switched on. |  |
-| [FaroTV settings and scripts](#farotv-settings-and-scripts) | Adds a "FaroTV" section to YouTube's Settings with switches to hide Shorts, hide the topic tabs and block video ads. |  |
 | [Fix volume keys](#fix-volume-keys) | Lets Android handle short presses and held volume keys instead of sending them to the web input method. |  |
 | [GmsCore support](#gmscore-support) | Redirects the app's Google Play Services calls to GmsCore (MicroG-RE). Requires MicroG-RE to be installed. Without it, YouTube for Android TV crashes because Google Play Services rejects DroidGuard for the new package name. |  |
 | [Performance diagnostics](#performance-diagnostics) | Logs aggregate script timings, resource durations and supported long tasks for troubleshooting. Disabled by default; does not log video URLs or response contents. |  |

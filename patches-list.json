@@ -1,7 +1,43 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.7.0",
+  "version": "1.0.0",
   "patches": [
+    {
+      "name": "BirdyTV settings and scripts",
+      "description": "Adds a \"BirdyTV\" section to YouTube's Settings with switches to hide Shorts, hide the topic tabs and block video ads.",
+      "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.google.android.youtube.tv",
+          "name": "YouTube for Android TV",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#FF0033",
+          "signatures": [
+            "21199d112cece428c82cb0df221da24ff8674c7a982a83a17a970eec43305b4a"
+          ],
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "7.32.300",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 24,
+              "description": null
+            },
+            {
+              "version": "8.02.300",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 24,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
     {
       "name": "Clone app",
       "description": "Changes the app package name to allow installing the same app multiple times. By default \".morphe\" is appended to the package name. Each cloned install must use a unique package name. Cloning does not work with all apps and using this patch may cause app crashes or other unexpected behavior.",
@@ -91,42 +127,6 @@
     {
       "name": "Disable start on boot",
       "description": "Keeps the app (and MicroG-RE) from starting in the background when the TV is switched on.",
-      "default": true,
-      "category": null,
-      "compatiblePackages": [
-        {
-          "packageName": "com.google.android.youtube.tv",
-          "name": "YouTube for Android TV",
-          "description": null,
-          "apkFileType": "APK",
-          "appIconColor": "#FF0033",
-          "signatures": [
-            "21199d112cece428c82cb0df221da24ff8674c7a982a83a17a970eec43305b4a"
-          ],
-          "formFactor": "MOBILE",
-          "targets": [
-            {
-              "version": "7.32.300",
-              "versionCodes": null,
-              "isExperimental": false,
-              "minSdk": 24,
-              "description": null
-            },
-            {
-              "version": "8.02.300",
-              "versionCodes": null,
-              "isExperimental": false,
-              "minSdk": 24,
-              "description": null
-            }
-          ]
-        }
-      ],
-      "options": []
-    },
-    {
-      "name": "BirdyTV settings and scripts",
-      "description": "Adds a \"BirdyTV\" section to YouTube's Settings with switches to hide Shorts, hide the topic tabs and block video ads.",
       "default": true,
       "category": null,
       "compatiblePackages": [
