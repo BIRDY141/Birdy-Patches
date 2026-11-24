@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.0.0...v1.0.1) (2026-11-24)
+
+### 🐛 Bug Fixes
+
+* **release:** remove backmerge plugin for single-branch main repository ([b54e127](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/b54e1272642fb700220a9265d1f5b5cff8c9ee6a))
+
 ## 1.0.0 (2026-11-24)
 
 ### ✨ New Features
