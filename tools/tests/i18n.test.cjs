@@ -36,7 +36,7 @@ function page(language = 'es-PE', browser = 'en-US', diagnostics = false, source
             constructor(callback) { this.callback = callback; observers.push(this); }
             observe(options) { this.types = options.entryTypes; }
         },
-        document: { documentElement: { lang: language }, title: 'YouTube', adoptedStyleSheets: [], querySelector: () => null },
+        document: { documentElement: { lang: language }, title: 'YouTube', adoptedStyleSheets: [], querySelector: () => null, querySelectorAll: () => [] },
         navigator: { language: browser }, location: { hostname: 'www.youtube.com', href: 'https://www.youtube.com/tv', hash: '' },
         setTimeout: (fn, ms) => { const id = nextTimer++; timers.set(id, { fn, ms }); return id; },
         clearTimeout: id => timers.delete(id), setInterval: (fn, ms) => { intervals.push({ fn, ms }); return 0; },

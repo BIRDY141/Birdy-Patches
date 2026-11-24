@@ -311,19 +311,29 @@
 
     // ---- seekbar colored markers (Picture 3) --------------------------------------------------
     function findProgressBar() {
-        return document.querySelector("ytlr-progress-bar [idomkey='progress-bar']") ||
-               document.querySelector("ytlr-progress-bar ytlr-multi-markers-player-bar-renderer") ||
-               document.querySelector("ytlr-progress-bar") ||
-               document.querySelector("[idomkey='progress-bar']") ||
-               document.querySelector(".ytlr-progress-bar") ||
-               document.querySelector(".ytp-progress-bar");
+        if (!document || typeof document.querySelector !== "function") return null;
+        var el = document.querySelector("ytlr-progress-bar [idomkey='progress-bar']") ||
+                 document.querySelector("ytlr-progress-bar ytlr-multi-markers-player-bar-renderer") ||
+                 document.querySelector("ytlr-progress-bar") ||
+                 document.querySelector("[idomkey='progress-bar']") ||
+                 document.querySelector(".ytlr-progress-bar") ||
+                 document.querySelector(".ytp-progress-bar");
+        if (!el || el.tagName === "VIDEO" || typeof el.querySelector !== "function") return null;
+        return el;
     }
 
     function clearSeekbarMarkers() {
-        var existing = document.querySelectorAll(".birdy-sb-track-markers");
-        for (var i = 0; i < existing.length; i++) {
-            existing[i].remove();
-        }
+        if (!document || typeof document.querySelectorAll !== "function") return;
+        try {
+            var existing = document.querySelectorAll(".birdy-sb-track-markers");
+            for (var i = 0; i < existing.length; i++) {
+                if (typeof existing[i].remove === "function") {
+                    existing[i].remove();
+                } else if (existing[i].parentNode) {
+                    existing[i].parentNode.removeChild(existing[i]);
+                }
+            }
+        } catch (e) {}
     }
 
     function updateSeekbarMarkers() {
@@ -333,22 +343,25 @@
         }
         var bar = findProgressBar();
         if (!bar) return;
-        var video = document.querySelector("video");
+        var video = document.querySelector ? document.querySelector("video") : null;
         if (!video || !isFinite(video.duration) || video.duration <= 0 || !segments.length) {
             clearSeekbarMarkers();
             return;
         }
         var duration = video.duration;
 
-        var container = bar.querySelector(".birdy-sb-track-markers");
-        if (!container) {
+        var container = typeof bar.querySelector === "function" ? bar.querySelector(".birdy-sb-track-markers") : null;
+        if (!container && typeof document.createElement === "function") {
             container = document.createElement("div");
             container.className = "birdy-sb-track-markers";
-            bar.appendChild(container);
+            if (bar.appendChild) bar.appendChild(container);
         }
+        if (!container) return;
         try {
-            if (window.getComputedStyle(bar).position === "static") {
-                bar.style.position = "relative";
+            if (window.getComputedStyle && bar.style) {
+                if (window.getComputedStyle(bar).position === "static") {
+                    bar.style.position = "relative";
+                }
             }
         } catch (e) {}
 
