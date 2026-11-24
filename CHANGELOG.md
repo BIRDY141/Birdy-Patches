@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.3.0...v1.3.1) (2026-11-24)
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** align seekbar markers strictly with player track line and fix sync script ([8dcb8a5](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/8dcb8a5023cbf2faf10d5bd2705ae4aaee4e8259))
+
 ## [1.3.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.2.0...v1.3.0) (2026-11-24)
 
 ### ✨ New Features
