@@ -7,7 +7,7 @@ echo          BirdyTV: Automated Morphe Patch ^& ADB TV Deployment
 echo ======================================================================
 echo.
 
-rem 1. Setup PATH for tools (Git & ADB)
+rem 1. Setup PATH for tools (Git, ADB, Java)
 if exist "%~dp0tools\git\cmd\git.exe" (
     set "PATH=%~dp0tools\git\cmd;%PATH%"
 ) else if exist "%~dp0..\git\cmd\git.exe" (
@@ -22,16 +22,26 @@ if exist "%~dp0tools\platform-tools\adb.exe" (
     set "ADB_EXE=adb"
 )
 
+set "JAVA_EXE="
+if defined JAVA_HOME if exist "%JAVA_HOME%\bin\java.exe" set "JAVA_EXE=%JAVA_HOME%\bin\java.exe"
+if not defined JAVA_EXE (
+    where java >nul 2>&1
+    if !errorlevel! equ 0 set "JAVA_EXE=java"
+)
+if not defined JAVA_EXE if exist "C:\Program Files\Android\Android Studio\jbr\bin\java.exe" (
+    set "JAVA_EXE=C:\Program Files\Android\Android Studio\jbr\bin\java.exe"
+)
+
 rem 2. TV IP Configuration
 set "TV_IP="
 if exist "tv_ip.txt" (
-    set /p TV_IP=<"tv_ip.txt"
+    set /p TV_IP=<tv_ip.txt
 )
 if "!TV_IP!"=="" (
     echo Enter your Android TV IP address [Settings - Network]:
     set /p "TV_IP=IP Address: "
     if not "!TV_IP!"=="" (
-        echo !TV_IP!>"tv_ip.txt"
+        echo !TV_IP!>tv_ip.txt
     )
 )
 
@@ -85,7 +95,15 @@ if not exist "%BASE_APK%" (
 rem 5. Step 3: Patch APK using Morphe CLI
 echo.
 echo [2/4] Patching YouTube TV using Morphe CLI...
-java -jar "%MORPHE_CLI%" patch -p "patches-bundle.json" -a "%BASE_APK%" -o "%OUTPUT_APK%"
+if not defined JAVA_EXE (
+    echo [ERROR] Java runtime not found!
+    echo Please install Java 17+ or add Java to your PATH.
+    pause
+    exit /b 1
+)
+
+echo Using Java: "!JAVA_EXE!"
+"!JAVA_EXE!" -jar "%MORPHE_CLI%" patch -p "patches-bundle.json" -a "%BASE_APK%" -o "%OUTPUT_APK%"
 if %errorlevel% neq 0 (
     echo [ERROR] Morphe CLI patching failed!
     pause
