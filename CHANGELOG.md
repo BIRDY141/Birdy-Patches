@@ -1,3 +1,15 @@
+## [1.2.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.1.2...v1.2.0) (2026-11-24)
+
+### ✨ New Features
+
+* **sponsorblock:** add 3-mode skipping, seekbar color highlights, and modern pill overlay ([69941e3](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/69941e38340034ed36f3798af6c33c347a0100be))
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** respect category defaults for seekbar color settings to maintain query cache parity ([03eba22](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/03eba22b8f442191122dec3ddd9ec8ceabd7a769))
+* **test:** add fallback for createElementNS in createSkipIcon and mock SVG support in test harness ([8df1393](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/8df139380efd6e9077afe84fa0fabe17ed5ef0e3))
+* **test:** guard seekbar DOM methods and mock querySelectorAll in test harness ([16960cf](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/16960cf2c56f2f393701ad28180cf0044828696f))
+
 ## [1.1.2](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.1.1...v1.1.2) (2026-11-24)
 
 ### 🐛 Bug Fixes
