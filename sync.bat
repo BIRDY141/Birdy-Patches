@@ -40,6 +40,10 @@ if "%msg%"=="" set "msg=feat: update patches"
 git add .
 git commit -m "%msg%" >nul 2>&1
 
+:: Pull latest changes from remote (e.g. semantic-release changelog commits)
+echo Pulling latest remote changes...
+git pull --rebase origin main
+
 echo.
 echo [3/3] Pushing changes to GitHub...
 :: Clean up stale upstream tags on remote so semantic-release can tag v1.0.0 cleanly
