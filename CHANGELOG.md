@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.2.0...v1.3.0) (2026-11-24)
+
+### ✨ New Features
+
+* **sponsorblock:** consolidate to 1 setting with 3 options on page and fix seekbar marker height ([099b625](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/099b625d24ee51b280cabf7c9d1129ac47ad1f56))
+
 ## [1.2.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.1.2...v1.2.0) (2026-11-24)
 
 ### ✨ New Features
