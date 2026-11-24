@@ -33,16 +33,19 @@ if %errorlevel% neq 0 (
 echo [2/3] Checking for modified files...
 git status -s
 
-:: 4. Commit and push
+:: 4. Pull remote changes first to prevent rebase conflicts with semantic-release bot
+echo Pulling latest remote changes...
+git pull origin main
+
+:: 5. Commit and push
 set /p "msg=Enter commit message (press Enter for default): "
 if "%msg%"=="" set "msg=feat: update patches"
 
 git add .
-git commit -m "%msg%" >nul 2>&1
-
-:: Pull latest changes from remote (e.g. semantic-release changelog commits)
-echo Pulling latest remote changes...
-git pull --rebase origin main
+git diff --quiet --cached
+if %errorlevel% neq 0 (
+    git commit -m "%msg%" >nul 2>&1
+)
 
 echo.
 echo [3/3] Pushing changes to GitHub...

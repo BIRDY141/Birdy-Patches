@@ -197,10 +197,10 @@
             ".birdy-skip-notice b, .farotv-skip-notice b { color: #ffffff; font-weight: 500; margin-left: 0.3rem; }" +
             ".birdy-skip-icon { width: 1.4rem; height: 1.4rem; fill: #ffffff; margin-left: 0.6rem; vertical-align: middle; flex-shrink: 0; }" +
             "[dir='rtl'] .birdy-skip-icon { margin-left: 0; margin-right: 0.6rem; transform: scaleX(-1); }" +
-            ".birdy-sb-track-markers { position: absolute; left: 0; width: 100%; top: 50%; transform: translateY(-50%); height: 5px;" +
-            " pointer-events: none; z-index: 5; overflow: hidden; border-radius: 2px; }" +
-            ".birdy-sb-marker { position: absolute; top: 0; height: 100%; border-radius: 1px; opacity: 0.95; pointer-events: none; }" +
-            "ytlr-progress-bar:focus .birdy-sb-track-markers, ytlr-progress-bar:focus-within .birdy-sb-track-markers, .ytp-progress-bar:hover .birdy-sb-track-markers { height: 8px; }" +
+            ".birdy-sb-track-markers { position: absolute; left: 0; right: 0; top: 50%; -webkit-transform: translateY(-50%); transform: translateY(-50%); height: 4px; max-height: 8px;" +
+            " pointer-events: none; z-index: 3; overflow: hidden; border-radius: 2px; }" +
+            ".birdy-sb-marker { position: absolute; top: 0; bottom: 0; height: 100%; border-radius: 1px; opacity: 0.95; pointer-events: none; }" +
+            "ytlr-progress-bar:focus .birdy-sb-track-markers, ytlr-progress-bar:focus-within .birdy-sb-track-markers, ytlr-multi-markers-player-bar-renderer:focus .birdy-sb-track-markers, .ytp-progress-bar:hover .birdy-sb-track-markers { height: 8px; }" +
             ".birdy-setting-prompt-button { outline: none; cursor: pointer; }");
         document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
     } catch (e) {}
@@ -357,14 +357,35 @@
     // ---- seekbar colored markers (Picture 3) --------------------------------------------------
     function findProgressBar() {
         if (!document || typeof document.querySelector !== "function") return null;
-        var el = document.querySelector("ytlr-progress-bar [idomkey='progress-bar']") ||
-                 document.querySelector("ytlr-progress-bar ytlr-multi-markers-player-bar-renderer") ||
-                 document.querySelector("ytlr-progress-bar") ||
-                 document.querySelector("[idomkey='progress-bar']") ||
-                 document.querySelector(".ytlr-progress-bar") ||
-                 document.querySelector(".ytp-progress-bar");
-        if (!el || el.tagName === "VIDEO" || typeof el.querySelector !== "function") return null;
-        return el;
+        // 1. Direct multi-markers player bar element or inner slider
+        var inner = document.querySelector("ytlr-multi-markers-player-bar-renderer") ||
+                    document.querySelector("[idomkey='multi-markers-player-bar']") ||
+                    document.querySelector("[idomkey='player-bar']") ||
+                    document.querySelector(".ytlr-multi-markers-player-bar-renderer-bar") ||
+                    document.querySelector(".progress-bar-line") ||
+                    document.querySelector(".ytp-progress-bar-container") ||
+                    document.querySelector(".ytp-progress-bar");
+        if (inner && inner.tagName !== "VIDEO" && typeof inner.querySelector === "function") return inner;
+
+        // 2. Look inside ytlr-progress-bar for the middle child (between current time and duration labels)
+        var pb = document.querySelector("ytlr-progress-bar, .ytlr-progress-bar");
+        if (pb && pb.children && pb.children.length >= 2) {
+            for (var i = 0; i < pb.children.length; i++) {
+                var child = pb.children[i];
+                if (child.className && String(child.className).indexOf("birdy-sb") !== -1) continue;
+                var text = (child.textContent || "").trim();
+                // If it doesn't contain time separator ":", it is the slider bar track!
+                if (text.indexOf(":") === -1) {
+                    var track = child.querySelector ? (child.querySelector("[idomkey='progress-bar'], [idomkey='slider'], [class*='bar'], [class*='marker']") || child) : child;
+                    if (track && track.tagName !== "VIDEO") return track;
+                }
+            }
+        }
+
+        // 3. Fallback to generic progress-bar element if not VIDEO
+        var fallback = document.querySelector("[idomkey='progress-bar']");
+        if (fallback && fallback.tagName !== "VIDEO" && typeof fallback.querySelector === "function") return fallback;
+        return null;
     }
 
     function clearSeekbarMarkers() {
