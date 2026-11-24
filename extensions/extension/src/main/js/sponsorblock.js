@@ -52,7 +52,7 @@
             key: c.key + "_seekbar",
             titleKey: "sponsor." + c.key + ".seekbar.title",
             summaryKey: "sponsor." + c.key + ".seekbar.summary",
-            default: true
+            default: c.default
         });
     });
 
