@@ -26,9 +26,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch upstream tags for regression tests
-        run: git fetch --tags https://github.com/KyVexo/farotv-patches.git || true
-
       - name: Setup Java
         uses: actions/setup-java@v6
         with:
