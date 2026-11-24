@@ -27,13 +27,12 @@
         filler: "#9C27B0"         // Purple
     };
 
-    // 1. Feature: SponsorBlock skipping (3 options per category: Auto, Manual/Prompt, Off)
+    // 1. Feature: SponsorBlock skipping (1 setting per category in list, 3 options on its page: On, Prompt to skip, Off)
     var featureSettings = [
         { key: "prompt_all", titleKey: "sponsor.prompt_all.title", summaryKey: "sponsor.prompt_all.summary", default: false }
     ];
     CATEGORIES.forEach(function (c) {
         featureSettings.push({ key: c.key, titleKey: c.titleKey, default: c.default });
-        featureSettings.push({ key: c.key + "_prompt", titleKey: c.promptTitleKey, default: false });
     });
 
     var feature = youtv.feature({
@@ -75,12 +74,37 @@
     // 3 options per category: "skip" (automatic), "prompt" (manual overlay), "off" (disabled)
     function getCategoryMode(key) {
         if (!feature.enabled()) return "off";
+        var rawMode = null;
+        try {
+            var raw = localStorage.getItem("yt.leanback.default::YOUTV_SPONSORBLOCK_" + key.toUpperCase() + "_MODE");
+            if (raw) rawMode = JSON.parse(raw);
+        } catch (e) {}
+        if (rawMode === "skip" || rawMode === "prompt" || rawMode === "off") {
+            return rawMode;
+        }
         var isManual = feature.settings.get(key + "_prompt");
         var isAuto = feature.settings.get(key);
         var globalPrompt = feature.settings.get("prompt_all");
         if (isManual || (isAuto && globalPrompt)) return "prompt";
         if (isAuto) return "skip";
         return "off";
+    }
+
+    function setCategoryMode(key, mode) {
+        var upper = key.toUpperCase();
+        try {
+            localStorage.setItem("yt.leanback.default::YOUTV_SPONSORBLOCK_" + upper + "_MODE", JSON.stringify(mode));
+            if (mode === "skip") {
+                localStorage.setItem("yt.leanback.default::YOUTV_SPONSORBLOCK_" + upper, '{"data":true}');
+                localStorage.setItem("yt.leanback.default::YOUTV_SPONSORBLOCK_" + upper + "_PROMPT", '{"data":false}');
+            } else if (mode === "prompt") {
+                localStorage.setItem("yt.leanback.default::YOUTV_SPONSORBLOCK_" + upper, '{"data":false}');
+                localStorage.setItem("yt.leanback.default::YOUTV_SPONSORBLOCK_" + upper + "_PROMPT", '{"data":true}');
+            } else {
+                localStorage.setItem("yt.leanback.default::YOUTV_SPONSORBLOCK_" + upper, '{"data":false}');
+                localStorage.setItem("yt.leanback.default::YOUTV_SPONSORBLOCK_" + upper + "_PROMPT", '{"data":false}');
+            }
+        } catch (e) {}
     }
 
     function enabledCategories() {
@@ -173,9 +197,11 @@
             ".birdy-skip-notice b, .farotv-skip-notice b { color: #ffffff; font-weight: 500; margin-left: 0.3rem; }" +
             ".birdy-skip-icon { width: 1.4rem; height: 1.4rem; fill: #ffffff; margin-left: 0.6rem; vertical-align: middle; flex-shrink: 0; }" +
             "[dir='rtl'] .birdy-skip-icon { margin-left: 0; margin-right: 0.6rem; transform: scaleX(-1); }" +
-            ".birdy-sb-track-markers { position: absolute; left: 0; top: 0; width: 100%; height: 100%;" +
-            " pointer-events: none; z-index: 6; overflow: hidden; border-radius: inherit; }" +
-            ".birdy-sb-marker { position: absolute; top: 0; height: 100%; border-radius: 1px; opacity: 0.95; pointer-events: none; }");
+            ".birdy-sb-track-markers { position: absolute; left: 0; width: 100%; top: 50%; transform: translateY(-50%); height: 5px;" +
+            " pointer-events: none; z-index: 5; overflow: hidden; border-radius: 2px; }" +
+            ".birdy-sb-marker { position: absolute; top: 0; height: 100%; border-radius: 1px; opacity: 0.95; pointer-events: none; }" +
+            "ytlr-progress-bar:focus .birdy-sb-track-markers, ytlr-progress-bar:focus-within .birdy-sb-track-markers, .ytp-progress-bar:hover .birdy-sb-track-markers { height: 8px; }" +
+            ".birdy-setting-prompt-button { outline: none; cursor: pointer; }");
         document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
     } catch (e) {}
 
@@ -406,8 +432,164 @@
         }
     }
 
+    // ---- 3-choice settings page enhancer (On, Prompt to skip, Off) ----------------------------
+    function updateButtonCheckmarks(pane, catKey) {
+        if (!pane || typeof pane.querySelectorAll !== "function") return;
+        var mode = getCategoryMode(catKey);
+        var buttons = pane.querySelectorAll("[role='button'], button");
+        if (buttons.length < 3) return;
+        var onBtn = buttons[0];
+        var promptBtn = buttons[1];
+        var offBtn = buttons[2];
+
+        function setCheck(btn, show) {
+            var svg = btn.querySelector ? btn.querySelector("svg, [class*='check'], [idomkey*='check']") : null;
+            if (svg) {
+                svg.style.display = show ? "" : "none";
+                svg.style.visibility = show ? "visible" : "hidden";
+            }
+            if (show) {
+                btn.setAttribute("aria-checked", "true");
+            } else {
+                btn.setAttribute("aria-checked", "false");
+            }
+        }
+
+        setCheck(onBtn, mode === "skip");
+        setCheck(promptBtn, mode === "prompt");
+        setCheck(offBtn, mode === "off");
+    }
+
+    function enhanceSettingsPane() {
+        if (!document || !document.body || typeof document.querySelectorAll !== "function") return;
+        var titles = document.querySelectorAll("h1, h2, h3, [class*='title'], [class*='heading']");
+        var activeCat = null;
+        var activeTitleEl = null;
+
+        for (var i = 0; i < titles.length; i++) {
+            var el = titles[i];
+            var txt = (el.textContent || "").trim();
+            if (!txt) continue;
+            for (var c = 0; c < CATEGORIES.length; c++) {
+                var cat = CATEGORIES[c];
+                var expected = youtv.t(cat.titleKey);
+                if (txt === expected || txt.indexOf(expected) !== -1 || expected.indexOf(txt) !== -1) {
+                    var p = el.closest ? (el.closest("ytlr-setting-boolean-renderer, [class*='setting'], [class*='pane'], [class*='renderer']") || el.parentElement) : el.parentElement;
+                    if (p && p.querySelectorAll) {
+                        var btns = p.querySelectorAll("[role='button'], button");
+                        if (btns.length >= 2) {
+                            activeCat = cat;
+                            activeTitleEl = el;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (activeCat) break;
+        }
+        if (!activeCat || !activeTitleEl) return;
+
+        var pane = activeTitleEl.closest ? (activeTitleEl.closest("ytlr-setting-boolean-renderer, [class*='setting'], [class*='pane'], [class*='renderer']") || activeTitleEl.parentElement) : activeTitleEl.parentElement;
+        if (!pane || !pane.querySelectorAll) return;
+
+        var buttons = pane.querySelectorAll("[role='button'], button");
+        if (buttons.length < 2) return;
+
+        var onBtn = buttons[0];
+        var offBtn = buttons[buttons.length - 1];
+
+        var promptBtn = pane.querySelector ? pane.querySelector(".birdy-setting-prompt-button") : null;
+        if (!promptBtn && typeof onBtn.cloneNode === "function") {
+            promptBtn = onBtn.cloneNode(true);
+            promptBtn.className = (onBtn.className || "") + " birdy-setting-prompt-button";
+            promptBtn.setAttribute("data-category", activeCat.key);
+
+            // Replace text inside promptBtn with "Prompt to skip"
+            if (typeof document.createTreeWalker === "function") {
+                try {
+                    var walk = document.createTreeWalker(promptBtn, NodeFilter.SHOW_TEXT, null, false);
+                    var n;
+                    while ((n = walk.nextNode())) {
+                        if (n.nodeValue && n.nodeValue.trim()) {
+                            n.nodeValue = youtv.t("sponsor.option.prompt");
+                            break;
+                        }
+                    }
+                } catch (e) {}
+            } else {
+                promptBtn.textContent = youtv.t("sponsor.option.prompt");
+            }
+
+            if (offBtn.parentNode && offBtn.parentNode.insertBefore) {
+                offBtn.parentNode.insertBefore(promptBtn, offBtn);
+            }
+
+            var currentKey = activeCat.key;
+            promptBtn.addEventListener("click", function (e) {
+                if (e.preventDefault) e.preventDefault();
+                if (e.stopPropagation) e.stopPropagation();
+                setCategoryMode(currentKey, "prompt");
+                updateButtonCheckmarks(pane, currentKey);
+            }, true);
+
+            promptBtn.addEventListener("keydown", function (e) {
+                var code = e.keyCode || e.which;
+                if (code === 13 || code === 23) {
+                    if (e.preventDefault) e.preventDefault();
+                    if (e.stopPropagation) e.stopPropagation();
+                    setCategoryMode(currentKey, "prompt");
+                    updateButtonCheckmarks(pane, currentKey);
+                } else if (code === 38 && onBtn.focus) {
+                    if (e.preventDefault) e.preventDefault();
+                    if (e.stopPropagation) e.stopPropagation();
+                    onBtn.focus();
+                } else if (code === 40 && offBtn.focus) {
+                    if (e.preventDefault) e.preventDefault();
+                    if (e.stopPropagation) e.stopPropagation();
+                    offBtn.focus();
+                }
+            }, true);
+
+            onBtn.addEventListener("keydown", function (e) {
+                var code = e.keyCode || e.which;
+                if (code === 40 && promptBtn.focus) {
+                    if (e.preventDefault) e.preventDefault();
+                    if (e.stopPropagation) e.stopPropagation();
+                    promptBtn.focus();
+                }
+            }, true);
+
+            offBtn.addEventListener("keydown", function (e) {
+                var code = e.keyCode || e.which;
+                if (code === 38 && promptBtn.focus) {
+                    if (e.preventDefault) e.preventDefault();
+                    if (e.stopPropagation) e.stopPropagation();
+                    promptBtn.focus();
+                }
+            }, true);
+
+            onBtn.addEventListener("click", function () {
+                setCategoryMode(currentKey, "skip");
+                setTimeout(function () { updateButtonCheckmarks(pane, currentKey); }, 50);
+            }, true);
+
+            offBtn.addEventListener("click", function () {
+                setCategoryMode(currentKey, "off");
+                setTimeout(function () { updateButtonCheckmarks(pane, currentKey); }, 50);
+            }, true);
+        }
+
+        updateButtonCheckmarks(pane, activeCat.key);
+    }
+
+    try {
+        window.addEventListener("focusin", enhanceSettingsPane, true);
+        window.addEventListener("keydown", function () { setTimeout(enhanceSettingsPane, 50); }, true);
+    } catch (e) {}
+
     // ---- main playback tick -------------------------------------------------------------------
     setInterval(function () {
+        enhanceSettingsPane();
         var id = (feature.enabled() || (seekbarFeature && seekbarFeature.enabled())) ? currentVideoId() : null;
         if (id !== videoId) {
             videoId = id;
