@@ -135,3 +135,10 @@ local.properties
 
 # Kotlin compiler cache
 .kotlin/
+
+# Local deployment tools and TV config
+tv_ip.txt
+morphe-cli.jar
+tools/git/
+tools/platform-tools/
+

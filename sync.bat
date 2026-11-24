@@ -2,8 +2,10 @@
 setlocal
 cd /d "%~dp0"
 
-:: Check if portable git exists in ..\git\cmd\git.exe
-if exist "%~dp0..\git\cmd\git.exe" (
+rem Check if portable git exists in tools\git\cmd\git.exe or ..\git\cmd\git.exe
+if exist "%~dp0tools\git\cmd\git.exe" (
+    set "PATH=%~dp0tools\git\cmd;%PATH%"
+) else if exist "%~dp0..\git\cmd\git.exe" (
     set "PATH=%~dp0..\git\cmd;%PATH%"
 )
 
