@@ -3,6 +3,5 @@
   "description": "## [1.1.1](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.1.0...v1.1.1) (2026-11-24)\n\n### 🐛 Bug Fixes\n\n* **ci:** grant packages read and supply GITHUB_TOKEN credentials for Morphe plugin resolution ([0278779](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/0278779e9d67eb3dfbd4ce7dd287578116f1d69c))",
   "download_url": "https://github.com/SEIFELDEEN15/Birdy-Patches/releases/download/v1.1.1/patches-1.1.1.mpp",
   "signature_download_url": "",
-  "version": "1.1.1",
-  "public_key": "B+w9LCwCheqTn0XZycE7F2wZPc5CBoaYxCExWOrB0sg="
+  "version": "1.1.1"
 }
