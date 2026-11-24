@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.1.1...v1.1.2) (2026-11-24)
+
+### 🐛 Bug Fixes
+
+* **source:** remove upstream signing key to enable direct installation in Morphe Manager ([503973f](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/503973f1de6ab744462557d1575921f3329507a2))
+
 ## [1.1.1](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.1.0...v1.1.1) (2026-11-24)
 
 ### 🐛 Bug Fixes
