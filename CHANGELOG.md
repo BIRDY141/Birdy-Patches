@@ -9,6 +9,23 @@
 
 * **ci:** grant executable permissions to gradlew wrapper ([8499b4a](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/8499b4abbcfee0f1f1bbd8d3f47863c57081e3be))
 * **locales:** strip UTF-8 BOM from docs locales and guard test parsers ([fd19ca0](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/fd19ca0edea130057ac89f1c51dd2c4c68300aa6))
+* **release:** prevent tag collision and enable clean v1.0.0 initial release ([f3ea320](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/f3ea32098401f4bf1dafe1d81b63fa959fe26ff1))
+* **sync:** allow push even when working tree is already committed ([c73ccbb](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/c73ccbbd94a535c031222c1cdf5866a05941229a))
+* **sync:** automatically rebase remote release commits before push ([151e3bf](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/151e3bffdc7e0da3b5053f908e83dc701d1277ed))
+* **tests:** provide fallback fixtures and fetch tags for regression baselines ([08c305d](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/08c305d709ce170bd7f4db1709641cce6ce2ff5b))
+* **tests:** resolve relative paths dynamically in verify_tests.ps1 ([87ae3ad](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/87ae3ad8e64358f0926bab4536a9c5cea472d5d4))
+
+## 1.0.0 (2026-11-24)
+
+### ✨ New Features
+
+* Birdy Patches for Android TV with red branding and 3-mode SponsorBlock ([f4d0008](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/f4d0008c3915b5c53a5e9c66fa813973682fb99e))
+* initial release of Birdy Patches for Android TV with red branding and 3-mode SponsorBlock ([0425dc8](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/0425dc872f795bf2f8ac47d2907d4724d2d61caf))
+
+### 🐛 Bug Fixes
+
+* **ci:** grant executable permissions to gradlew wrapper ([8499b4a](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/8499b4abbcfee0f1f1bbd8d3f47863c57081e3be))
+* **locales:** strip UTF-8 BOM from docs locales and guard test parsers ([fd19ca0](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/fd19ca0edea130057ac89f1c51dd2c4c68300aa6))
 * **sync:** allow push even when working tree is already committed ([c73ccbb](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/c73ccbbd94a535c031222c1cdf5866a05941229a))
 * **tests:** provide fallback fixtures and fetch tags for regression baselines ([08c305d](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/08c305d709ce170bd7f4db1709641cce6ce2ff5b))
 * **tests:** resolve relative paths dynamically in verify_tests.ps1 ([87ae3ad](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/87ae3ad8e64358f0926bab4536a9c5cea472d5d4))
