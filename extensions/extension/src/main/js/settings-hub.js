@@ -85,16 +85,62 @@
         } catch (e) {}
     }
 
-    // ---- SVG Icons (consistent across all Android TV Cobalt builds) ---------------------------
+    // ---- SVG Icons (built via createElementNS so TrustedHTML CSP is respected) ---------------
+    var SVG_NS = "http://www.w3.org/2000/svg";
     var ICONS = {
-        sponsorblock: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/><path d='m9 12 2 2 4-4'/></svg>",
-        seekbar: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='13.5' cy='6.5' r='.5' fill='currentColor'/><circle cx='17.5' cy='10.5' r='.5' fill='currentColor'/><circle cx='8.5' cy='7.5' r='.5' fill='currentColor'/><circle cx='6.5' cy='12.5' r='.5' fill='currentColor'/><path d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z'/></svg>",
-        ads: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><path d='m4.9 4.9 14.2 14.2'/></svg>",
-        player: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='4' width='20' height='16' rx='3'/><polygon points='10 9 16 12 10 15 10 9' fill='currentColor' stroke='none'/></svg>",
-        shorts: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/></svg>",
-        ryd: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 14V2'/><path d='M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z'/></svg>",
-        about: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><line x1='12' y1='16' x2='12' y2='12'/><line x1='12' y1='8' x2='12.01' y2='8'/></svg>"
+        sponsorblock: [
+            ["path", { d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" }],
+            ["path", { d: "m9 12 2 2 4-4" }]
+        ],
+        seekbar: [
+            ["circle", { cx: "13.5", cy: "6.5", r: "0.7", fill: "currentColor" }],
+            ["circle", { cx: "17.5", cy: "10.5", r: "0.7", fill: "currentColor" }],
+            ["circle", { cx: "8.5", cy: "7.5", r: "0.7", fill: "currentColor" }],
+            ["circle", { cx: "6.5", cy: "12.5", r: "0.7", fill: "currentColor" }],
+            ["path", { d: "M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" }]
+        ],
+        ads: [
+            ["circle", { cx: "12", cy: "12", r: "10" }],
+            ["path", { d: "m4.9 4.9 14.2 14.2" }]
+        ],
+        player: [
+            ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "3" }],
+            ["polygon", { points: "10 9 16 12 10 15 10 9", fill: "currentColor", stroke: "none" }]
+        ],
+        shorts: [
+            ["polygon", { points: "13 2 3 14 12 14 11 22 21 10 12 10 13 2" }]
+        ],
+        ryd: [
+            ["path", { d: "M17 14V2" }],
+            ["path", { d: "M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z" }]
+        ],
+        about: [
+            ["circle", { cx: "12", cy: "12", r: "10" }],
+            ["line", { x1: "12", y1: "16", x2: "12", y2: "12" }],
+            ["line", { x1: "12", y1: "8", x2: "12.01", y2: "8" }]
+        ]
     };
+
+    function createSvgIcon(shapes) {
+        var svg = document.createElementNS(SVG_NS, "svg");
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("fill", "none");
+        svg.setAttribute("stroke", "currentColor");
+        svg.setAttribute("stroke-width", "2");
+        svg.setAttribute("stroke-linecap", "round");
+        svg.setAttribute("stroke-linejoin", "round");
+        for (var i = 0; i < shapes.length; i++) {
+            var node = document.createElementNS(SVG_NS, shapes[i][0]);
+            var attrs = shapes[i][1];
+            for (var k in attrs) {
+                if (Object.prototype.hasOwnProperty.call(attrs, k)) {
+                    node.setAttribute(k, attrs[k]);
+                }
+            }
+            svg.appendChild(node);
+        }
+        return svg;
+    }
 
     // ---- Styles -------------------------------------------------------------------------------
     var sheet = new CSSStyleSheet();
@@ -268,7 +314,7 @@
 
             var iconWrap = document.createElement("span");
             iconWrap.className = "birdy-hub-tab-icon";
-            iconWrap.innerHTML = tab.icon;
+            iconWrap.appendChild(createSvgIcon(tab.icon));
 
             var label = document.createElement("span");
             label.textContent = t(tab.labelKey);
@@ -500,11 +546,17 @@
             repoRow.className = "birdy-hub-row";
             var ver = window.__farotvVersion ? "v" + window.__farotvVersion : "";
             var ytVer = window.__youtubeVersion ? "YouTube TV " + window.__youtubeVersion : "Android TV Cobalt";
-            repoRow.innerHTML =
-                "<div class='birdy-hub-row-left'>" +
-                "<span class='birdy-hub-row-title'>" + (window.__youtvBranding || "BirdyTV") + (ver ? " " + ver : "") + "</span>" +
-                "<span class='birdy-hub-row-summary'>SEIFELDEEN15/Birdy-Patches • " + ytVer + "</span>" +
-                "</div>";
+            var repoLeft = document.createElement("div");
+            repoLeft.className = "birdy-hub-row-left";
+            var repoTitle = document.createElement("span");
+            repoTitle.className = "birdy-hub-row-title";
+            repoTitle.textContent = (window.__youtvBranding || "BirdyTV") + (ver ? " " + ver : "");
+            var repoSummary = document.createElement("span");
+            repoSummary.className = "birdy-hub-row-summary";
+            repoSummary.textContent = "SEIFELDEEN15/Birdy-Patches • " + ytVer;
+            repoLeft.appendChild(repoTitle);
+            repoLeft.appendChild(repoSummary);
+            repoRow.appendChild(repoLeft);
             content.appendChild(repoRow);
         }
 
