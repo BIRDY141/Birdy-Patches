@@ -1,3 +1,9 @@
+## [1.9.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.8.0...v1.9.0) (2026-11-25)
+
+### ✨ New Features
+
+* exact TizenTube right-drawer drill-down style for settings hub ([fa86aec](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/fa86aec49ff35df5e228ea12f12d4c727b4fd068))
+
 ## [1.8.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.7.3...v1.8.0) (2026-11-25)
 
 ### ✨ New Features
