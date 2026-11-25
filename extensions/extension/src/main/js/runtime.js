@@ -321,16 +321,7 @@
             } }
         } };
 
-        var categoryItems = [hubItem].concat(settings.map(function (setting) {
-            return { settingBooleanRenderer: {
-                thumbnail: settingThumbnail(setting),
-                title: runs(setting.titleKey ? t(setting.titleKey) : setting.title),
-                summary: runs(setting.summaryKey ? t(setting.summaryKey) : (setting.summary || "")),
-                enableServiceEndpoint: settingCommand(setting, true),
-                disableServiceEndpoint: settingCommand(setting, false),
-                itemId: setting.key
-            } };
-        }));
+        var categoryItems = [hubItem];
 
         items.splice(1, 0, { settingCategoryCollectionRenderer: {
             title: runs(sectionTitle()),

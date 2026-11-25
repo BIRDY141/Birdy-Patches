@@ -19,7 +19,7 @@ echo [1/3] Running tests...
 powershell -NoProfile -ExecutionPolicy Bypass -File "verify_tests.ps1"
 if %errorlevel% neq 0 (
     echo [ERROR] Tests failed! Aborting push to keep GitHub releases clean.
-    pause
+    if not "%NO_PAUSE%"=="1" pause
     exit /b %errorlevel%
 )
 
@@ -27,7 +27,7 @@ if %errorlevel% neq 0 (
 where git >nul 2>&1
 if %errorlevel% neq 0 (
     echo [ERROR] Git is not installed or found in PATH.
-    pause
+    if not "%NO_PAUSE%"=="1" pause
     exit /b 1
 )
 
@@ -61,6 +61,8 @@ if %errorlevel% equ 0 (
 ) else (
     echo.
     echo [ERROR] Push failed. Check your network or GitHub credentials.
+    if not "%NO_PAUSE%"=="1" pause
+    exit /b 1
 )
 
-pause
+if not "%NO_PAUSE%"=="1" pause

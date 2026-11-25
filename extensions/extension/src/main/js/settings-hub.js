@@ -1,7 +1,7 @@
-// BirdyTV Settings Hub: TizenTube Cobalt-style TV overlay settings modal.
-// Hosts all BirdyTV settings: SponsorBlock (3-way modes), Seekbar Colors, AdBlock,
-// Player Controls, Shorts, Return Dislike (RYD), Topics, and About.
-// Full spatial D-pad remote navigation (Up, Down, Left, Right, OK, Back).
+// BirdyTV Settings Hub: TizenTube Cobalt-style TV overlay settings menu.
+// Replaces the native YouTube settings list with a dedicated, D-pad-navigable TV overlay
+// hosting all BirdyTV settings: SponsorBlock (3-way modes), Seekbar Colors, Ads & Promos,
+// Player Controls, Shorts & Topics, Return YouTube Dislike (RYD), and About.
 (function () {
     if (!window.youtv) return;
 
@@ -85,70 +85,103 @@
         } catch (e) {}
     }
 
+    // ---- SVG Icons (consistent across all Android TV Cobalt builds) ---------------------------
+    var ICONS = {
+        sponsorblock: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/><path d='m9 12 2 2 4-4'/></svg>",
+        seekbar: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='13.5' cy='6.5' r='.5' fill='currentColor'/><circle cx='17.5' cy='10.5' r='.5' fill='currentColor'/><circle cx='8.5' cy='7.5' r='.5' fill='currentColor'/><circle cx='6.5' cy='12.5' r='.5' fill='currentColor'/><path d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z'/></svg>",
+        ads: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><path d='m4.9 4.9 14.2 14.2'/></svg>",
+        player: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='4' width='20' height='16' rx='3'/><polygon points='10 9 16 12 10 15 10 9' fill='currentColor' stroke='none'/></svg>",
+        shorts: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/></svg>",
+        ryd: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 14V2'/><path d='M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z'/></svg>",
+        about: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><line x1='12' y1='16' x2='12' y2='12'/><line x1='12' y1='8' x2='12.01' y2='8'/></svg>"
+    };
+
     // ---- Styles -------------------------------------------------------------------------------
     var sheet = new CSSStyleSheet();
     try {
         sheet.replaceSync(
             ".birdy-hub-backdrop {" +
             " position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 2147483647;" +
-            " background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);" +
+            " background: rgba(6, 6, 9, 0.84); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);" +
             " display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none;" +
-            " transition: opacity 220ms ease; font-family: Roboto, 'YouTube Sans', Arial, sans-serif; }" +
+            " transition: opacity 200ms ease; font-family: Roboto, 'YouTube Sans', Arial, sans-serif; }" +
             ".birdy-hub-backdrop.show { opacity: 1; pointer-events: auto; }" +
             ".birdy-hub-modal {" +
-            " width: 88vw; height: 86vh; max-width: 1360px; max-height: 820px; background: #141414;" +
-            " border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px;" +
-            " box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85); display: flex; flex-direction: column;" +
-            " overflow: hidden; color: #ffffff; }" +
+            " width: 88vw; height: 86vh; max-width: 1380px; max-height: 820px;" +
+            " background: linear-gradient(160deg, rgba(24, 24, 28, 0.98), rgba(14, 14, 17, 0.99));" +
+            " border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 22px;" +
+            " box-shadow: 0 28px 80px rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;" +
+            " overflow: hidden; color: #f1f1f1; }" +
             ".birdy-hub-header {" +
-            " display: flex; align-items: center; justify-content: space-between; padding: 1.6rem 2.4rem;" +
-            " border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: #181818; flex-shrink: 0; }" +
-            ".birdy-hub-title-box { display: flex; align-items: center; gap: 1rem; }" +
+            " display: flex; align-items: center; justify-content: space-between; padding: 1.35rem 2.2rem;" +
+            " border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.02); flex-shrink: 0; }" +
+            ".birdy-hub-title-box { display: flex; align-items: center; gap: 0.9rem; }" +
             ".birdy-hub-badge {" +
-            " background: #FF2028; color: #ffffff; font-weight: 800; font-size: 0.85rem;" +
-            " padding: 0.35rem 0.8rem; border-radius: 9999px; letter-spacing: 0.05em; text-transform: uppercase; }" +
-            ".birdy-hub-title { font-size: 1.65rem; font-weight: 700; margin: 0; color: #ffffff; }" +
-            ".birdy-hub-hint { color: rgba(255, 255, 255, 0.55); font-size: 1.15rem; font-weight: 500; }" +
+            " background: linear-gradient(135deg, #FF2028, #D9141C); color: #ffffff; font-weight: 800; font-size: 0.85rem;" +
+            " padding: 0.35rem 0.85rem; border-radius: 9999px; letter-spacing: 0.06em; text-transform: uppercase;" +
+            " box-shadow: 0 4px 14px rgba(255, 32, 40, 0.35); }" +
+            ".birdy-hub-title { font-size: 1.55rem; font-weight: 700; margin: 0; color: #ffffff; letter-spacing: -0.01em; }" +
+            ".birdy-hub-hint { color: rgba(255, 255, 255, 0.5); font-size: 1.05rem; font-weight: 500; }" +
             ".birdy-hub-body { display: flex; flex: 1; overflow: hidden; }" +
             ".birdy-hub-sidebar {" +
-            " width: 280px; flex-shrink: 0; background: #121212; border-right: 1px solid rgba(255, 255, 255, 0.08);" +
-            " padding: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; overflow-y: auto; }" +
+            " width: 290px; flex-shrink: 0; background: rgba(0, 0, 0, 0.25); border-right: 1px solid rgba(255, 255, 255, 0.07);" +
+            " padding: 1.2rem 1rem; display: flex; flex-direction: column; gap: 0.45rem; overflow-y: auto; }" +
             ".birdy-hub-tab {" +
-            " display: flex; align-items: center; gap: 1rem; padding: 1rem 1.4rem; border-radius: 14px;" +
-            " font-size: 1.25rem; font-weight: 600; color: rgba(255, 255, 255, 0.7); cursor: pointer;" +
-            " border: 2px solid transparent; transition: all 180ms ease; outline: none; }" +
+            " position: relative; display: flex; align-items: center; gap: 0.9rem; padding: 0.95rem 1.25rem; border-radius: 14px;" +
+            " font-size: 1.18rem; font-weight: 600; color: rgba(255, 255, 255, 0.65); cursor: pointer;" +
+            " border: 2px solid transparent; transition: all 160ms ease; outline: none; }" +
+            ".birdy-hub-tab-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }" +
+            ".birdy-hub-tab-icon svg { width: 20px; height: 20px; }" +
             ".birdy-hub-tab.active { background: rgba(255, 255, 255, 0.08); color: #ffffff; }" +
-            ".birdy-hub-tab.birdy-focus { border-color: #FF2028; background: rgba(255, 32, 40, 0.15); color: #ffffff; }" +
+            ".birdy-hub-tab.active::before {" +
+            " content: ''; position: absolute; left: 0; top: 22%; height: 56%; width: 4px;" +
+            " border-radius: 0 4px 4px 0; background: #FF2028; }" +
+            ".birdy-hub-tab.birdy-focus {" +
+            " border-color: #ffffff; background: rgba(255, 32, 40, 0.18); color: #ffffff;" +
+            " box-shadow: 0 4px 18px rgba(255, 32, 40, 0.25); transform: scale(1.02); }" +
             ".birdy-hub-content {" +
-            " flex: 1; padding: 2rem 2.8rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.4rem; }" +
+            " flex: 1; padding: 1.8rem 2.4rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }" +
+            ".birdy-hub-section-head {" +
+            " display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.3rem; padding-bottom: 0.6rem;" +
+            " border-bottom: 1px solid rgba(255, 255, 255, 0.06); }" +
+            ".birdy-hub-section-title { font-size: 1.35rem; font-weight: 700; color: #ffffff; }" +
+            ".birdy-hub-restart-banner {" +
+            " display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.3rem;" +
+            " background: rgba(255, 179, 0, 0.14); border: 1px solid rgba(255, 179, 0, 0.45); border-radius: 14px;" +
+            " color: #ffd54f; font-size: 1.05rem; font-weight: 600; }" +
             ".birdy-hub-row {" +
-            " display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 1.6rem;" +
-            " background: rgba(255, 255, 255, 0.03); border-radius: 16px; border: 1.5px solid transparent;" +
-            " transition: all 180ms ease; }" +
-            ".birdy-hub-row.birdy-focus { border-color: #FF2028; background: rgba(255, 255, 255, 0.07); }" +
-            ".birdy-hub-row-left { display: flex; flex-direction: column; gap: 0.3rem; max-width: 55%; }" +
-            ".birdy-hub-row-title-wrap { display: flex; align-items: center; gap: 0.75rem; }" +
-            ".birdy-hub-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }" +
-            ".birdy-hub-row-title { font-size: 1.3rem; font-weight: 600; color: #ffffff; }" +
-            ".birdy-hub-row-summary { font-size: 1rem; color: rgba(255, 255, 255, 0.5); line-height: 1.3; }" +
-            ".birdy-hub-pill-group { display: flex; align-items: center; gap: 0.5rem; }" +
+            " display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.05rem 1.45rem;" +
+            " background: rgba(255, 255, 255, 0.035); border-radius: 16px; border: 2px solid transparent;" +
+            " transition: all 160ms ease; }" +
+            ".birdy-hub-row.birdy-focus { border-color: rgba(255, 255, 255, 0.85); background: rgba(255, 255, 255, 0.09); }" +
+            ".birdy-hub-row-left { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; min-width: 0; }" +
+            ".birdy-hub-row-title-wrap { display: flex; align-items: center; gap: 0.7rem; }" +
+            ".birdy-hub-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }" +
+            ".birdy-hub-row-title { font-size: 1.2rem; font-weight: 600; color: #ffffff; }" +
+            ".birdy-hub-row-summary { font-size: 0.96rem; color: rgba(255, 255, 255, 0.55); line-height: 1.35; }" +
+            ".birdy-hub-pill-group { display: flex; align-items: center; gap: 0.45rem; flex-shrink: 0; background: rgba(0, 0, 0, 0.28); padding: 0.3rem; border-radius: 14px; }" +
             ".birdy-hub-pill {" +
-            " padding: 0.65rem 1.15rem; border-radius: 12px; font-size: 1.1rem; font-weight: 600;" +
-            " background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.65);" +
-            " border: 2px solid transparent; cursor: pointer; transition: all 180ms ease; outline: none; }" +
-            ".birdy-hub-pill.selected { background: #FF2028; color: #ffffff; }" +
-            ".birdy-hub-pill.birdy-focus { border-color: #ffffff; box-shadow: 0 0 12px rgba(255, 255, 255, 0.4); transform: scale(1.04); }" +
-            ".birdy-hub-toggle {" +
-            " padding: 0.65rem 1.6rem; border-radius: 12px; font-size: 1.15rem; font-weight: 700;" +
-            " border: 2px solid transparent; cursor: pointer; transition: all 180ms ease; outline: none; }" +
-            ".birdy-hub-toggle.on { background: #00D400; color: #121212; }" +
-            ".birdy-hub-toggle.off { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5); }" +
-            ".birdy-hub-toggle.birdy-focus { border-color: #ffffff; box-shadow: 0 0 12px rgba(255, 255, 255, 0.4); transform: scale(1.04); }" +
+            " padding: 0.55rem 1rem; border-radius: 10px; font-size: 1.02rem; font-weight: 600;" +
+            " background: transparent; color: rgba(255, 255, 255, 0.6);" +
+            " border: 2px solid transparent; cursor: pointer; transition: all 150ms ease; outline: none; }" +
+            ".birdy-hub-pill.selected { background: #FF2028; color: #ffffff; box-shadow: 0 2px 10px rgba(255, 32, 40, 0.4); }" +
+            ".birdy-hub-pill.birdy-focus { border-color: #ffffff; color: #ffffff; transform: scale(1.04); }" +
+            ".birdy-hub-switch {" +
+            " position: relative; width: 58px; height: 32px; border-radius: 9999px; flex-shrink: 0;" +
+            " background: rgba(255, 255, 255, 0.18); border: 2px solid transparent; cursor: pointer;" +
+            " transition: background 180ms ease, transform 150ms ease, border-color 150ms ease; outline: none; }" +
+            ".birdy-hub-switch.on { background: #00D400; }" +
+            ".birdy-hub-switch::after {" +
+            " content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px;" +
+            " border-radius: 50%; background: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.4);" +
+            " transition: transform 180ms ease; }" +
+            ".birdy-hub-switch.on::after { transform: translateX(26px); }" +
+            ".birdy-hub-switch.birdy-focus { border-color: #ffffff; box-shadow: 0 0 14px rgba(255, 255, 255, 0.45); transform: scale(1.06); }" +
             ".birdy-hub-action-btn {" +
-            " padding: 0.85rem 1.8rem; border-radius: 14px; font-size: 1.2rem; font-weight: 700;" +
+            " padding: 0.85rem 1.8rem; border-radius: 14px; font-size: 1.15rem; font-weight: 700;" +
             " background: #FF2028; color: #ffffff; border: 2px solid transparent; cursor: pointer;" +
-            " transition: all 180ms ease; outline: none; align-self: flex-start; margin-top: 1rem; }" +
-            ".birdy-hub-action-btn.birdy-focus { border-color: #ffffff; box-shadow: 0 0 16px rgba(255, 32, 40, 0.7); transform: scale(1.03); }"
+            " transition: all 160ms ease; outline: none; align-self: flex-start; margin-top: 0.5rem; }" +
+            ".birdy-hub-action-btn.birdy-focus { border-color: #ffffff; box-shadow: 0 0 18px rgba(255, 32, 40, 0.75); transform: scale(1.03); }"
         );
         document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
     } catch (e) {}
@@ -159,22 +192,26 @@
     var focusArea = "sidebar"; // "sidebar" or "content"
     var focusSidebarIndex = 0;
     var focusContentIndex = 0;
-    var focusPillIndex = 0; // For rows with 3 pills
+    var focusPillIndex = 0;
+    var pendingRestart = false;
 
     var TABS = [
-        { key: "sponsorblock", labelKey: "hub.tab.sponsorblock", icon: "🛡️" },
-        { key: "seekbar", labelKey: "hub.tab.seekbar", icon: "🎨" },
-        { key: "ads", labelKey: "hub.tab.ads", icon: "🚫" },
-        { key: "player", labelKey: "hub.tab.player", icon: "🎬" },
-        { key: "shorts", labelKey: "hub.tab.shorts", icon: "⚡" },
-        { key: "ryd", labelKey: "hub.tab.ryd", icon: "👎" },
-        { key: "about", labelKey: "hub.tab.about", icon: "ℹ️" }
+        { key: "sponsorblock", labelKey: "hub.tab.sponsorblock", icon: ICONS.sponsorblock },
+        { key: "seekbar", labelKey: "hub.tab.seekbar", icon: ICONS.seekbar },
+        { key: "ads", labelKey: "hub.tab.ads", icon: ICONS.ads },
+        { key: "player", labelKey: "hub.tab.player", icon: ICONS.player },
+        { key: "shorts", labelKey: "hub.tab.shorts", icon: ICONS.shorts },
+        { key: "ryd", labelKey: "hub.tab.ryd", icon: ICONS.ryd },
+        { key: "about", labelKey: "hub.tab.about", icon: ICONS.about }
     ];
 
     function createModal() {
         if (modalBackdrop) return;
         modalBackdrop = document.createElement("div");
         modalBackdrop.className = "birdy-hub-backdrop";
+        modalBackdrop.onclick = function (e) {
+            if (e.target === modalBackdrop) closeHub();
+        };
 
         var modal = document.createElement("div");
         modal.className = "birdy-hub-modal";
@@ -187,7 +224,7 @@
         titleBox.className = "birdy-hub-title-box";
         var badge = document.createElement("span");
         badge.className = "birdy-hub-badge";
-        badge.textContent = "BirdyTV";
+        badge.textContent = window.__youtvBranding || "BirdyTV";
         var title = document.createElement("h2");
         title.className = "birdy-hub-title";
         title.textContent = t("hub.title");
@@ -228,7 +265,24 @@
             var el = document.createElement("div");
             el.className = "birdy-hub-tab" + (tab.key === activeTabKey ? " active" : "");
             el.setAttribute("data-key", tab.key);
-            el.textContent = tab.icon + "  " + t(tab.labelKey);
+
+            var iconWrap = document.createElement("span");
+            iconWrap.className = "birdy-hub-tab-icon";
+            iconWrap.innerHTML = tab.icon;
+
+            var label = document.createElement("span");
+            label.textContent = t(tab.labelKey);
+
+            el.appendChild(iconWrap);
+            el.appendChild(label);
+            el.onclick = function () {
+                activeTabKey = tab.key;
+                focusSidebarIndex = idx;
+                focusArea = "sidebar";
+                renderSidebar();
+                renderContent();
+                updateFocusUI();
+            };
             sidebar.appendChild(el);
         });
     }
@@ -238,9 +292,42 @@
         if (!content) return;
         content.textContent = "";
 
+        var currentTab = null;
+        for (var i = 0; i < TABS.length; i++) {
+            if (TABS[i].key === activeTabKey) { currentTab = TABS[i]; break; }
+        }
+        if (currentTab) {
+            var secHead = document.createElement("div");
+            secHead.className = "birdy-hub-section-head";
+            var secTitle = document.createElement("span");
+            secTitle.className = "birdy-hub-section-title";
+            secTitle.textContent = t(currentTab.labelKey);
+            secHead.appendChild(secTitle);
+            content.appendChild(secHead);
+        }
+
+        if (pendingRestart) {
+            var banner = document.createElement("div");
+            banner.className = "birdy-hub-restart-banner";
+            var bannerText = document.createElement("span");
+            bannerText.textContent = t("restart.message");
+            banner.appendChild(bannerText);
+            content.appendChild(banner);
+        }
+
         if (activeTabKey === "sponsorblock") {
-            // Master prompt_all toggle
-            var promptAllRow = createToggleRow(
+            content.appendChild(createToggleRow(
+                t("feature.sponsorblock.name"),
+                t("feature.sponsorblock.summary"),
+                getBool("YOUTV_SPONSORBLOCK", true),
+                function (val) {
+                    setBool("YOUTV_SPONSORBLOCK", val);
+                    renderContent();
+                    updateFocusUI();
+                }
+            ));
+
+            content.appendChild(createToggleRow(
                 t("sponsor.prompt_all.title"),
                 t("sponsor.prompt_all.summary"),
                 getBool("YOUTV_SPONSORBLOCK_PROMPT_ALL", false),
@@ -249,10 +336,8 @@
                     renderContent();
                     updateFocusUI();
                 }
-            );
-            content.appendChild(promptAllRow);
+            ));
 
-            // Per category 3-way mode selectors
             CATEGORIES.forEach(function (cat) {
                 var currentMode = getSponsorMode(cat.key);
                 var row = document.createElement("div");
@@ -283,13 +368,14 @@
                     { id: "off", text: t("hub.action.off") }
                 ];
 
-                modes.forEach(function (m) {
+                modes.forEach(function (m, idx) {
                     var pill = document.createElement("button");
                     pill.className = "birdy-hub-pill" + (currentMode === m.id ? " selected" : "");
                     pill.textContent = m.text;
                     pill.setAttribute("data-mode", m.id);
                     pill.onclick = function () {
                         setSponsorMode(cat.key, m.id);
+                        focusPillIndex = idx;
                         renderContent();
                         updateFocusUI();
                     };
@@ -301,40 +387,34 @@
                 content.appendChild(row);
             });
         } else if (activeTabKey === "seekbar") {
-            // Master seekbar colors toggle
-            var masterRow = createToggleRow(
+            content.appendChild(createToggleRow(
                 t("feature.sponsorblock_colors.name"),
                 t("feature.sponsorblock_colors.summary"),
-                getBool("YOUTV_SPONSORBLOCK-COLORS", true),
+                getBool("YOUTV_SPONSORBLOCK_COLORS", true),
                 function (val) {
-                    setBool("YOUTV_SPONSORBLOCK-COLORS", val);
+                    setBool("YOUTV_SPONSORBLOCK_COLORS", val);
                     renderContent();
                     updateFocusUI();
                 }
-            );
-            content.appendChild(masterRow);
+            ));
 
-            // Per category seekbar toggles
             CATEGORIES.forEach(function (cat) {
-                var key = "YOUTV_SPONSORBLOCK-COLORS_" + cat.key.toUpperCase() + "_SEEKBAR";
+                var key = "YOUTV_SPONSORBLOCK_COLORS_" + cat.key.toUpperCase() + "_SEEKBAR";
                 var def = cat.key === "sponsor" || cat.key === "selfpromo" || cat.key === "interaction";
-                var isEnabled = getBool(key, def);
-
-                var row = createToggleRow(
+                content.appendChild(createToggleRow(
                     t(cat.titleKey),
                     t("sponsor." + cat.key + ".seekbar.summary"),
-                    isEnabled,
+                    getBool(key, def),
                     function (val) {
                         setBool(key, val);
                         renderContent();
                         updateFocusUI();
                     },
                     cat.color
-                );
-                content.appendChild(row);
+                ));
             });
         } else if (activeTabKey === "ads") {
-            var adsRow = createToggleRow(
+            content.appendChild(createToggleRow(
                 t("feature.ads.name"),
                 t("feature.ads.summary"),
                 getBool("YOUTV_ADS", true),
@@ -343,10 +423,20 @@
                     renderContent();
                     updateFocusUI();
                 }
-            );
-            content.appendChild(adsRow);
+            ));
+
+            content.appendChild(createToggleRow(
+                t("feature.premium-promos.name"),
+                t("feature.premium-promos.summary"),
+                getBool("YOUTV_PREMIUM_PROMOS", true),
+                function (val) {
+                    setBool("YOUTV_PREMIUM_PROMOS", val);
+                    renderContent();
+                    updateFocusUI();
+                }
+            ));
         } else if (activeTabKey === "player") {
-            var playerMaster = createToggleRow(
+            content.appendChild(createToggleRow(
                 t("feature.player.name"),
                 t("feature.player.summary"),
                 getBool("YOUTV_PLAYER", true),
@@ -355,12 +445,11 @@
                     renderContent();
                     updateFocusUI();
                 }
-            );
-            content.appendChild(playerMaster);
+            ));
 
             PLAYER_BUTTONS.forEach(function (btn) {
                 var key = "YOUTV_PLAYER_" + btn.key.toUpperCase();
-                var row = createToggleRow(
+                content.appendChild(createToggleRow(
                     t(btn.titleKey),
                     btn.summaryKey ? t(btn.summaryKey) : "",
                     getBool(key, false),
@@ -369,23 +458,34 @@
                         renderContent();
                         updateFocusUI();
                     }
-                );
-                content.appendChild(row);
+                ));
             });
         } else if (activeTabKey === "shorts") {
-            var shortsRow = createToggleRow(
+            content.appendChild(createToggleRow(
                 t("feature.shorts.name"),
                 t("feature.shorts.summary"),
                 getBool("YOUTV_SHORTS", true),
                 function (val) {
                     setBool("YOUTV_SHORTS", val);
+                    pendingRestart = true;
                     renderContent();
                     updateFocusUI();
                 }
-            );
-            content.appendChild(shortsRow);
+            ));
+
+            content.appendChild(createToggleRow(
+                t("feature.topics.name"),
+                t("feature.topics.summary"),
+                getBool("YOUTV_TOPICS", false),
+                function (val) {
+                    setBool("YOUTV_TOPICS", val);
+                    pendingRestart = true;
+                    renderContent();
+                    updateFocusUI();
+                }
+            ));
         } else if (activeTabKey === "ryd") {
-            var rydRow = createToggleRow(
+            content.appendChild(createToggleRow(
                 t("feature.ryd.name"),
                 t("feature.ryd.summary"),
                 getBool("YOUTV_RYD", true),
@@ -394,18 +494,21 @@
                     renderContent();
                     updateFocusUI();
                 }
-            );
-            content.appendChild(rydRow);
+            ));
         } else if (activeTabKey === "about") {
             var repoRow = document.createElement("div");
             repoRow.className = "birdy-hub-row";
+            var ver = window.__farotvVersion ? "v" + window.__farotvVersion : "";
+            var ytVer = window.__youtubeVersion ? "YouTube TV " + window.__youtubeVersion : "Android TV Cobalt";
             repoRow.innerHTML =
                 "<div class='birdy-hub-row-left'>" +
-                "<span class='birdy-hub-row-title'>SEIFELDEEN15 / Birdy-Patches</span>" +
-                "<span class='birdy-hub-row-summary'>" + (window.__farotvVersion ? "v" + window.__farotvVersion : "v1.3.0") + " • Android TV Cobalt</span>" +
+                "<span class='birdy-hub-row-title'>" + (window.__youtvBranding || "BirdyTV") + (ver ? " " + ver : "") + "</span>" +
+                "<span class='birdy-hub-row-summary'>SEIFELDEEN15/Birdy-Patches • " + ytVer + "</span>" +
                 "</div>";
             content.appendChild(repoRow);
+        }
 
+        if (pendingRestart || activeTabKey === "about") {
             var restartBtn = document.createElement("button");
             restartBtn.className = "birdy-hub-action-btn birdy-interactive-row";
             restartBtn.textContent = t("hub.restart_app");
@@ -445,16 +548,31 @@
             left.appendChild(rowSummary);
         }
 
-        var toggle = document.createElement("button");
-        toggle.className = "birdy-hub-toggle " + (isEnabled ? "on" : "off");
-        toggle.textContent = isEnabled ? t("hub.enabled") : t("hub.disabled");
-        toggle.onclick = function () {
+        var switchBtn = document.createElement("button");
+        switchBtn.className = "birdy-hub-switch" + (isEnabled ? " on" : "");
+        switchBtn.setAttribute("aria-label", isEnabled ? t("hub.enabled") : t("hub.disabled"));
+        switchBtn.onclick = function () {
             onToggle(!isEnabled);
         };
 
         row.appendChild(left);
-        row.appendChild(toggle);
+        row.appendChild(switchBtn);
         return row;
+    }
+
+    function syncPillIndexToSelected(row) {
+        if (!row || row.getAttribute("data-type") !== "3way") {
+            focusPillIndex = 0;
+            return;
+        }
+        var pills = row.querySelectorAll(".birdy-hub-pill");
+        for (var i = 0; i < pills.length; i++) {
+            if (pills[i].classList.contains("selected")) {
+                focusPillIndex = i;
+                return;
+            }
+        }
+        focusPillIndex = 0;
     }
 
     // ---- Focus & Navigation -------------------------------------------------------------------
@@ -469,10 +587,13 @@
             var tabs = modalBackdrop.querySelectorAll(".birdy-hub-tab");
             if (tabs[focusSidebarIndex]) {
                 tabs[focusSidebarIndex].classList.add("birdy-focus");
-                tabs[focusSidebarIndex].scrollIntoView ? tabs[focusSidebarIndex].scrollIntoView({ block: "nearest" }) : null;
+                if (tabs[focusSidebarIndex].scrollIntoView) {
+                    tabs[focusSidebarIndex].scrollIntoView({ block: "nearest" });
+                }
             }
         } else {
             var rows = modalBackdrop.querySelectorAll(".birdy-interactive-row");
+            if (focusContentIndex >= rows.length) focusContentIndex = Math.max(0, rows.length - 1);
             var targetRow = rows[focusContentIndex];
             if (!targetRow) return;
 
@@ -485,13 +606,21 @@
                 }
             } else if (type === "toggle") {
                 targetRow.classList.add("birdy-focus");
-                var toggleBtn = targetRow.querySelector(".birdy-hub-toggle");
-                if (toggleBtn) toggleBtn.classList.add("birdy-focus");
+                var switchBtn = targetRow.querySelector(".birdy-hub-switch");
+                if (switchBtn) switchBtn.classList.add("birdy-focus");
             } else {
                 targetRow.classList.add("birdy-focus");
             }
-            targetRow.scrollIntoView ? targetRow.scrollIntoView({ block: "nearest" }) : null;
+            if (targetRow.scrollIntoView) {
+                targetRow.scrollIntoView({ block: "nearest" });
+            }
         }
+    }
+
+    function stopEvent(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
     }
 
     function onKeyDown(e) {
@@ -499,38 +628,35 @@
         var code = e.keyCode || e.which;
 
         // BACK: 27 (Escape), 4 (Android Back), 10009 (Tizen Back)
-        if (code === 27 || code === 4 || code === 10009 || e.key === "Escape" || e.key === "GoBack") {
-            e.preventDefault();
-            e.stopPropagation();
-            if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        if (code === 27 || code === 4 || code === 10009 || e.key === "Escape" || e.key === "GoBack" || e.key === "BrowserBack") {
+            stopEvent(e);
             closeHub();
             return;
         }
 
-        var tabs = modalBackdrop.querySelectorAll(".birdy-hub-tab");
         var rows = modalBackdrop.querySelectorAll(".birdy-interactive-row");
 
         if (focusArea === "sidebar") {
             if (code === 38) { // UP
-                e.preventDefault();
+                stopEvent(e);
                 focusSidebarIndex = Math.max(0, focusSidebarIndex - 1);
                 activeTabKey = TABS[focusSidebarIndex].key;
                 renderSidebar();
                 renderContent();
                 updateFocusUI();
             } else if (code === 40) { // DOWN
-                e.preventDefault();
+                stopEvent(e);
                 focusSidebarIndex = Math.min(TABS.length - 1, focusSidebarIndex + 1);
                 activeTabKey = TABS[focusSidebarIndex].key;
                 renderSidebar();
                 renderContent();
                 updateFocusUI();
             } else if (code === 39 || code === 13 || code === 23) { // RIGHT or OK
-                e.preventDefault();
+                stopEvent(e);
                 if (rows.length > 0) {
                     focusArea = "content";
                     focusContentIndex = 0;
-                    focusPillIndex = 0;
+                    syncPillIndexToSelected(rows[0]);
                     updateFocusUI();
                 }
             }
@@ -539,21 +665,21 @@
             var type = curRow ? curRow.getAttribute("data-type") : null;
 
             if (code === 38) { // UP
-                e.preventDefault();
+                stopEvent(e);
                 if (focusContentIndex > 0) {
                     focusContentIndex--;
-                    focusPillIndex = 0;
+                    syncPillIndexToSelected(rows[focusContentIndex]);
                     updateFocusUI();
                 }
             } else if (code === 40) { // DOWN
-                e.preventDefault();
+                stopEvent(e);
                 if (focusContentIndex < rows.length - 1) {
                     focusContentIndex++;
-                    focusPillIndex = 0;
+                    syncPillIndexToSelected(rows[focusContentIndex]);
                     updateFocusUI();
                 }
             } else if (code === 37) { // LEFT
-                e.preventDefault();
+                stopEvent(e);
                 if (type === "3way" && focusPillIndex > 0) {
                     focusPillIndex--;
                     updateFocusUI();
@@ -562,7 +688,7 @@
                     updateFocusUI();
                 }
             } else if (code === 39) { // RIGHT
-                e.preventDefault();
+                stopEvent(e);
                 if (type === "3way") {
                     var pills = curRow.querySelectorAll(".birdy-hub-pill");
                     if (focusPillIndex < pills.length - 1) {
@@ -571,13 +697,13 @@
                     }
                 }
             } else if (code === 13 || code === 23) { // OK / ENTER
-                e.preventDefault();
+                stopEvent(e);
                 if (type === "3way") {
                     var pillsList = curRow.querySelectorAll(".birdy-hub-pill");
                     if (pillsList[focusPillIndex]) pillsList[focusPillIndex].click();
                 } else if (type === "toggle") {
-                    var togBtn = curRow.querySelector(".birdy-hub-toggle");
-                    if (togBtn) togBtn.click();
+                    var swBtn = curRow.querySelector(".birdy-hub-switch");
+                    if (swBtn) swBtn.click();
                 } else if (curRow) {
                     curRow.click();
                 }
@@ -586,7 +712,7 @@
     }
 
     function isHubOpen() {
-        return modalBackdrop && modalBackdrop.className.indexOf("show") !== -1;
+        return !!(modalBackdrop && modalBackdrop.className.indexOf("show") !== -1);
     }
 
     function openHub(initialTab) {
@@ -624,28 +750,53 @@
         isOpen: isHubOpen
     };
 
-    // Global shortcut: F2 or 'KeyS' or clicking settings entry opens the hub
+    function matchesHubEntry(el) {
+        while (el && el !== document.body) {
+            var itemId = el.getAttribute && el.getAttribute("data-item-id");
+            if (itemId === "BIRDY_SETTINGS_HUB") return true;
+            var text = (el.textContent || "").trim();
+            if (text === t("hub.open") || text === t("hub.title")) return true;
+            el = el.parentElement;
+        }
+        return false;
+    }
+
+    // Global shortcuts: F2 opens hub; OK/Enter on the native "Open BirdyTV Settings" item opens hub
     window.addEventListener("keydown", function (e) {
         if (isHubOpen()) return;
         var code = e.keyCode || e.which;
         if (code === 113 /* F2 */) {
-            e.preventDefault();
+            stopEvent(e);
             openHub();
+            return;
+        }
+        if (code === 13 || code === 23) {
+            var candidate = document.activeElement;
+            if (!matchesHubEntry(candidate)) {
+                candidate = document.querySelector("[data-item-id='BIRDY_SETTINGS_HUB']") ||
+                    document.querySelector(".ytlr-focused, [focused='true'], [aria-selected='true']");
+                if (candidate && candidate.getAttribute("data-item-id") === "BIRDY_SETTINGS_HUB") {
+                    // Only trigger if it's actually the focused item
+                    var isFocused = candidate.classList.contains("ytlr-focused") ||
+                        candidate.getAttribute("focused") === "true" ||
+                        candidate.getAttribute("aria-selected") === "true" ||
+                        candidate.querySelector(".ytlr-focused, [focused='true'], [aria-selected='true']");
+                    if (!isFocused) candidate = null;
+                }
+            }
+            if (candidate && matchesHubEntry(candidate)) {
+                stopEvent(e);
+                openHub();
+            }
         }
     }, true);
 
-    // Watch for click or Enter on the native settings entry for BirdyTV Settings
+    // Pointer / click on the native settings entry for BirdyTV Settings
     document.addEventListener("click", function (e) {
-        var el = e.target;
-        while (el && el !== document.body) {
-            var text = (el.textContent || "").trim();
-            if (el.getAttribute("data-item-id") === "BIRDY_SETTINGS_HUB" ||
-                text === t("hub.open") ||
-                text.indexOf(t("hub.title")) !== -1) {
-                openHub();
-                break;
-            }
-            el = el.parentElement;
+        if (isHubOpen()) return;
+        if (matchesHubEntry(e.target)) {
+            stopEvent(e);
+            openHub();
         }
     }, true);
 })();
