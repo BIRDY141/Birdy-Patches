@@ -1,3 +1,9 @@
+## [1.7.1](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.7.0...v1.7.1) (2026-11-25)
+
+### 🐛 Bug Fixes
+
+* open BirdyTV settings hub via native client setting hook ([bfdc1eb](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/bfdc1eb1161c3e9193783646b11dafafbc3f6174))
+
 ## [1.7.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.6.0...v1.7.0) (2026-11-25)
 
 ### ✨ New Features
