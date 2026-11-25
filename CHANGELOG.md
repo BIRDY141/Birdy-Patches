@@ -1,3 +1,18 @@
+## [1.4.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.3.1...v1.4.0) (2026-11-25)
+
+### ✨ New Features
+
+* **settings:** add TizenTube Cobalt-style TV settings hub and 1-click deploy script ([2c79b45](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/2c79b459660019353ea62b37ba12ca16a5eff006))
+* update patches ([87c7c19](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/87c7c190df20268536defd77da4561f26d4bd199))
+* update patches ([7d1ace8](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/7d1ace86f8182a3d656875d28283dfd7df4295c1))
+* update patches ([22b01a4](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/22b01a401e285f3fad122ff13a8c5df394590c11))
+
+### 🐛 Bug Fixes
+
+* **deploy:** auto-detect Android Studio Java JBR and fallback paths ([4b8647f](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/4b8647f65a308d969aa54a42994039e7632ebe4a))
+* **deploy:** handle signature mismatch reinstall and launch correct package ([471121e](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/471121e6a3f54e7de515adcefb9a68aaa5186e8c))
+* **deploy:** use bundled Java 21 and correct Morphe CLI arguments ([2d0cbb7](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/2d0cbb77ba521327b4269da7aeb9deb74b55520a))
+
 ## [1.3.1](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.3.0...v1.3.1) (2026-11-24)
 
 ### 🐛 Bug Fixes
