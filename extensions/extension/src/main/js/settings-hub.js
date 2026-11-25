@@ -1,7 +1,6 @@
-// BirdyTV Settings Hub: TizenTube Cobalt-style TV overlay settings menu.
-// Replaces the native YouTube settings list with a dedicated, D-pad-navigable TV overlay
-// hosting all BirdyTV settings: SponsorBlock (3-way modes), Seekbar Colors, Ads & Promos,
-// Player Controls, Shorts & Topics, Return YouTube Dislike (RYD), and About.
+// BirdyTV Settings Hub: Native YouTube TV (Cobalt Leanback) style overlay menu.
+// Optimized for low-power TV GPUs (no backdrop blur, O(1) focus updates, in-place toggles,
+// DocumentFragment tab rendering) with reliable scrollTop scrolling and full D-pad support.
 (function () {
     if (!window.youtv) return;
 
@@ -85,7 +84,7 @@
         } catch (e) {}
     }
 
-    // ---- SVG Icons (built via createElementNS so TrustedHTML CSP is respected) ---------------
+    // ---- SVG Icons (created via createElementNS for TrustedHTML compatibility) ----------------
     var SVG_NS = "http://www.w3.org/2000/svg";
     var ICONS = {
         sponsorblock: [
@@ -142,98 +141,101 @@
         return svg;
     }
 
-    // ---- Styles -------------------------------------------------------------------------------
+    // ---- Styles (YouTube TV Leanback Material Dark) -------------------------------------------
     var sheet = new CSSStyleSheet();
     try {
         sheet.replaceSync(
             ".birdy-hub-backdrop {" +
             " position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 2147483647;" +
-            " background: rgba(6, 6, 9, 0.84); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);" +
-            " display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none;" +
-            " transition: opacity 200ms ease; font-family: Roboto, 'YouTube Sans', Arial, sans-serif; }" +
-            ".birdy-hub-backdrop.show { opacity: 1; pointer-events: auto; }" +
+            " background: rgba(15, 15, 15, 0.94);" +
+            " display: none; align-items: center; justify-content: center;" +
+            " font-family: 'YouTube Sans', Roboto, Arial, sans-serif; }" +
+            ".birdy-hub-backdrop.show { display: flex; }" +
             ".birdy-hub-modal {" +
-            " width: 88vw; height: 86vh; max-width: 1380px; max-height: 820px;" +
-            " background: linear-gradient(160deg, rgba(24, 24, 28, 0.98), rgba(14, 14, 17, 0.99));" +
-            " border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 22px;" +
-            " box-shadow: 0 28px 80px rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;" +
-            " overflow: hidden; color: #f1f1f1; }" +
+            " width: 90vw; height: 88vh; max-width: 1400px; max-height: 840px;" +
+            " background: #0f0f0f; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px;" +
+            " display: flex; flex-direction: column; overflow: hidden; color: #f1f1f1; }" +
             ".birdy-hub-header {" +
-            " display: flex; align-items: center; justify-content: space-between; padding: 1.35rem 2.2rem;" +
-            " border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.02); flex-shrink: 0; }" +
-            ".birdy-hub-title-box { display: flex; align-items: center; gap: 0.9rem; }" +
-            ".birdy-hub-badge {" +
-            " background: linear-gradient(135deg, #FF2028, #D9141C); color: #ffffff; font-weight: 800; font-size: 0.85rem;" +
-            " padding: 0.35rem 0.85rem; border-radius: 9999px; letter-spacing: 0.06em; text-transform: uppercase;" +
-            " box-shadow: 0 4px 14px rgba(255, 32, 40, 0.35); }" +
-            ".birdy-hub-title { font-size: 1.55rem; font-weight: 700; margin: 0; color: #ffffff; letter-spacing: -0.01em; }" +
-            ".birdy-hub-hint { color: rgba(255, 255, 255, 0.5); font-size: 1.05rem; font-weight: 500; }" +
-            ".birdy-hub-body { display: flex; flex: 1; overflow: hidden; }" +
+            " display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem;" +
+            " border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: #0f0f0f; flex-shrink: 0; }" +
+            ".birdy-hub-title-box { display: flex; align-items: center; gap: 0.85rem; }" +
+            ".birdy-hub-yt-mark {" +
+            " width: 30px; height: 22px; border-radius: 6px; background: #ff0000; color: #ffffff;" +
+            " display: flex; align-items: center; justify-content: center; flex-shrink: 0; }" +
+            ".birdy-hub-yt-tri {" +
+            " width: 0; height: 0; margin-left: 2px;" +
+            " border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 9px solid #ffffff; }" +
+            ".birdy-hub-title { font-size: 1.5rem; font-weight: 700; margin: 0; color: #f1f1f1; letter-spacing: -0.01em; }" +
+            ".birdy-hub-hint { color: #aaaaaa; font-size: 1rem; font-weight: 500; }" +
+            ".birdy-hub-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }" +
             ".birdy-hub-sidebar {" +
-            " width: 290px; flex-shrink: 0; background: rgba(0, 0, 0, 0.25); border-right: 1px solid rgba(255, 255, 255, 0.07);" +
-            " padding: 1.2rem 1rem; display: flex; flex-direction: column; gap: 0.45rem; overflow-y: auto; }" +
+            " position: relative; width: 290px; flex-shrink: 0; background: #0f0f0f;" +
+            " border-right: 1px solid rgba(255, 255, 255, 0.1); padding: 1rem 0.9rem;" +
+            " display: flex; flex-direction: column; gap: 0.3rem; min-height: 0; overflow-y: auto; }" +
             ".birdy-hub-tab {" +
-            " position: relative; display: flex; align-items: center; gap: 0.9rem; padding: 0.95rem 1.25rem; border-radius: 14px;" +
-            " font-size: 1.18rem; font-weight: 600; color: rgba(255, 255, 255, 0.65); cursor: pointer;" +
-            " border: 2px solid transparent; transition: all 160ms ease; outline: none; }" +
+            " display: flex; align-items: center; gap: 0.95rem; padding: 0.9rem 1.1rem; border-radius: 8px;" +
+            " font-size: 1.15rem; font-weight: 500; color: #aaaaaa; cursor: pointer;" +
+            " border: 2px solid transparent; outline: none; flex-shrink: 0; }" +
             ".birdy-hub-tab-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }" +
             ".birdy-hub-tab-icon svg { width: 20px; height: 20px; }" +
-            ".birdy-hub-tab.active { background: rgba(255, 255, 255, 0.08); color: #ffffff; }" +
-            ".birdy-hub-tab.active::before {" +
-            " content: ''; position: absolute; left: 0; top: 22%; height: 56%; width: 4px;" +
-            " border-radius: 0 4px 4px 0; background: #FF2028; }" +
-            ".birdy-hub-tab.birdy-focus {" +
-            " border-color: #ffffff; background: rgba(255, 32, 40, 0.18); color: #ffffff;" +
-            " box-shadow: 0 4px 18px rgba(255, 32, 40, 0.25); transform: scale(1.02); }" +
+            ".birdy-hub-tab.active { background: rgba(255, 255, 255, 0.1); color: #f1f1f1; font-weight: 600; }" +
+            ".birdy-hub-tab.birdy-focus { background: #f1f1f1; color: #0f0f0f; font-weight: 700; }" +
             ".birdy-hub-content {" +
-            " flex: 1; padding: 1.8rem 2.4rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }" +
+            " position: relative; flex: 1; min-height: 0; padding: 1.6rem 2.2rem 2.4rem;" +
+            " overflow-y: auto; display: flex; flex-direction: column; gap: 0.65rem; background: #141414; }" +
             ".birdy-hub-section-head {" +
-            " display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.3rem; padding-bottom: 0.6rem;" +
-            " border-bottom: 1px solid rgba(255, 255, 255, 0.06); }" +
-            ".birdy-hub-section-title { font-size: 1.35rem; font-weight: 700; color: #ffffff; }" +
+            " padding-bottom: 0.65rem; margin-bottom: 0.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); flex-shrink: 0; }" +
+            ".birdy-hub-section-title { font-size: 1.35rem; font-weight: 700; color: #f1f1f1; }" +
             ".birdy-hub-restart-banner {" +
-            " display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.3rem;" +
-            " background: rgba(255, 179, 0, 0.14); border: 1px solid rgba(255, 179, 0, 0.45); border-radius: 14px;" +
-            " color: #ffd54f; font-size: 1.05rem; font-weight: 600; }" +
+            " display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 1.2rem;" +
+            " background: rgba(62, 166, 255, 0.12); border: 1px solid rgba(62, 166, 255, 0.45); border-radius: 8px;" +
+            " color: #3ea6ff; font-size: 1rem; font-weight: 600; flex-shrink: 0; }" +
             ".birdy-hub-row {" +
-            " display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.05rem 1.45rem;" +
-            " background: rgba(255, 255, 255, 0.035); border-radius: 16px; border: 2px solid transparent;" +
-            " transition: all 160ms ease; }" +
-            ".birdy-hub-row.birdy-focus { border-color: rgba(255, 255, 255, 0.85); background: rgba(255, 255, 255, 0.09); }" +
-            ".birdy-hub-row-left { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; min-width: 0; }" +
-            ".birdy-hub-row-title-wrap { display: flex; align-items: center; gap: 0.7rem; }" +
-            ".birdy-hub-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }" +
-            ".birdy-hub-row-title { font-size: 1.2rem; font-weight: 600; color: #ffffff; }" +
-            ".birdy-hub-row-summary { font-size: 0.96rem; color: rgba(255, 255, 255, 0.55); line-height: 1.35; }" +
-            ".birdy-hub-pill-group { display: flex; align-items: center; gap: 0.45rem; flex-shrink: 0; background: rgba(0, 0, 0, 0.28); padding: 0.3rem; border-radius: 14px; }" +
+            " display: flex; align-items: center; justify-content: space-between; gap: 1.4rem; padding: 1rem 1.3rem;" +
+            " background: #212121; border-radius: 8px; border: 2px solid transparent; flex-shrink: 0; }" +
+            ".birdy-hub-row.birdy-focus { background: #2c2c2c; border-color: #f1f1f1; }" +
+            ".birdy-hub-row-left { display: flex; flex-direction: column; gap: 0.2rem; flex: 1; min-width: 0; }" +
+            ".birdy-hub-row-title-wrap { display: flex; align-items: center; gap: 0.65rem; }" +
+            ".birdy-hub-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }" +
+            ".birdy-hub-row-title { font-size: 1.15rem; font-weight: 500; color: #f1f1f1; }" +
+            ".birdy-hub-row.birdy-focus .birdy-hub-row-title { font-weight: 600; color: #ffffff; }" +
+            ".birdy-hub-row-summary { font-size: 0.94rem; color: #aaaaaa; line-height: 1.35; }" +
+            ".birdy-hub-pill-group { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; background: #141414; padding: 0.25rem; border-radius: 8px; }" +
             ".birdy-hub-pill {" +
-            " padding: 0.55rem 1rem; border-radius: 10px; font-size: 1.02rem; font-weight: 600;" +
-            " background: transparent; color: rgba(255, 255, 255, 0.6);" +
-            " border: 2px solid transparent; cursor: pointer; transition: all 150ms ease; outline: none; }" +
-            ".birdy-hub-pill.selected { background: #FF2028; color: #ffffff; box-shadow: 0 2px 10px rgba(255, 32, 40, 0.4); }" +
-            ".birdy-hub-pill.birdy-focus { border-color: #ffffff; color: #ffffff; transform: scale(1.04); }" +
+            " padding: 0.5rem 0.95rem; border-radius: 6px; font-size: 0.98rem; font-weight: 500;" +
+            " background: transparent; color: #aaaaaa; border: 2px solid transparent; cursor: pointer; outline: none; }" +
+            ".birdy-hub-pill.selected { background: #3ea6ff; color: #0f0f0f; font-weight: 700; }" +
+            ".birdy-hub-pill.birdy-focus { border-color: #ffffff; background: #f1f1f1; color: #0f0f0f; font-weight: 700; }" +
+            ".birdy-hub-switch-wrap { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }" +
+            ".birdy-hub-switch-label { font-size: 0.95rem; font-weight: 500; color: #aaaaaa; min-width: 64px; text-align: right; }" +
+            ".birdy-hub-switch-label.on { color: #3ea6ff; }" +
             ".birdy-hub-switch {" +
-            " position: relative; width: 58px; height: 32px; border-radius: 9999px; flex-shrink: 0;" +
-            " background: rgba(255, 255, 255, 0.18); border: 2px solid transparent; cursor: pointer;" +
-            " transition: background 180ms ease, transform 150ms ease, border-color 150ms ease; outline: none; }" +
-            ".birdy-hub-switch.on { background: #00D400; }" +
+            " position: relative; width: 52px; height: 28px; border-radius: 9999px; flex-shrink: 0;" +
+            " background: #525252; border: 2px solid transparent; cursor: pointer; outline: none; }" +
+            ".birdy-hub-switch.on { background: #3ea6ff; }" +
             ".birdy-hub-switch::after {" +
-            " content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px;" +
-            " border-radius: 50%; background: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.4);" +
-            " transition: transform 180ms ease; }" +
-            ".birdy-hub-switch.on::after { transform: translateX(26px); }" +
-            ".birdy-hub-switch.birdy-focus { border-color: #ffffff; box-shadow: 0 0 14px rgba(255, 255, 255, 0.45); transform: scale(1.06); }" +
+            " content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;" +
+            " border-radius: 50%; background: #f1f1f1; }" +
+            ".birdy-hub-switch.on::after { transform: translateX(24px); background: #0f0f0f; }" +
+            ".birdy-hub-switch.birdy-focus { border-color: #ffffff; }" +
             ".birdy-hub-action-btn {" +
-            " padding: 0.85rem 1.8rem; border-radius: 14px; font-size: 1.15rem; font-weight: 700;" +
-            " background: #FF2028; color: #ffffff; border: 2px solid transparent; cursor: pointer;" +
-            " transition: all 160ms ease; outline: none; align-self: flex-start; margin-top: 0.5rem; }" +
-            ".birdy-hub-action-btn.birdy-focus { border-color: #ffffff; box-shadow: 0 0 18px rgba(255, 32, 40, 0.75); transform: scale(1.03); }"
+            " padding: 0.85rem 1.6rem; border-radius: 8px; font-size: 1.1rem; font-weight: 600;" +
+            " background: #272727; color: #f1f1f1; border: 2px solid rgba(255,255,255,0.2); cursor: pointer;" +
+            " outline: none; align-self: flex-start; margin-top: 0.4rem; flex-shrink: 0; }" +
+            ".birdy-hub-action-btn.birdy-focus { background: #f1f1f1; color: #0f0f0f; border-color: #f1f1f1; font-weight: 700; }"
         );
         document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
     } catch (e) {}
 
     // ---- Modal DOM & Focus Controller ---------------------------------------------------------
     var modalBackdrop = null;
+    var sidebarEl = null;
+    var contentEl = null;
+    var sidebarTabs = [];
+    var currentRows = [];
+    var focusedNodes = [];
+    var restartBannerInserted = false;
+
     var activeTabKey = "sponsorblock";
     var focusArea = "sidebar"; // "sidebar" or "content"
     var focusSidebarIndex = 0;
@@ -268,13 +270,15 @@
 
         var titleBox = document.createElement("div");
         titleBox.className = "birdy-hub-title-box";
-        var badge = document.createElement("span");
-        badge.className = "birdy-hub-badge";
-        badge.textContent = window.__youtvBranding || "BirdyTV";
+        var ytMark = document.createElement("span");
+        ytMark.className = "birdy-hub-yt-mark";
+        var ytTri = document.createElement("span");
+        ytTri.className = "birdy-hub-yt-tri";
+        ytMark.appendChild(ytTri);
         var title = document.createElement("h2");
         title.className = "birdy-hub-title";
-        title.textContent = t("hub.title");
-        titleBox.appendChild(badge);
+        title.textContent = (window.__youtvBranding || "BirdyTV") + " · " + t("hub.title");
+        titleBox.appendChild(ytMark);
         titleBox.appendChild(title);
 
         var hint = document.createElement("span");
@@ -289,59 +293,108 @@
         var body = document.createElement("div");
         body.className = "birdy-hub-body";
 
-        var sidebar = document.createElement("div");
-        sidebar.className = "birdy-hub-sidebar";
-        body.appendChild(sidebar);
+        sidebarEl = document.createElement("div");
+        sidebarEl.className = "birdy-hub-sidebar";
+        buildSidebarOnce();
+        body.appendChild(sidebarEl);
 
-        var content = document.createElement("div");
-        content.className = "birdy-hub-content";
-        body.appendChild(content);
+        contentEl = document.createElement("div");
+        contentEl.className = "birdy-hub-content";
+        body.appendChild(contentEl);
 
         modal.appendChild(body);
         modalBackdrop.appendChild(modal);
         document.body.appendChild(modalBackdrop);
     }
 
-    function renderSidebar() {
-        var sidebar = modalBackdrop.querySelector(".birdy-hub-sidebar");
-        if (!sidebar) return;
-        sidebar.textContent = "";
+    function buildSidebarOnce() {
+        sidebarEl.textContent = "";
+        sidebarTabs = [];
+        for (var i = 0; i < TABS.length; i++) {
+            (function (tab, idx) {
+                var el = document.createElement("div");
+                el.className = "birdy-hub-tab" + (tab.key === activeTabKey ? " active" : "");
+                el.setAttribute("data-key", tab.key);
 
-        TABS.forEach(function (tab, idx) {
-            var el = document.createElement("div");
-            el.className = "birdy-hub-tab" + (tab.key === activeTabKey ? " active" : "");
-            el.setAttribute("data-key", tab.key);
+                var iconWrap = document.createElement("span");
+                iconWrap.className = "birdy-hub-tab-icon";
+                iconWrap.appendChild(createSvgIcon(tab.icon));
 
-            var iconWrap = document.createElement("span");
-            iconWrap.className = "birdy-hub-tab-icon";
-            iconWrap.appendChild(createSvgIcon(tab.icon));
+                var label = document.createElement("span");
+                label.textContent = t(tab.labelKey);
 
-            var label = document.createElement("span");
-            label.textContent = t(tab.labelKey);
+                el.appendChild(iconWrap);
+                el.appendChild(label);
+                el.onclick = function () {
+                    selectTab(idx);
+                    focusArea = "sidebar";
+                    updateFocusUI();
+                };
+                sidebarEl.appendChild(el);
+                sidebarTabs.push(el);
+            })(TABS[i], i);
+        }
+    }
 
-            el.appendChild(iconWrap);
-            el.appendChild(label);
-            el.onclick = function () {
-                activeTabKey = tab.key;
-                focusSidebarIndex = idx;
-                focusArea = "sidebar";
-                renderSidebar();
-                renderContent();
-                updateFocusUI();
-            };
-            sidebar.appendChild(el);
-        });
+    function updateSidebarActive() {
+        for (var i = 0; i < sidebarTabs.length; i++) {
+            sidebarTabs[i].classList.toggle("active", TABS[i].key === activeTabKey);
+        }
+    }
+
+    function selectTab(idx) {
+        if (idx < 0 || idx >= TABS.length) return;
+        focusSidebarIndex = idx;
+        var nextKey = TABS[idx].key;
+        if (activeTabKey !== nextKey) {
+            activeTabKey = nextKey;
+            updateSidebarActive();
+            renderContent();
+        }
+    }
+
+    function addRestartBannerIfNeeded() {
+        if (!pendingRestart || restartBannerInserted || !contentEl) return;
+        restartBannerInserted = true;
+        var banner = document.createElement("div");
+        banner.className = "birdy-hub-restart-banner";
+        var bannerText = document.createElement("span");
+        bannerText.textContent = t("restart.message");
+        banner.appendChild(bannerText);
+
+        var head = contentEl.querySelector(".birdy-hub-section-head");
+        if (head && head.nextSibling) {
+            contentEl.insertBefore(banner, head.nextSibling);
+        } else {
+            contentEl.appendChild(banner);
+        }
+
+        if (activeTabKey !== "about") {
+            var restartBtn = createRestartButton();
+            contentEl.appendChild(restartBtn);
+            currentRows.push(restartBtn);
+        }
+    }
+
+    function createRestartButton() {
+        var restartBtn = document.createElement("button");
+        restartBtn.className = "birdy-hub-action-btn birdy-interactive-row";
+        restartBtn.textContent = t("hub.restart_app");
+        restartBtn.onclick = function () {
+            location.reload();
+        };
+        return restartBtn;
     }
 
     function renderContent() {
-        var content = modalBackdrop.querySelector(".birdy-hub-content");
-        if (!content) return;
-        content.textContent = "";
+        if (!contentEl) return;
+        contentEl.textContent = "";
+        contentEl.scrollTop = 0;
+        currentRows = [];
+        restartBannerInserted = false;
 
-        var currentTab = null;
-        for (var i = 0; i < TABS.length; i++) {
-            if (TABS[i].key === activeTabKey) { currentTab = TABS[i]; break; }
-        }
+        var frag = document.createDocumentFragment();
+        var currentTab = TABS[focusSidebarIndex];
         if (currentTab) {
             var secHead = document.createElement("div");
             secHead.className = "birdy-hub-section-head";
@@ -349,197 +402,108 @@
             secTitle.className = "birdy-hub-section-title";
             secTitle.textContent = t(currentTab.labelKey);
             secHead.appendChild(secTitle);
-            content.appendChild(secHead);
+            frag.appendChild(secHead);
         }
 
         if (pendingRestart) {
+            restartBannerInserted = true;
             var banner = document.createElement("div");
             banner.className = "birdy-hub-restart-banner";
             var bannerText = document.createElement("span");
             bannerText.textContent = t("restart.message");
             banner.appendChild(bannerText);
-            content.appendChild(banner);
+            frag.appendChild(banner);
         }
 
         if (activeTabKey === "sponsorblock") {
-            content.appendChild(createToggleRow(
+            appendRow(frag, createToggleRow(
                 t("feature.sponsorblock.name"),
                 t("feature.sponsorblock.summary"),
-                getBool("YOUTV_SPONSORBLOCK", true),
-                function (val) {
-                    setBool("YOUTV_SPONSORBLOCK", val);
-                    renderContent();
-                    updateFocusUI();
-                }
+                "YOUTV_SPONSORBLOCK",
+                true
             ));
-
-            content.appendChild(createToggleRow(
+            appendRow(frag, createToggleRow(
                 t("sponsor.prompt_all.title"),
                 t("sponsor.prompt_all.summary"),
-                getBool("YOUTV_SPONSORBLOCK_PROMPT_ALL", false),
-                function (val) {
-                    setBool("YOUTV_SPONSORBLOCK_PROMPT_ALL", val);
-                    renderContent();
-                    updateFocusUI();
-                }
+                "YOUTV_SPONSORBLOCK_PROMPT_ALL",
+                false
             ));
 
-            CATEGORIES.forEach(function (cat) {
-                var currentMode = getSponsorMode(cat.key);
-                var row = document.createElement("div");
-                row.className = "birdy-hub-row birdy-interactive-row";
-                row.setAttribute("data-type", "3way");
-                row.setAttribute("data-cat", cat.key);
-
-                var left = document.createElement("div");
-                left.className = "birdy-hub-row-left";
-                var titleWrap = document.createElement("div");
-                titleWrap.className = "birdy-hub-row-title-wrap";
-                var dot = document.createElement("span");
-                dot.className = "birdy-hub-dot";
-                dot.style.backgroundColor = cat.color;
-                var rowTitle = document.createElement("span");
-                rowTitle.className = "birdy-hub-row-title";
-                rowTitle.textContent = t(cat.titleKey);
-                titleWrap.appendChild(dot);
-                titleWrap.appendChild(rowTitle);
-                left.appendChild(titleWrap);
-
-                var pillGroup = document.createElement("div");
-                pillGroup.className = "birdy-hub-pill-group";
-
-                var modes = [
-                    { id: "skip", text: t("hub.action.skip") },
-                    { id: "prompt", text: t("hub.action.prompt") },
-                    { id: "off", text: t("hub.action.off") }
-                ];
-
-                modes.forEach(function (m, idx) {
-                    var pill = document.createElement("button");
-                    pill.className = "birdy-hub-pill" + (currentMode === m.id ? " selected" : "");
-                    pill.textContent = m.text;
-                    pill.setAttribute("data-mode", m.id);
-                    pill.onclick = function () {
-                        setSponsorMode(cat.key, m.id);
-                        focusPillIndex = idx;
-                        renderContent();
-                        updateFocusUI();
-                    };
-                    pillGroup.appendChild(pill);
-                });
-
-                row.appendChild(left);
-                row.appendChild(pillGroup);
-                content.appendChild(row);
-            });
+            for (var i = 0; i < CATEGORIES.length; i++) {
+                appendRow(frag, createThreeWayRow(CATEGORIES[i]));
+            }
         } else if (activeTabKey === "seekbar") {
-            content.appendChild(createToggleRow(
+            appendRow(frag, createToggleRow(
                 t("feature.sponsorblock_colors.name"),
                 t("feature.sponsorblock_colors.summary"),
-                getBool("YOUTV_SPONSORBLOCK_COLORS", true),
-                function (val) {
-                    setBool("YOUTV_SPONSORBLOCK_COLORS", val);
-                    renderContent();
-                    updateFocusUI();
-                }
+                "YOUTV_SPONSORBLOCK_COLORS",
+                true
             ));
 
-            CATEGORIES.forEach(function (cat) {
+            for (var j = 0; j < CATEGORIES.length; j++) {
+                var cat = CATEGORIES[j];
                 var key = "YOUTV_SPONSORBLOCK_COLORS_" + cat.key.toUpperCase() + "_SEEKBAR";
                 var def = cat.key === "sponsor" || cat.key === "selfpromo" || cat.key === "interaction";
-                content.appendChild(createToggleRow(
+                appendRow(frag, createToggleRow(
                     t(cat.titleKey),
                     t("sponsor." + cat.key + ".seekbar.summary"),
-                    getBool(key, def),
-                    function (val) {
-                        setBool(key, val);
-                        renderContent();
-                        updateFocusUI();
-                    },
+                    key,
+                    def,
+                    false,
                     cat.color
                 ));
-            });
+            }
         } else if (activeTabKey === "ads") {
-            content.appendChild(createToggleRow(
+            appendRow(frag, createToggleRow(
                 t("feature.ads.name"),
                 t("feature.ads.summary"),
-                getBool("YOUTV_ADS", true),
-                function (val) {
-                    setBool("YOUTV_ADS", val);
-                    renderContent();
-                    updateFocusUI();
-                }
+                "YOUTV_ADS",
+                true
             ));
-
-            content.appendChild(createToggleRow(
+            appendRow(frag, createToggleRow(
                 t("feature.premium-promos.name"),
                 t("feature.premium-promos.summary"),
-                getBool("YOUTV_PREMIUM_PROMOS", true),
-                function (val) {
-                    setBool("YOUTV_PREMIUM_PROMOS", val);
-                    renderContent();
-                    updateFocusUI();
-                }
+                "YOUTV_PREMIUM_PROMOS",
+                true
             ));
         } else if (activeTabKey === "player") {
-            content.appendChild(createToggleRow(
+            appendRow(frag, createToggleRow(
                 t("feature.player.name"),
                 t("feature.player.summary"),
-                getBool("YOUTV_PLAYER", true),
-                function (val) {
-                    setBool("YOUTV_PLAYER", val);
-                    renderContent();
-                    updateFocusUI();
-                }
+                "YOUTV_PLAYER",
+                true
             ));
 
-            PLAYER_BUTTONS.forEach(function (btn) {
-                var key = "YOUTV_PLAYER_" + btn.key.toUpperCase();
-                content.appendChild(createToggleRow(
+            for (var k = 0; k < PLAYER_BUTTONS.length; k++) {
+                var btn = PLAYER_BUTTONS[k];
+                appendRow(frag, createToggleRow(
                     t(btn.titleKey),
                     btn.summaryKey ? t(btn.summaryKey) : "",
-                    getBool(key, false),
-                    function (val) {
-                        setBool(key, val);
-                        renderContent();
-                        updateFocusUI();
-                    }
+                    "YOUTV_PLAYER_" + btn.key.toUpperCase(),
+                    false
                 ));
-            });
+            }
         } else if (activeTabKey === "shorts") {
-            content.appendChild(createToggleRow(
+            appendRow(frag, createToggleRow(
                 t("feature.shorts.name"),
                 t("feature.shorts.summary"),
-                getBool("YOUTV_SHORTS", true),
-                function (val) {
-                    setBool("YOUTV_SHORTS", val);
-                    pendingRestart = true;
-                    renderContent();
-                    updateFocusUI();
-                }
+                "YOUTV_SHORTS",
+                true,
+                true
             ));
-
-            content.appendChild(createToggleRow(
+            appendRow(frag, createToggleRow(
                 t("feature.topics.name"),
                 t("feature.topics.summary"),
-                getBool("YOUTV_TOPICS", false),
-                function (val) {
-                    setBool("YOUTV_TOPICS", val);
-                    pendingRestart = true;
-                    renderContent();
-                    updateFocusUI();
-                }
+                "YOUTV_TOPICS",
+                false,
+                true
             ));
         } else if (activeTabKey === "ryd") {
-            content.appendChild(createToggleRow(
+            appendRow(frag, createToggleRow(
                 t("feature.ryd.name"),
                 t("feature.ryd.summary"),
-                getBool("YOUTV_RYD", true),
-                function (val) {
-                    setBool("YOUTV_RYD", val);
-                    renderContent();
-                    updateFocusUI();
-                }
+                "YOUTV_RYD",
+                true
             ));
         } else if (activeTabKey === "about") {
             var repoRow = document.createElement("div");
@@ -557,21 +521,79 @@
             repoLeft.appendChild(repoTitle);
             repoLeft.appendChild(repoSummary);
             repoRow.appendChild(repoLeft);
-            content.appendChild(repoRow);
+            frag.appendChild(repoRow);
         }
 
         if (pendingRestart || activeTabKey === "about") {
-            var restartBtn = document.createElement("button");
-            restartBtn.className = "birdy-hub-action-btn birdy-interactive-row";
-            restartBtn.textContent = t("hub.restart_app");
-            restartBtn.onclick = function () {
-                location.reload();
-            };
-            content.appendChild(restartBtn);
+            appendRow(frag, createRestartButton());
         }
+
+        contentEl.appendChild(frag);
     }
 
-    function createToggleRow(titleText, summaryText, isEnabled, onToggle, dotColor) {
+    function appendRow(frag, row) {
+        frag.appendChild(row);
+        currentRows.push(row);
+    }
+
+    function createThreeWayRow(cat) {
+        var currentMode = getSponsorMode(cat.key);
+        var row = document.createElement("div");
+        row.className = "birdy-hub-row birdy-interactive-row";
+        row.setAttribute("data-type", "3way");
+        row.setAttribute("data-cat", cat.key);
+
+        var left = document.createElement("div");
+        left.className = "birdy-hub-row-left";
+        var titleWrap = document.createElement("div");
+        titleWrap.className = "birdy-hub-row-title-wrap";
+        var dot = document.createElement("span");
+        dot.className = "birdy-hub-dot";
+        dot.style.backgroundColor = cat.color;
+        var rowTitle = document.createElement("span");
+        rowTitle.className = "birdy-hub-row-title";
+        rowTitle.textContent = t(cat.titleKey);
+        titleWrap.appendChild(dot);
+        titleWrap.appendChild(rowTitle);
+        left.appendChild(titleWrap);
+
+        var pillGroup = document.createElement("div");
+        pillGroup.className = "birdy-hub-pill-group";
+
+        var modes = [
+            { id: "skip", text: t("hub.action.skip") },
+            { id: "prompt", text: t("hub.action.prompt") },
+            { id: "off", text: t("hub.action.off") }
+        ];
+
+        var pills = [];
+        for (var i = 0; i < modes.length; i++) {
+            (function (m, idx) {
+                var pill = document.createElement("button");
+                pill.className = "birdy-hub-pill" + (currentMode === m.id ? " selected" : "");
+                pill.textContent = m.text;
+                pill.setAttribute("data-mode", m.id);
+                pill.onclick = function () {
+                    setSponsorMode(cat.key, m.id);
+                    for (var p = 0; p < pills.length; p++) {
+                        pills[p].classList.toggle("selected", p === idx);
+                    }
+                    focusPillIndex = idx;
+                    updateFocusUI();
+                };
+                pillGroup.appendChild(pill);
+                pills.push(pill);
+            })(modes[i], i);
+        }
+
+        row._pills = pills;
+        row.appendChild(left);
+        row.appendChild(pillGroup);
+        return row;
+    }
+
+    function createToggleRow(titleText, summaryText, storageKey, defaultVal, needsRestart, dotColor) {
+        var isEnabled = getBool(storageKey, defaultVal);
         var row = document.createElement("div");
         row.className = "birdy-hub-row birdy-interactive-row";
         row.setAttribute("data-type", "toggle");
@@ -600,26 +622,49 @@
             left.appendChild(rowSummary);
         }
 
+        var wrap = document.createElement("div");
+        wrap.className = "birdy-hub-switch-wrap";
+
+        var stateLabel = document.createElement("span");
+        stateLabel.className = "birdy-hub-switch-label" + (isEnabled ? " on" : "");
+        stateLabel.textContent = isEnabled ? t("hub.enabled") : t("hub.disabled");
+
         var switchBtn = document.createElement("button");
         switchBtn.className = "birdy-hub-switch" + (isEnabled ? " on" : "");
-        switchBtn.setAttribute("aria-label", isEnabled ? t("hub.enabled") : t("hub.disabled"));
-        switchBtn.onclick = function () {
-            onToggle(!isEnabled);
-        };
+        switchBtn.setAttribute("aria-label", stateLabel.textContent);
 
+        function applyToggle() {
+            isEnabled = !isEnabled;
+            setBool(storageKey, isEnabled);
+            switchBtn.classList.toggle("on", isEnabled);
+            stateLabel.classList.toggle("on", isEnabled);
+            var txt = isEnabled ? t("hub.enabled") : t("hub.disabled");
+            stateLabel.textContent = txt;
+            switchBtn.setAttribute("aria-label", txt);
+            if (needsRestart) {
+                pendingRestart = true;
+                addRestartBannerIfNeeded();
+            }
+        }
+
+        switchBtn.onclick = applyToggle;
+        row._switchBtn = switchBtn;
+        row._toggle = applyToggle;
+
+        wrap.appendChild(stateLabel);
+        wrap.appendChild(switchBtn);
         row.appendChild(left);
-        row.appendChild(switchBtn);
+        row.appendChild(wrap);
         return row;
     }
 
     function syncPillIndexToSelected(row) {
-        if (!row || row.getAttribute("data-type") !== "3way") {
+        if (!row || !row._pills) {
             focusPillIndex = 0;
             return;
         }
-        var pills = row.querySelectorAll(".birdy-hub-pill");
-        for (var i = 0; i < pills.length; i++) {
-            if (pills[i].classList.contains("selected")) {
+        for (var i = 0; i < row._pills.length; i++) {
+            if (row._pills[i].classList.contains("selected")) {
                 focusPillIndex = i;
                 return;
             }
@@ -627,45 +672,59 @@
         focusPillIndex = 0;
     }
 
-    // ---- Focus & Navigation -------------------------------------------------------------------
+    // ---- Scroll & Focus Controller ------------------------------------------------------------
+    function ensureVisible(container, el, isFirst) {
+        if (!container || !el) return;
+        if (isFirst) {
+            container.scrollTop = 0;
+            return;
+        }
+        var cRect = container.getBoundingClientRect();
+        var eRect = el.getBoundingClientRect();
+        var pad = 20;
+        if (eRect.top - pad < cRect.top) {
+            container.scrollTop -= (cRect.top - (eRect.top - pad));
+        } else if (eRect.bottom + pad > cRect.bottom) {
+            container.scrollTop += ((eRect.bottom + pad) - cRect.bottom);
+        }
+    }
+
+    function clearFocusedNodes() {
+        for (var i = 0; i < focusedNodes.length; i++) {
+            focusedNodes[i].classList.remove("birdy-focus");
+        }
+        focusedNodes.length = 0;
+    }
+
+    function addFocusedNode(el) {
+        if (!el) return;
+        el.classList.add("birdy-focus");
+        focusedNodes.push(el);
+    }
+
     function updateFocusUI() {
         if (!modalBackdrop) return;
-        var prevFocused = modalBackdrop.querySelectorAll(".birdy-focus");
-        for (var i = 0; i < prevFocused.length; i++) {
-            prevFocused[i].classList.remove("birdy-focus");
-        }
+        clearFocusedNodes();
 
         if (focusArea === "sidebar") {
-            var tabs = modalBackdrop.querySelectorAll(".birdy-hub-tab");
-            if (tabs[focusSidebarIndex]) {
-                tabs[focusSidebarIndex].classList.add("birdy-focus");
-                if (tabs[focusSidebarIndex].scrollIntoView) {
-                    tabs[focusSidebarIndex].scrollIntoView({ block: "nearest" });
-                }
+            var tab = sidebarTabs[focusSidebarIndex];
+            if (tab) {
+                addFocusedNode(tab);
+                ensureVisible(sidebarEl, tab, focusSidebarIndex === 0);
             }
         } else {
-            var rows = modalBackdrop.querySelectorAll(".birdy-interactive-row");
-            if (focusContentIndex >= rows.length) focusContentIndex = Math.max(0, rows.length - 1);
-            var targetRow = rows[focusContentIndex];
+            if (!currentRows.length) return;
+            if (focusContentIndex >= currentRows.length) focusContentIndex = currentRows.length - 1;
+            var targetRow = currentRows[focusContentIndex];
             if (!targetRow) return;
 
-            var type = targetRow.getAttribute("data-type");
-            if (type === "3way") {
-                targetRow.classList.add("birdy-focus");
-                var pills = targetRow.querySelectorAll(".birdy-hub-pill");
-                if (pills[focusPillIndex]) {
-                    pills[focusPillIndex].classList.add("birdy-focus");
-                }
-            } else if (type === "toggle") {
-                targetRow.classList.add("birdy-focus");
-                var switchBtn = targetRow.querySelector(".birdy-hub-switch");
-                if (switchBtn) switchBtn.classList.add("birdy-focus");
-            } else {
-                targetRow.classList.add("birdy-focus");
+            addFocusedNode(targetRow);
+            if (targetRow._pills && targetRow._pills[focusPillIndex]) {
+                addFocusedNode(targetRow._pills[focusPillIndex]);
+            } else if (targetRow._switchBtn) {
+                addFocusedNode(targetRow._switchBtn);
             }
-            if (targetRow.scrollIntoView) {
-                targetRow.scrollIntoView({ block: "nearest" });
-            }
+            ensureVisible(contentEl, targetRow, focusContentIndex === 0);
         }
     }
 
@@ -686,53 +745,48 @@
             return;
         }
 
-        var rows = modalBackdrop.querySelectorAll(".birdy-interactive-row");
-
         if (focusArea === "sidebar") {
             if (code === 38) { // UP
                 stopEvent(e);
-                focusSidebarIndex = Math.max(0, focusSidebarIndex - 1);
-                activeTabKey = TABS[focusSidebarIndex].key;
-                renderSidebar();
-                renderContent();
-                updateFocusUI();
+                if (focusSidebarIndex > 0) {
+                    selectTab(focusSidebarIndex - 1);
+                    updateFocusUI();
+                }
             } else if (code === 40) { // DOWN
                 stopEvent(e);
-                focusSidebarIndex = Math.min(TABS.length - 1, focusSidebarIndex + 1);
-                activeTabKey = TABS[focusSidebarIndex].key;
-                renderSidebar();
-                renderContent();
-                updateFocusUI();
+                if (focusSidebarIndex < TABS.length - 1) {
+                    selectTab(focusSidebarIndex + 1);
+                    updateFocusUI();
+                }
             } else if (code === 39 || code === 13 || code === 23) { // RIGHT or OK
                 stopEvent(e);
-                if (rows.length > 0) {
+                if (currentRows.length > 0) {
                     focusArea = "content";
                     focusContentIndex = 0;
-                    syncPillIndexToSelected(rows[0]);
+                    syncPillIndexToSelected(currentRows[0]);
                     updateFocusUI();
                 }
             }
         } else {
-            var curRow = rows[focusContentIndex];
-            var type = curRow ? curRow.getAttribute("data-type") : null;
+            var curRow = currentRows[focusContentIndex];
 
             if (code === 38) { // UP
                 stopEvent(e);
                 if (focusContentIndex > 0) {
                     focusContentIndex--;
-                    syncPillIndexToSelected(rows[focusContentIndex]);
+                    syncPillIndexToSelected(currentRows[focusContentIndex]);
                     updateFocusUI();
                 }
             } else if (code === 40) { // DOWN
                 stopEvent(e);
-                if (focusContentIndex < rows.length - 1) {
+                if (focusContentIndex < currentRows.length - 1) {
                     focusContentIndex++;
-                    syncPillIndexToSelected(rows[focusContentIndex]);
+                    syncPillIndexToSelected(currentRows[focusContentIndex]);
                     updateFocusUI();
                 }
             } else if (code === 37) { // LEFT
                 stopEvent(e);
-                if (type === "3way" && focusPillIndex > 0) {
+                if (curRow && curRow._pills && focusPillIndex > 0) {
                     focusPillIndex--;
                     updateFocusUI();
                 } else {
@@ -741,21 +795,16 @@
                 }
             } else if (code === 39) { // RIGHT
                 stopEvent(e);
-                if (type === "3way") {
-                    var pills = curRow.querySelectorAll(".birdy-hub-pill");
-                    if (focusPillIndex < pills.length - 1) {
-                        focusPillIndex++;
-                        updateFocusUI();
-                    }
+                if (curRow && curRow._pills && focusPillIndex < curRow._pills.length - 1) {
+                    focusPillIndex++;
+                    updateFocusUI();
                 }
             } else if (code === 13 || code === 23) { // OK / ENTER
                 stopEvent(e);
-                if (type === "3way") {
-                    var pillsList = curRow.querySelectorAll(".birdy-hub-pill");
-                    if (pillsList[focusPillIndex]) pillsList[focusPillIndex].click();
-                } else if (type === "toggle") {
-                    var swBtn = curRow.querySelector(".birdy-hub-switch");
-                    if (swBtn) swBtn.click();
+                if (curRow && curRow._pills && curRow._pills[focusPillIndex]) {
+                    curRow._pills[focusPillIndex].click();
+                } else if (curRow && curRow._toggle) {
+                    curRow._toggle();
                 } else if (curRow) {
                     curRow.click();
                 }
@@ -764,7 +813,7 @@
     }
 
     function isHubOpen() {
-        return !!(modalBackdrop && modalBackdrop.className.indexOf("show") !== -1);
+        return !!(modalBackdrop && modalBackdrop.classList.contains("show"));
     }
 
     function openHub(initialTab) {
@@ -778,12 +827,11 @@
                 }
             }
         }
-        renderSidebar();
+        modalBackdrop.classList.add("show");
+        updateSidebarActive();
         renderContent();
         focusArea = "sidebar";
         updateFocusUI();
-
-        modalBackdrop.className = "birdy-hub-backdrop show";
         window.removeEventListener("keydown", onKeyDown, true);
         window.addEventListener("keydown", onKeyDown, true);
         youtv.report("settings-hub: opened");
@@ -791,7 +839,7 @@
 
     function closeHub() {
         if (!modalBackdrop) return;
-        modalBackdrop.className = "birdy-hub-backdrop";
+        modalBackdrop.classList.remove("show");
         window.removeEventListener("keydown", onKeyDown, true);
         youtv.report("settings-hub: closed");
     }
@@ -813,7 +861,6 @@
         return false;
     }
 
-    // Global shortcuts: F2 opens hub; OK/Enter on the native "Open BirdyTV Settings" item opens hub
     window.addEventListener("keydown", function (e) {
         if (isHubOpen()) return;
         var code = e.keyCode || e.which;
@@ -841,7 +888,6 @@
         }
     }, true);
 
-    // Pointer / click on the native settings entry for BirdyTV Settings
     document.addEventListener("click", function (e) {
         if (isHubOpen()) return;
         if (matchesHubEntry(e.target)) {
