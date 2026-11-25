@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-25T22:39:13",
-  "description": "## [1.4.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.3.1...v1.4.0) (2026-11-25)\n\n### ✨ New Features\n\n* **settings:** add TizenTube Cobalt-style TV settings hub and 1-click deploy script ([2c79b45](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/2c79b459660019353ea62b37ba12ca16a5eff006))\n* update patches ([87c7c19](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/87c7c190df20268536defd77da4561f26d4bd199))\n* update patches ([7d1ace8](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/7d1ace86f8182a3d656875d28283dfd7df4295c1))\n* update patches ([22b01a4](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/22b01a401e285f3fad122ff13a8c5df394590c11))\n\n### 🐛 Bug Fixes\n\n* **deploy:** auto-detect Android Studio Java JBR and fallback paths ([4b8647f](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/4b8647f65a308d969aa54a42994039e7632ebe4a))\n* **deploy:** handle signature mismatch reinstall and launch correct package ([471121e](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/471121e6a3f54e7de515adcefb9a68aaa5186e8c))\n* **deploy:** use bundled Java 21 and correct Morphe CLI arguments ([2d0cbb7](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/2d0cbb77ba521327b4269da7aeb9deb74b55520a))",
-  "download_url": "https://github.com/SEIFELDEEN15/Birdy-Patches/releases/download/v1.4.0/patches-1.4.0.mpp",
+  "created_at": "2026-11-25T22:44:50",
+  "description": "## [1.5.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.4.0...v1.5.0) (2026-11-25)\n\n### ✨ New Features\n\n* update patches ([587aeb7](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/587aeb78e457bae181a46032fde26526f28b0139))",
+  "download_url": "https://github.com/SEIFELDEEN15/Birdy-Patches/releases/download/v1.5.0/patches-1.5.0.mpp",
   "signature_download_url": "",
-  "version": "1.4.0"
+  "version": "1.5.0"
 }
