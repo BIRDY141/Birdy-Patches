@@ -126,7 +126,14 @@ Assert-Test ((Get-CategoryMode $true $false $false $true) -eq "off") "Global pro
 # Test 4.6: Master feature turned off
 Assert-Test ((Get-CategoryMode $false $true $true $true) -eq "off") "Master feature disabled resolves everything to 'off'"
 
+# 5. Run Node.js CI test suite if node is available
+if (Get-Command node -ErrorAction SilentlyContinue) {
+    node --test "$baseDir\tools\tests\i18n.test.cjs" "$baseDir\tools\tests\site-locales.test.cjs" "$baseDir\tools\tests\premium.test.cjs" "$baseDir\tools\tests\tree-filters.test.cjs"
+    Assert-Test ($LASTEXITCODE -eq 0) "Node.js CI test suite passed"
+}
+
 Write-Host ""
 Write-Host "========================================"
 Write-Host "  RESULTS: $passed passed, $failed failed  "
 Write-Host "========================================"
+if ($failed -gt 0) { exit 1 }

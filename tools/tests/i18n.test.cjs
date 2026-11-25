@@ -283,14 +283,14 @@ test('Arabic regional settings, restart and direction preserve saved settings', 
     const arabic = settings(p).items[1].settingCategoryCollectionRenderer;
     assert.ok(arabic.title.runs[0].text === catalogs.ar['section.title'].replace('{brand}', 'BirdyTV') ||
               arabic.title.runs[0].text === catalogs.ar['section.title'].replace('{brand}', 'FaroTV'));
-    assert.ok(arabic.items.length >= 26);
-    const shorts = arabic.items.find(x => x.settingBooleanRenderer.itemId === 'YOUTV_SHORTS').settingBooleanRenderer;
-    const popup = shorts.enableServiceEndpoint.commandExecutorCommand.commands[1].confirmDialogEndpoint.content.confirmDialogRenderer;
-    assert.equal(popup.confirmButton.buttonRenderer.text.runs[0].text, catalogs.ar['restart.confirm']);
+    assert.equal(arabic.items.length, 1);
+    assert.equal(arabic.items[0].settingActionRenderer.itemId, 'BIRDY_SETTINGS_HUB');
+    assert.equal(arabic.items[0].settingActionRenderer.title.runs[0].text, catalogs.ar['hub.open']);
     p.document.documentElement.lang = 'en';
     assert.equal(p.farotvI18n.direction(), 'ltr');
     const english = settings(p).items[1].settingCategoryCollectionRenderer;
-    assert.deepEqual(Array.from(arabic.items, x => x.settingBooleanRenderer.itemId), Array.from(english.items, x => x.settingBooleanRenderer.itemId));
+    assert.equal(english.items[0].settingActionRenderer.itemId, 'BIRDY_SETTINGS_HUB');
+    assert.equal(english.items[0].settingActionRenderer.title.runs[0].text, catalogs.en['hub.open']);
 });
 
 test('app language wins over browser; regional locales and English fallback work', () => {
@@ -312,31 +312,24 @@ test('missing keys fall back per string; substitution does not interpret dollar 
     assert.equal(p.youtv.t('section.title', { brand: '$& <Faro>' }), '$& <Faro> Parches');
 });
 
-test('all 26 settings, About and restart commands switch language without changing stored IDs', () => {
+test('BirdyTV settings hub entry, About and stored IDs switch language cleanly', () => {
     const p = page('es');
     const spanish = settings(p);
     const a = spanish.items[1].settingCategoryCollectionRenderer;
     assert.ok(a.title.runs[0].text === 'BirdyTV Parches' || a.title.runs[0].text === 'FaroTV Parches');
-    assert.ok(a.items.length >= 26);
-    assert.equal(a.items[0].settingBooleanRenderer.title.runs[0].text, 'Bloquear anuncios');
+    assert.equal(a.items.length, 1);
+    assert.equal(a.items[0].settingActionRenderer.itemId, 'BIRDY_SETTINGS_HUB');
+    assert.equal(a.items[0].settingActionRenderer.title.runs[0].text, catalogs.es['hub.open']);
     vm.runInContext(`localStorage.setItem('yt.leanback.default::YOUTV_PLAYER_LIKE', '{"data":true}');`, p);
     p.document.documentElement.lang = 'en-US';
     const english = settings(p);
     const b = english.items[1].settingCategoryCollectionRenderer;
     assert.ok(b.title.runs[0].text === 'BirdyTV Patches' || b.title.runs[0].text === 'FaroTV Patches');
-    assert.equal(b.items[0].settingBooleanRenderer.title.runs[0].text, 'Block ads');
-    assert.deepEqual(Array.from(a.items, x => x.settingBooleanRenderer.itemId), Array.from(b.items, x => x.settingBooleanRenderer.itemId));
-    const shorts = b.items.find(x => x.settingBooleanRenderer.itemId === 'YOUTV_SHORTS').settingBooleanRenderer;
-    const popup = shorts.enableServiceEndpoint.commandExecutorCommand.commands[1].confirmDialogEndpoint.content.confirmDialogRenderer;
-    assert.equal(popup.title.runs[0].text, 'Restart required');
-    assert.equal(popup.confirmButton.buttonRenderer.text.runs[0].text, 'Restart');
-    assert.equal(popup.cancelButton.buttonRenderer.text.runs[0].text, 'Later');
+    assert.equal(b.items.length, 1);
+    assert.equal(b.items[0].settingActionRenderer.itemId, 'BIRDY_SETTINGS_HUB');
+    assert.equal(b.items[0].settingActionRenderer.title.runs[0].text, catalogs.en['hub.open']);
     assert.match(english.items[0].settingCategoryCollectionRenderer.items[1].settingActionRenderer.summary.runs[0].text, /(Created by|Birdy|Gabriel Jair|SEIFELDEEN15)/i);
     assert.equal(p.localStorage.getItem('yt.leanback.default::YOUTV_PLAYER_LIKE'), '{"data":true}');
-    for (const item of b.items) {
-        const renderer = item.settingBooleanRenderer;
-        assert.ok(!/^(feature|player|sponsor)\./.test(renderer.title.runs[0].text), renderer.itemId);
-    }
 });
 
 
