@@ -1,3 +1,9 @@
+## [1.7.3](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.7.2...v1.7.3) (2026-11-25)
+
+### 🐛 Bug Fixes
+
+* avoid innerHTML in settings hub for TrustedHTML CSP ([39f8b12](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/39f8b128442e9a5ed4f8d0caa6514eb8d3e994c3))
+
 ## [1.7.2](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.7.1...v1.7.2) (2026-11-25)
 
 ### 🐛 Bug Fixes
