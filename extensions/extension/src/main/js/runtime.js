@@ -45,6 +45,7 @@
     var STORAGE_PREFIX = "yt.leanback.default::";
     var CATEGORY_ID = "SETTING_CAT_YOUTV";
     var RESTART_SETTING = { key: "YOUTV_RESTART_REQUEST", defaultValue: false };  // see restart dialog
+    var OPEN_HUB_SETTING = { key: "BIRDY_OPEN_HUB_REQUEST", defaultValue: false };
     var settings = [];          // { key, title, summary, defaultValue } in display order
     var registry = null;        // YouTube's known client settings ({ KEY: true })
     var defaults = null;        // YouTube's client setting defaults (Map)
@@ -95,6 +96,7 @@
         }
         settings.forEach(registerSetting);
         registerSetting(RESTART_SETTING);
+        registerSetting(OPEN_HUB_SETTING);
         report("settings: registered " + settings.length + " setting(s)");
         return true;
     }
@@ -139,6 +141,10 @@
         return key === STORAGE_PREFIX + RESTART_SETTING.key && String(value).indexOf("true") !== -1;
     }
 
+    function isOpenHubRequest(key, value) {
+        return key === STORAGE_PREFIX + OPEN_HUB_SETTING.key && String(value).indexOf("true") !== -1;
+    }
+
     var restarting = false;
     function restartApp() {
         if (restarting) return;
@@ -152,11 +158,20 @@
         var setItem = Storage.prototype.setItem;
         Storage.prototype.setItem = function (key, value) {
             var result = setItem.apply(this, arguments);
-            try { if (this === localStorage && isRestartRequest(key, value)) restartApp(); } catch (e) {}
+            try {
+                if (this === localStorage && isRestartRequest(key, value)) restartApp();
+                if (this === localStorage && isOpenHubRequest(key, value)) {
+                    try { localStorage.removeItem(STORAGE_PREFIX + OPEN_HUB_SETTING.key); } catch (e) {}
+                    if (window.birdyTvSettingsHub && typeof window.birdyTvSettingsHub.open === "function") {
+                        setTimeout(function () { window.birdyTvSettingsHub.open(); }, 0);
+                    }
+                }
+            } catch (e) {}
             return result;
         };
         // A leftover request (for example the app was closed before the reload) is dropped.
         localStorage.removeItem(STORAGE_PREFIX + RESTART_SETTING.key);
+        localStorage.removeItem(STORAGE_PREFIX + OPEN_HUB_SETTING.key);
     } catch (e) {
         report("restart hook failed: " + e);
     }
@@ -307,7 +322,7 @@
             isSettings = true;
         }
         if (!isSettings) return;
-        var hubAction = { signalAction: { signal: "BIRDY_OPEN_SETTINGS" } };
+        var hubAction = clientSettingEndpoint(OPEN_HUB_SETTING.key, true);
         var hubItem = { settingActionRenderer: {
             itemId: "BIRDY_SETTINGS_HUB",
             title: runs(t("hub.open")),
@@ -315,6 +330,7 @@
             thumbnail: { thumbnails: [{ url: GSTATIC_PICTURE + "brand" }] },
             serviceEndpoint: hubAction,
             actionButton: { buttonRenderer: {
+                style: "STYLE_PRIMARY",
                 text: runs(t("hub.open")),
                 serviceEndpoint: hubAction,
                 command: hubAction
