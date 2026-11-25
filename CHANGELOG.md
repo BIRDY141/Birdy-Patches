@@ -1,3 +1,13 @@
+## [1.8.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.7.3...v1.8.0) (2026-11-25)
+
+### ✨ New Features
+
+* YouTube TV styling, scroll fix, and UI optimizations for settings hub ([a1b1e30](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/a1b1e30d2403fd8f4e18149f020c4b8aa2a39e05))
+
+### 🐛 Bug Fixes
+
+* bump app.morphe.patches Gradle plugin to 2.1.1 ([2c6ee1c](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/2c6ee1cc36f825fb0033914242e13e30996c4240))
+
 ## [1.7.3](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.7.2...v1.7.3) (2026-11-25)
 
 ### 🐛 Bug Fixes
