@@ -773,15 +773,13 @@
         if (code === 13 || code === 23) {
             var candidate = document.activeElement;
             if (!matchesHubEntry(candidate)) {
-                candidate = document.querySelector("[data-item-id='BIRDY_SETTINGS_HUB']") ||
-                    document.querySelector(".ytlr-focused, [focused='true'], [aria-selected='true']");
-                if (candidate && candidate.getAttribute("data-item-id") === "BIRDY_SETTINGS_HUB") {
-                    // Only trigger if it's actually the focused item
-                    var isFocused = candidate.classList.contains("ytlr-focused") ||
-                        candidate.getAttribute("focused") === "true" ||
-                        candidate.getAttribute("aria-selected") === "true" ||
-                        candidate.querySelector(".ytlr-focused, [focused='true'], [aria-selected='true']");
-                    if (!isFocused) candidate = null;
+                candidate = null;
+                var focusedList = document.querySelectorAll("[class*='focused'], [focused='true'], [aria-selected='true']");
+                for (var i = 0; i < focusedList.length; i++) {
+                    if (matchesHubEntry(focusedList[i])) {
+                        candidate = focusedList[i];
+                        break;
+                    }
                 }
             }
             if (candidate && matchesHubEntry(candidate)) {
