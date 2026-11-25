@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.6.0...v1.7.0) (2026-11-25)
+
+### ✨ New Features
+
+* update patches ([bd0cd7b](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/bd0cd7bee20f92d5a7842c698cad35c3a9c689e1))
+
 ## [1.6.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.5.0...v1.6.0) (2026-11-25)
 
 ### ✨ New Features
