@@ -1,3 +1,9 @@
+## [1.7.2](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.7.1...v1.7.2) (2026-11-25)
+
+### 🐛 Bug Fixes
+
+* detect focused BirdyTV hub entry on D-pad OK ([da5cd2c](https://github.com/SEIFELDEEN15/Birdy-Patches/commit/da5cd2c7789dd1a3d3d2e92b6920bc45dba707b9))
+
 ## [1.7.1](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.7.0...v1.7.1) (2026-11-25)
 
 ### 🐛 Bug Fixes
