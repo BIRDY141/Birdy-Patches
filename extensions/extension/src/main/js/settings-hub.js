@@ -134,6 +134,11 @@
             ["path", { d: "M17 14V2" }],
             ["path", { d: "M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z" }]
         ],
+        dearrow: [
+            ["path", { d: "M5 12h14" }],
+            ["path", { d: "m13 6 6 6-6 6" }],
+            ["circle", { cx: "5", cy: "12", r: "1.5", fill: "currentColor" }]
+        ],
         about: [
             ["circle", { cx: "12", cy: "12", r: "10" }],
             ["line", { x1: "12", y1: "16", x2: "12", y2: "12" }],
@@ -273,6 +278,7 @@
         { key: "player", labelKey: "hub.tab.player", icon: ICONS.player },
         { key: "shorts", labelKey: "hub.tab.shorts", icon: ICONS.shorts },
         { key: "ui_tweaks", labelKey: "hub.tab.ui_tweaks", icon: ICONS.ui_tweaks },
+        { key: "dearrow", labelKey: "hub.tab.dearrow", icon: ICONS.dearrow },
         { key: "ryd", labelKey: "hub.tab.ryd", icon: ICONS.ryd },
         { key: "about", labelKey: "hub.tab.about", icon: ICONS.about }
     ];
@@ -528,6 +534,43 @@
                     ));
                 })(TOPIC_TABS[m]);
             }
+        } else if (activeTabKey === "dearrow") {
+            appendRow(frag, createToggleRow(
+                t("feature.dearrow.name"),
+                t("feature.dearrow.summary"),
+                "YOUTV_DEARROW",
+                true
+            ));
+            appendRow(frag, createToggleRow(
+                t("dearrow.titles.title"),
+                t("dearrow.titles.summary"),
+                "YOUTV_DEARROW_TITLES",
+                true
+            ));
+            appendRow(frag, createToggleRow(
+                t("dearrow.thumbnails.title"),
+                t("dearrow.thumbnails.summary"),
+                "YOUTV_DEARROW_THUMBNAILS",
+                true
+            ));
+            appendRow(frag, createToggleRow(
+                t("dearrow.show_title_icon.title"),
+                t("dearrow.show_title_icon.summary"),
+                "YOUTV_DEARROW_SHOW_TITLE_ICON",
+                true
+            ));
+            appendRow(frag, createToggleRow(
+                t("dearrow.show_thumb_icon.title"),
+                t("dearrow.show_thumb_icon.summary"),
+                "YOUTV_DEARROW_SHOW_THUMB_ICON",
+                true
+            ));
+            appendRow(frag, createToggleRow(
+                t("dearrow.cleanup_titles.title"),
+                t("dearrow.cleanup_titles.summary"),
+                "YOUTV_DEARROW_CLEANUP_TITLES",
+                false
+            ));
         } else if (activeTabKey === "ryd") {
             appendRow(frag, createToggleRow(
                 t("feature.ryd.name"),
