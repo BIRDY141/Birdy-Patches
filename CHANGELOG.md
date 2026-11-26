@@ -1,3 +1,9 @@
+## [1.15.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.15.0...v1.15.1) (2026-11-26)
+
+### 🐛 Bug Fixes
+
+* **dearrow:** proxy thumbnails through NetBridge as data URIs to satisfy Cobalt CSP ([0feced3](https://github.com/BIRDY141/Birdy-Patches/commit/0feced309ecc3b858f234b9e2ff76c73430dde6b))
+
 ## [1.15.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.14.1...v1.15.0) (2026-11-26)
 
 ### ✨ New Features

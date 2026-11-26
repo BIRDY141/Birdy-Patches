@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-26T22:08:29",
-  "description": "## [1.15.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.14.1...v1.15.0) (2026-11-26)\n\n### ✨ New Features\n\n* **dearrow:** implement DeArrow titles, thumbnails, icons, and title cleanup ([1fca208](https://github.com/BIRDY141/Birdy-Patches/commit/1fca208f182374899fc3f759c7f8c281f41cc709))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.15.0/patches-1.15.0.mpp",
+  "created_at": "2026-11-26T22:15:21",
+  "description": "## [1.15.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.15.0...v1.15.1) (2026-11-26)\n\n### 🐛 Bug Fixes\n\n* **dearrow:** proxy thumbnails through NetBridge as data URIs to satisfy Cobalt CSP ([0feced3](https://github.com/BIRDY141/Birdy-Patches/commit/0feced309ecc3b858f234b9e2ff76c73430dde6b))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.15.1/patches-1.15.1.mpp",
   "signature_download_url": "",
-  "version": "1.15.0"
+  "version": "1.15.1"
 }
