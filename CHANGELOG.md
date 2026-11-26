@@ -1,3 +1,9 @@
+## [1.13.3](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.2...v1.13.3) (2026-11-26)
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** show skip prompt for entire segment and honor prompt_all ([0b761f8](https://github.com/BIRDY141/Birdy-Patches/commit/0b761f8980c3a67d94c5889cd4278f9b344c8531))
+
 ## [1.13.2](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.1...v1.13.2) (2026-11-26)
 
 ### 🐛 Bug Fixes
