@@ -1,3 +1,9 @@
+## [1.13.2](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.1...v1.13.2) (2026-11-26)
+
+### 🐛 Bug Fixes
+
+* let left settings item focus right Open BirdyTV Settings button ([28a966d](https://github.com/BIRDY141/Birdy-Patches/commit/28a966ddcfb55f2867df085e9936af1cae53b95d))
+
 ## [1.13.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.0...v1.13.1) (2026-11-26)
 
 ### 🐛 Bug Fixes

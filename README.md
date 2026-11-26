@@ -41,7 +41,7 @@ This repository does **not** distribute YouTube APKs, neither original nor modif
 ## 🩹 Lista de parches
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.13.1](https://github.com/BIRDY141/Birdy-Patches/releases/tag/v1.13.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;9 patches total
+> **[v1.13.2](https://github.com/BIRDY141/Birdy-Patches/releases/tag/v1.13.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;9 patches total
 <details open>
 <summary>📦 YouTube for Android TV&nbsp;&nbsp;•&nbsp;&nbsp;8 patches</summary>
 <br>
