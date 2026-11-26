@@ -328,7 +328,7 @@ test('BirdyTV settings hub entry, About and stored IDs switch language cleanly',
     assert.equal(b.items.length, 1);
     assert.equal(b.items[0].settingActionRenderer.itemId, 'BIRDY_SETTINGS_HUB');
     assert.equal(b.items[0].settingActionRenderer.title.runs[0].text, catalogs.en['hub.open']);
-    assert.match(english.items[0].settingCategoryCollectionRenderer.items[1].settingActionRenderer.summary.runs[0].text, /(Created by|Birdy|Gabriel Jair|SEIFELDEEN15)/i);
+    assert.match(english.items[0].settingCategoryCollectionRenderer.items[1].settingActionRenderer.summary.runs[0].text, /(Created by|Birdy|Gabriel Jair|BIRDY141)/i);
     assert.equal(p.localStorage.getItem('yt.leanback.default::YOUTV_PLAYER_LIKE'), '{"data":true}');
 });
 

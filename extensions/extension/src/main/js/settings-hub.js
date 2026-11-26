@@ -485,7 +485,7 @@
             repoTitle.textContent = (window.__youtvBranding || "BirdyTV") + (ver ? " " + ver : "");
             var repoSummary = document.createElement("span");
             repoSummary.className = "birdy-yt-row-summary";
-            repoSummary.textContent = "SEIFELDEEN15/Birdy-Patches • " + ytVer;
+            repoSummary.textContent = "BIRDY141/Birdy-Patches • " + ytVer;
             repoLeft.appendChild(repoTitle);
             repoLeft.appendChild(repoSummary);
             repoRow.appendChild(repoLeft);

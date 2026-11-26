@@ -58,7 +58,7 @@
   "step.source.title": "ماخذ شامل کریں",
   "step.patch.title": "APK پر پیچ لگائیں",
   "step.open.title": "FaroTV انسٹال کر کے کھولیں",
-  "step.source.add": "<a href=\"https://morphe.software/add-source?github=SEIFELDEEN15/Birdy-Patches\">Morphe میں شامل کریں</a> منتخب کریں یا Morphe Manager میں یہ ماخذ شامل کریں:",
+  "step.source.add": "<a href=\"https://morphe.software/add-source?github=BIRDY141/Birdy-Patches\">Morphe میں شامل کریں</a> منتخب کریں یا Morphe Manager میں یہ ماخذ شامل کریں:",
   "step.source.directory": "<a href=\"https://morphe-patches.software/?app=com.google.android.youtube.tv\">morphe-patches.software</a>",
   "step.patch.apk": "Android TV کے لیے YouTube 7.32.300 یا 8.02.300 کا APK منتخب کریں۔ تجویز کردہ پیچ پہلے سے منتخب ہوتے ہیں۔",
   "step.patch.spoof": "<b>Spoof device</b> صرف اس وقت فعال کریں جب YouTube آپ کے ٹی وی کو غیر موافق کہے۔",

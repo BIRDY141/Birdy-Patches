@@ -5,7 +5,7 @@
   var releases = [], filter = 'stable', releaseStatus = 'loading', refreshed = null;
   var select = document.getElementById('site-language');
   var storageKey = 'birdytv.site.language';
-  var REPO = 'SEIFELDEEN15/Birdy-Patches';
+  var REPO = 'BIRDY141/Birdy-Patches';
   function $(id) { return document.getElementById(id); }
 
   function normalize(value) {

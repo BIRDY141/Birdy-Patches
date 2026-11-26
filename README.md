@@ -28,9 +28,9 @@ Tested and confirmed working on **YouTube TV 8.02.300 (armeabi-v7a)** and **7.32
 
 1. Install [MicroG-RE](https://github.com/MorpheApp/MicroG-RE/releases) on your Android TV.
 2. Add this repository as a patch source in Morphe Manager:
-   https://github.com/SEIFELDEEN15/Birdy-Patches
+   https://github.com/BIRDY141/Birdy-Patches
 
-   <a href="https://morphe.software/add-source?github=SEIFELDEEN15/Birdy-Patches">
+   <a href="https://morphe.software/add-source?github=BIRDY141/Birdy-Patches">
      <img src=".github/assets/add-to-morphe.svg" alt="Add to Morphe" height="36">
    </a>
 

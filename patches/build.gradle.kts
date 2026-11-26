@@ -4,10 +4,10 @@ patches {
     about {
         name = "Birdy Patches"
         description = "Birdy: unofficial patches for YouTube on Android TV, compatible with Morphe. MicroG-RE support, ad blocking, SponsorBlock with skip/prompt options, settings inside the app, player customization."
-        source = "git@github.com:SEIFELDEEN15/Birdy-Patches.git"
-        author = "SEIFELDEEN15"
-        contact = "https://github.com/SEIFELDEEN15/Birdy-Patches/issues"
-        website = "https://github.com/SEIFELDEEN15/Birdy-Patches"
+        source = "git@github.com:BIRDY141/Birdy-Patches.git"
+        author = "BIRDY141"
+        contact = "https://github.com/BIRDY141/Birdy-Patches/issues"
+        website = "https://github.com/BIRDY141/Birdy-Patches"
         license = "GPLv3"
     }
 }

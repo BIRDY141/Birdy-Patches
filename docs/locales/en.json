@@ -58,7 +58,7 @@
   "step.source.title": "Add the source",
   "step.patch.title": "Patch your APK",
   "step.open.title": "Install and open FaroTV",
-  "step.source.add": "Select <a href=\"https://morphe.software/add-source?github=SEIFELDEEN15/Birdy-Patches\">Add to Morphe</a>, or add this source in Morphe Manager:",
+  "step.source.add": "Select <a href=\"https://morphe.software/add-source?github=BIRDY141/Birdy-Patches\">Add to Morphe</a>, or add this source in Morphe Manager:",
   "step.source.directory": "<a href=\"https://morphe-patches.software/?app=com.google.android.youtube.tv\">morphe-patches.software</a>",
   "step.patch.apk": "Choose your YouTube for Android TV 7.32.300 or 8.02.300 APK. Recommended patches are selected by default.",
   "step.patch.spoof": "Enable <b>Spoof device</b> only if YouTube says your TV is unsupported.",
