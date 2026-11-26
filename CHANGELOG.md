@@ -1,3 +1,9 @@
+## [1.13.5](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.4...v1.13.5) (2026-11-26)
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** cache seekbar markers to eliminate flickering during playback ([c20022d](https://github.com/BIRDY141/Birdy-Patches/commit/c20022db6e80e78f2c07530e6afa2d68a19be9b4))
+
 ## [1.13.4](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.3...v1.13.4) (2026-11-26)
 
 ### 🐛 Bug Fixes
