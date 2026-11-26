@@ -1,3 +1,9 @@
+## [1.12.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.11.0...v1.12.0) (2026-11-26)
+
+### ✨ New Features
+
+* exact 1:1 YouTube TV Settings screen UI for BirdyTV hub ([430b1d2](https://github.com/BIRDY141/Birdy-Patches/commit/430b1d20793a8fc5a76a9568dda1b216f384ed2d))
+
 ## [1.11.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.10.0...v1.11.0) (2026-11-26)
 
 ### ✨ New Features
