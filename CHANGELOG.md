@@ -1,3 +1,9 @@
+## [1.14.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.6...v1.14.0) (2026-11-26)
+
+### ✨ New Features
+
+* **ui:** add UI Tweaks tab with topic filter and AMOLED black settings theme ([ed08502](https://github.com/BIRDY141/Birdy-Patches/commit/ed085024d4b7e86f07d71e9dcd6436dccba61dad))
+
 ## [1.13.6](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.5...v1.13.6) (2026-11-26)
 
 ### 🐛 Bug Fixes
