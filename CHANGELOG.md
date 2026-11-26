@@ -1,3 +1,9 @@
+## [1.15.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.14.1...v1.15.0) (2026-11-26)
+
+### ✨ New Features
+
+* **dearrow:** implement DeArrow titles, thumbnails, icons, and title cleanup ([1fca208](https://github.com/BIRDY141/Birdy-Patches/commit/1fca208f182374899fc3f759c7f8c281f41cc709))
+
 ## [1.14.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.14.0...v1.14.1) (2026-11-26)
 
 ### 🐛 Bug Fixes
