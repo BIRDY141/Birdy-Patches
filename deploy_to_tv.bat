@@ -168,7 +168,7 @@ if not exist "%MORPHE_CLI%" (
 
 echo.
 echo Downloading latest patch bundle from GitHub...
-powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $ErrorActionPreference = 'Stop'; $repo = 'BIRDY141/Birdy-Patches'; try { $u = (& git remote get-url origin 2>$null); if ($LASTEXITCODE -eq 0 -and $u -match 'github\.com[:/]([^/]+/[^/.]+?)(?:\.git)?$') { $repo = $Matches[1] } } catch {}; $url = $null; try { $url = (Invoke-RestMethod -Uri ('https://raw.githubusercontent.com/' + $repo + '/main/patches-bundle.json')).download_url } catch {}; if (-not $url) { $url = (Get-Content '%~dp0patches-bundle.json' | ConvertFrom-Json).download_url }; Invoke-WebRequest -Uri $url -OutFile '%PATCHES_MPP%'"
+powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $ErrorActionPreference = 'Stop'; $repo = 'BIRDY141/Birdy-Patches'; try { $u = (& git remote get-url origin 2>$null); if ($LASTEXITCODE -eq 0 -and $u -match 'github\.com[:/]([^/]+/[^/.]+?)(?:\.git)?$') { $repo = $Matches[1] } } catch {}; $url = $null; try { $url = (Invoke-RestMethod -Uri ('https://raw.githubusercontent.com/' + $repo + '/main/patches-bundle.json')).download_url } catch {}; if (-not $url) { $url = (Get-Content '%~dp0patches-bundle.json' | ConvertFrom-Json).download_url }; for ($i = 1; $i -le 3; $i++) { try { Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile '%PATCHES_MPP%'; break } catch { if ($i -eq 3) { throw }; Write-Host ('[Retry ' + $i + '/3] Download failed, retrying in 3s...'); Start-Sleep 3 } }"
 if !errorlevel! neq 0 (
     echo [ERROR] Could not download patches.mpp.
     pause
