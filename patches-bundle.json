@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-26T19:37:41",
-  "description": "## [1.10.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.9.0...v1.10.0) (2026-11-26)\n\n### ✨ New Features\n\n* YouTube TV 2-column settings screen UI for BirdyTV hub ([0f00cfa](https://github.com/BIRDY141/Birdy-Patches/commit/0f00cfa9dafdb76745f212adf45a16a2d0656785))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.10.0/patches-1.10.0.mpp",
+  "created_at": "2026-11-26T20:20:34",
+  "description": "## [1.11.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.10.0...v1.11.0) (2026-11-26)\n\n### ✨ New Features\n\n* update patches ([49867d4](https://github.com/BIRDY141/Birdy-Patches/commit/49867d4c86b95846608f9c4a7196020c1942fc26))\n* update patches ([9c6f737](https://github.com/BIRDY141/Birdy-Patches/commit/9c6f737249168e8a8b9b4fa71018c705f325b5ad))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.11.0/patches-1.11.0.mpp",
   "signature_download_url": "",
-  "version": "1.10.0"
+  "version": "1.11.0"
 }

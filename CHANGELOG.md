@@ -1,3 +1,10 @@
+## [1.11.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.10.0...v1.11.0) (2026-11-26)
+
+### ✨ New Features
+
+* update patches ([49867d4](https://github.com/BIRDY141/Birdy-Patches/commit/49867d4c86b95846608f9c4a7196020c1942fc26))
+* update patches ([9c6f737](https://github.com/BIRDY141/Birdy-Patches/commit/9c6f737249168e8a8b9b4fa71018c705f325b5ad))
+
 ## [1.10.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.9.0...v1.10.0) (2026-11-26)
 
 ### ✨ New Features
