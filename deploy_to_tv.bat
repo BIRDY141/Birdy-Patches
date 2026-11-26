@@ -81,7 +81,25 @@ if "!TV_IP!"=="" (
     exit /b 1
 )
 
+:adb_connect_loop
 echo [Target TV] !TV_IP!:5555
+echo Connecting to TV via ADB before starting...
+"!ADB_EXE!" connect !TV_IP!:5555
+"!ADB_EXE!" devices | findstr /r /c:"!TV_IP!:5555[ 	]*device" >nul 2>&1
+if !errorlevel! neq 0 (
+    echo.
+    echo [ERROR] Could not connect to !TV_IP!:5555.
+    echo Make sure TV ADB Debugging is ON and check the IP address.
+    set "NEW_IP="
+    set /p "NEW_IP=Enter TV IP address (or press Enter to retry !TV_IP!): "
+    if not "!NEW_IP!"=="" (
+        set "TV_IP=!NEW_IP!"
+        echo !TV_IP!>tv_ip.txt
+    )
+    echo.
+    goto adb_connect_loop
+)
+echo [OK] Connected to !TV_IP!:5555
 echo (To change TV IP, edit or delete 'tv_ip.txt')
 echo.
 
