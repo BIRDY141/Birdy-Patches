@@ -3,6 +3,7 @@ package app.tvpatches.extension.youtubetv;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -26,10 +27,11 @@ final class NetBridge {
     static final String REQUEST_PREFIX = "@req ";
 
     private static final String[] ALLOWED_HOSTS = {
-            "sponsor.ajay.app",                 // SponsorBlock
+            "sponsor.ajay.app",                 // SponsorBlock & DeArrow branding
+            "dearrow-thumb.ajay.app",           // DeArrow thumbnails (returned as data: URI for CSP)
             "returnyoutubedislikeapi.com",      // Return YouTube Dislike
     };
-    private static final int MAX_BODY = 256 * 1024;
+    private static final int MAX_BODY = 512 * 1024;
 
     private static final ExecutorService executor = Executors.newFixedThreadPool(2);
     private static final Handler main = new Handler(Looper.getMainLooper());
@@ -64,8 +66,20 @@ final class NetBridge {
                 c.setRequestProperty("User-Agent", "FaroTV");
                 try {
                     status = c.getResponseCode();
+                    String contentType = c.getContentType();
                     InputStream in = status >= 400 ? c.getErrorStream() : c.getInputStream();
-                    body = in == null ? "" : read(in);
+                    if (in == null) {
+                        body = "";
+                    } else {
+                        byte[] raw = readBytes(in);
+                        if (status == 200 && contentType != null && contentType.toLowerCase(java.util.Locale.US).startsWith("image/")) {
+                            int semi = contentType.indexOf(';');
+                            String mime = (semi > 0 ? contentType.substring(0, semi) : contentType).trim();
+                            body = "data:" + mime + ";base64," + Base64.encodeToString(raw, Base64.NO_WRAP);
+                        } else {
+                            body = new String(raw, "UTF-8");
+                        }
+                    }
                 } finally {
                     c.disconnect();
                 }
@@ -96,7 +110,7 @@ final class NetBridge {
         return false;
     }
 
-    private static String read(InputStream in) throws Exception {
+    private static byte[] readBytes(InputStream in) throws Exception {
         try (InputStream input = in) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] buf = new byte[8192];
@@ -105,7 +119,7 @@ final class NetBridge {
                 out.write(buf, 0, n);
                 if (out.size() > MAX_BODY) break;
             }
-            return out.toString("UTF-8");
+            return out.toByteArray();
         }
     }
 

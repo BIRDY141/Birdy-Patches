@@ -93,6 +93,9 @@
 
     var brandingCache = new Map(); // videoId -> { time, title, thumbUrl }
     var inFlight = new Map();      // videoId -> [callbacks]
+    var thumbDataCache = new Map(); // thumbUrl -> { time, dataUrl }
+    var thumbInFlight = new Map();  // thumbUrl -> [callbacks]
+    var MAX_THUMB_CACHE = 80;
     var queue = [];
     var activeRequests = 0;
 
@@ -237,13 +240,46 @@
         }
 
         if (useThumbs && entry && entry.thumbUrl) {
-            if (target.thumbObj && Array.isArray(target.thumbObj.thumbnails)) {
-                target.thumbObj.thumbnails = [
-                    { url: entry.thumbUrl, width: 1280, height: 720 }
-                ];
-            }
-            appliedThumbs.set(target.videoId, entry.thumbUrl);
+            fetchThumbDataUrl(entry.thumbUrl, function (dataUrl) {
+                if (!dataUrl) return;
+                if (target.thumbObj && Array.isArray(target.thumbObj.thumbnails)) {
+                    target.thumbObj.thumbnails = [
+                        { url: dataUrl, width: 1280, height: 720 }
+                    ];
+                }
+                appliedThumbs.set(target.videoId, dataUrl);
+                syncDomThumbnails();
+            });
         }
+    }
+
+    function fetchThumbDataUrl(thumbUrl, callback) {
+        var cached = thumbDataCache.get(thumbUrl);
+        if (cached && (Date.now() - cached.time) < CACHE_TTL) {
+            callback(cached.dataUrl);
+            return;
+        }
+        if (cached) thumbDataCache.delete(thumbUrl);
+
+        if (thumbInFlight.has(thumbUrl)) {
+            thumbInFlight.get(thumbUrl).push(callback);
+            return;
+        }
+        thumbInFlight.set(thumbUrl, [callback]);
+        youtv.request(thumbUrl, function (status, body) {
+            var dataUrl = (status === 200 && typeof body === "string" && body.indexOf("data:image/") === 0) ? body : null;
+            if (dataUrl) {
+                if (!thumbDataCache.has(thumbUrl) && thumbDataCache.size >= MAX_THUMB_CACHE) {
+                    thumbDataCache.delete(thumbDataCache.keys().next().value);
+                }
+                thumbDataCache.set(thumbUrl, { time: Date.now(), dataUrl: dataUrl });
+            }
+            var cbs = thumbInFlight.get(thumbUrl) || [];
+            thumbInFlight.delete(thumbUrl);
+            for (var i = 0; i < cbs.length; i++) {
+                try { cbs[i](dataUrl); } catch (e) {}
+            }
+        });
     }
 
     function collectTargets(node, depth, out) {
@@ -338,33 +374,60 @@
         return badge;
     }
 
+    function attachThumbBadge(container) {
+        if (!container || container.querySelector(".birdy-da-thumb-badge")) return;
+        try {
+            if (container.style && (!container.style.position || container.style.position === "static")) {
+                container.style.position = "relative";
+            }
+            container.appendChild(createDeArrowBadge());
+        } catch (e) {}
+    }
+
     function syncDomThumbnails() {
         if (!feature.enabled() || typeof document === "undefined" || !document.querySelectorAll) return;
         var useThumbs = feature.settings.get("thumbnails") !== false;
         var showThumbIcon = feature.settings.get("show_thumb_icon") !== false;
         if (!useThumbs || !appliedThumbs.size) return;
 
-        var imgs = document.querySelectorAll("img[src*='/vi/'], img[src*='dearrow-thumb.ajay.app']");
+        var imgs = document.querySelectorAll("img[src*='/vi/'], img[data-birdy-da-vid]");
         for (var i = 0; i < imgs.length; i++) {
             var img = imgs[i];
-            var src = img.getAttribute("src") || "";
-            var m = /\/vi\/([A-Za-z0-9_-]{11})\//.exec(src) || /videoID=([A-Za-z0-9_-]{11})/.exec(src);
-            if (!m) continue;
-            var vid = m[1];
-            var dearrowUrl = appliedThumbs.get(vid);
-            if (!dearrowUrl) continue;
+            var vid = img.getAttribute("data-birdy-da-vid");
+            if (!vid) {
+                var src = img.getAttribute("src") || "";
+                var m = /\/vi\/([A-Za-z0-9_-]{11})\//.exec(src);
+                if (!m) continue;
+                vid = m[1];
+            }
+            var dataUrl = appliedThumbs.get(vid);
+            if (!dataUrl) continue;
 
-            if (src !== dearrowUrl && src.indexOf("dearrow-thumb.ajay.app") === -1) {
-                img.setAttribute("src", dearrowUrl);
+            if (img.getAttribute("src") !== dataUrl) {
+                img.setAttribute("src", dataUrl);
+                img.setAttribute("data-birdy-da-vid", vid);
             }
-            if (showThumbIcon && img.parentElement && !img.parentElement.querySelector(".birdy-da-thumb-badge")) {
-                try {
-                    if (img.parentElement.style && (!img.parentElement.style.position || img.parentElement.style.position === "static")) {
-                        img.parentElement.style.position = "relative";
-                    }
-                    img.parentElement.appendChild(createDeArrowBadge());
-                } catch (e) {}
+            if (showThumbIcon && img.parentElement) attachThumbBadge(img.parentElement);
+        }
+
+        var bgEls = document.querySelectorAll("[style*='/vi/'], [data-birdy-da-bg-vid]");
+        for (var j = 0; j < bgEls.length; j++) {
+            var el = bgEls[j];
+            var bgVid = el.getAttribute("data-birdy-da-bg-vid");
+            if (!bgVid) {
+                var bg = (el.style && el.style.backgroundImage) || el.getAttribute("style") || "";
+                var bm = /\/vi\/([A-Za-z0-9_-]{11})\//.exec(bg);
+                if (!bm) continue;
+                bgVid = bm[1];
             }
+            var bgDataUrl = appliedThumbs.get(bgVid);
+            if (!bgDataUrl) continue;
+
+            if (!el.getAttribute("data-birdy-da-bg-vid")) {
+                el.style.backgroundImage = 'url("' + bgDataUrl + '")';
+                el.setAttribute("data-birdy-da-bg-vid", bgVid);
+            }
+            if (showThumbIcon) attachThumbBadge(el);
         }
     }
 
