@@ -1,3 +1,9 @@
+## [1.13.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.0...v1.13.1) (2026-11-26)
+
+### 🐛 Bug Fixes
+
+* use GPU translateY list scrolling for Android TV Cobalt ([3295601](https://github.com/BIRDY141/Birdy-Patches/commit/3295601b571871fc72d04d0ec4baccb56f338a2a))
+
 ## [1.13.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.12.0...v1.13.0) (2026-11-26)
 
 ### ✨ New Features

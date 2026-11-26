@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-26T20:43:20",
-  "description": "## [1.13.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.12.0...v1.13.0) (2026-11-26)\n\n### ✨ New Features\n\n* restore 2-column tabbed YouTube TV UI and fix scrolling ([292b83c](https://github.com/BIRDY141/Birdy-Patches/commit/292b83c5b65a34581b67ce1ef8b7e1228b0ff31a))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.13.0/patches-1.13.0.mpp",
+  "created_at": "2026-11-26T20:48:41",
+  "description": "## [1.13.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.0...v1.13.1) (2026-11-26)\n\n### 🐛 Bug Fixes\n\n* use GPU translateY list scrolling for Android TV Cobalt ([3295601](https://github.com/BIRDY141/Birdy-Patches/commit/3295601b571871fc72d04d0ec4baccb56f338a2a))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.13.1/patches-1.13.1.mpp",
   "signature_download_url": "",
-  "version": "1.13.0"
+  "version": "1.13.1"
 }
