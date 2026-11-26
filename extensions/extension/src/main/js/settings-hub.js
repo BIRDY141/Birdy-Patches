@@ -33,6 +33,15 @@
         { key: "related", titleKey: "player.related.title", summaryKey: "player.related.summary" }
     ];
 
+    var TOPIC_TABS = [
+        { key: "gaming", titleKey: "topics.gaming.title" },
+        { key: "music", titleKey: "topics.music.title" },
+        { key: "news", titleKey: "topics.news.title" },
+        { key: "sports", titleKey: "topics.sports.title" },
+        { key: "podcasts", titleKey: "topics.podcasts.title" },
+        { key: "movies", titleKey: "topics.movies.title" }
+    ];
+
     // ---- Storage helpers ----------------------------------------------------------------------
     function getBool(key, def) {
         try {
@@ -110,6 +119,17 @@
         shorts: [
             ["polygon", { points: "13 2 3 14 12 14 11 22 21 10 12 10 13 2" }]
         ],
+        ui_tweaks: [
+            ["line", { x1: "4", y1: "21", x2: "4", y2: "14" }],
+            ["line", { x1: "4", y1: "10", x2: "4", y2: "3" }],
+            ["line", { x1: "12", y1: "21", x2: "12", y2: "12" }],
+            ["line", { x1: "12", y1: "8", x2: "12", y2: "3" }],
+            ["line", { x1: "20", y1: "21", x2: "20", y2: "16" }],
+            ["line", { x1: "20", y1: "12", x2: "20", y2: "3" }],
+            ["line", { x1: "1", y1: "14", x2: "7", y2: "14" }],
+            ["line", { x1: "9", y1: "8", x2: "15", y2: "8" }],
+            ["line", { x1: "17", y1: "16", x2: "23", y2: "16" }]
+        ],
         ryd: [
             ["path", { d: "M17 14V2" }],
             ["path", { d: "M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z" }]
@@ -148,7 +168,7 @@
         sheet.replaceSync(
             ".birdy-yt-screen {" +
             " position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 2147483647;" +
-            " background: #0f1014; color: #f1f1f1; display: none; flex-direction: column;" +
+            " background: #000000; color: #f1f1f1; display: none; flex-direction: column;" +
             " font-family: 'YouTube Sans', Roboto, Arial, sans-serif; box-sizing: border-box; }" +
             ".birdy-yt-screen.show { display: flex; }" +
             ".birdy-yt-topbar {" +
@@ -161,7 +181,7 @@
             " padding: 0 3.5rem 2rem; gap: 2.5rem; overflow: hidden; }" +
             ".birdy-yt-sidebar {" +
             " position: relative; width: 320px; height: 100%; box-sizing: border-box; flex-shrink: 0;" +
-            " overflow: hidden; border-right: 1px solid rgba(255, 255, 255, 0.2);" +
+            " overflow: hidden; border-right: 1px solid rgba(255, 255, 255, 0.14);" +
             " padding: 0.25rem 1.5rem 2rem 0; }" +
             ".birdy-yt-sec {" +
             " font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;" +
@@ -171,8 +191,8 @@
             " font-size: 1.12rem; font-weight: 500; color: #dcdcdc; cursor: pointer; flex-shrink: 0; }" +
             ".birdy-yt-cat-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }" +
             ".birdy-yt-cat-icon svg { width: 20px; height: 20px; }" +
-            ".birdy-yt-cat.active { background: rgba(255, 255, 255, 0.14); color: #ffffff; font-weight: 600; }" +
-            ".birdy-yt-cat.birdy-focus { background: #f1f1f1; color: #0f0f0f; font-weight: 700; }" +
+            ".birdy-yt-cat.active { background: rgba(255, 255, 255, 0.1); color: #ffffff; font-weight: 600; }" +
+            ".birdy-yt-cat.birdy-focus { background: #ffffff; color: #000000; font-weight: 700; }" +
             ".birdy-yt-content {" +
             " position: relative; flex: 1; height: 100%; box-sizing: border-box;" +
             " overflow: hidden; padding: 0.25rem 0.5rem 2rem 0; }" +
@@ -183,14 +203,14 @@
             " font-size: 1.5rem; font-weight: 700; color: #ffffff; margin: 0 0 0.6rem; padding: 0 1.25rem; flex-shrink: 0; }" +
             ".birdy-yt-restart-banner {" +
             " margin: 0 0 0.6rem; padding: 0.85rem 1.25rem; border-radius: 10px;" +
-            " background: rgba(62, 166, 255, 0.14); border: 1px solid rgba(62, 166, 255, 0.45);" +
+            " background: rgba(62, 166, 255, 0.1); border: 1px solid rgba(62, 166, 255, 0.45);" +
             " color: #7cc4ff; font-size: 1rem; font-weight: 600; flex-shrink: 0; }" +
             ".birdy-yt-row {" +
             " display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;" +
-            " padding: 1rem 1.3rem; border-radius: 10px; background: rgba(255, 255, 255, 0.04);" +
+            " padding: 1rem 1.3rem; border-radius: 10px; background: #000000; border: 1px solid rgba(255, 255, 255, 0.12);" +
             " color: #f1f1f1; flex-shrink: 0; cursor: pointer; }" +
-            ".birdy-yt-row.birdy-focus { background: #f1f1f1; color: #0f0f0f; }" +
-            ".birdy-yt-row[data-type='3way'].birdy-focus { background: rgba(255, 255, 255, 0.14); color: #ffffff; }" +
+            ".birdy-yt-row.birdy-focus { background: #ffffff; color: #000000; border-color: #ffffff; }" +
+            ".birdy-yt-row[data-type='3way'].birdy-focus { background: #080808; border-color: rgba(255, 255, 255, 0.35); color: #ffffff; }" +
             ".birdy-yt-row-left { display: flex; flex-direction: column; gap: 0.2rem; flex: 1; min-width: 0; }" +
             ".birdy-yt-row-title-wrap { display: flex; align-items: center; gap: 0.7rem; }" +
             ".birdy-yt-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }" +
@@ -202,13 +222,13 @@
             ".birdy-yt-switch-wrap { display: flex; align-items: center; gap: 0.85rem; flex-shrink: 0; }" +
             ".birdy-yt-switch-state { font-size: 0.94rem; font-weight: 500; color: rgba(255, 255, 255, 0.6); min-width: 64px; text-align: right; }" +
             ".birdy-yt-switch-state.on { color: #ffffff; }" +
-            ".birdy-yt-row.birdy-focus .birdy-yt-switch-state { color: #0f0f0f; font-weight: 700; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-switch-state { color: #000000; font-weight: 700; }" +
             ".birdy-yt-switch {" +
             " position: relative; width: 46px; height: 26px; border-radius: 9999px; flex-shrink: 0;" +
-            " background: #717171; border: none; padding: 0; cursor: pointer; outline: none; }" +
+            " background: #555555; border: none; padding: 0; cursor: pointer; outline: none; }" +
             ".birdy-yt-switch.on { background: #3ea6ff; }" +
             ".birdy-yt-row.birdy-focus .birdy-yt-switch { background: #8e8e8e; }" +
-            ".birdy-yt-row.birdy-focus .birdy-yt-switch.on { background: #0f0f0f; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-switch.on { background: #000000; }" +
             ".birdy-yt-switch::after {" +
             " content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px;" +
             " border-radius: 50%; background: #f1f1f1; }" +
@@ -216,14 +236,14 @@
             ".birdy-yt-pills { display: flex; align-items: center; gap: 0.45rem; flex-shrink: 0; }" +
             ".birdy-yt-pill {" +
             " padding: 0.55rem 1.05rem; border-radius: 9999px; font-size: 0.94rem; font-weight: 600;" +
-            " background: rgba(255, 255, 255, 0.12); color: #dcdcdc; border: 2px solid transparent; cursor: pointer; outline: none; }" +
-            ".birdy-yt-pill.selected { background: #3ea6ff; color: #0f0f0f; font-weight: 700; }" +
-            ".birdy-yt-pill.birdy-focus { background: #ffffff; color: #0f0f0f; border-color: #ffffff; font-weight: 700; }" +
+            " background: #0a0a0a; color: #dcdcdc; border: 2px solid rgba(255, 255, 255, 0.16); cursor: pointer; outline: none; }" +
+            ".birdy-yt-pill.selected { background: #3ea6ff; color: #000000; border-color: #3ea6ff; font-weight: 700; }" +
+            ".birdy-yt-pill.birdy-focus { background: #ffffff; color: #000000; border-color: #ffffff; font-weight: 700; }" +
             ".birdy-yt-btn {" +
             " padding: 0.9rem 1.8rem; border-radius: 9999px; font-size: 1.06rem; font-weight: 600;" +
-            " background: rgba(255, 255, 255, 0.14); color: #f1f1f1; border: none; cursor: pointer;" +
+            " background: #0a0a0a; color: #f1f1f1; border: 1px solid rgba(255, 255, 255, 0.18); cursor: pointer;" +
             " outline: none; align-self: flex-start; margin: 0.65rem 0 0 1.25rem; flex-shrink: 0; }" +
-            ".birdy-yt-btn.birdy-focus { background: #f1f1f1; color: #0f0f0f; font-weight: 700; }"
+            ".birdy-yt-btn.birdy-focus { background: #ffffff; color: #000000; border-color: #ffffff; font-weight: 700; }"
         );
         document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
     } catch (e) {}
@@ -252,6 +272,7 @@
         { key: "ads", labelKey: "hub.tab.ads", icon: ICONS.ads },
         { key: "player", labelKey: "hub.tab.player", icon: ICONS.player },
         { key: "shorts", labelKey: "hub.tab.shorts", icon: ICONS.shorts },
+        { key: "ui_tweaks", labelKey: "hub.tab.ui_tweaks", icon: ICONS.ui_tweaks },
         { key: "ryd", labelKey: "hub.tab.ryd", icon: ICONS.ryd },
         { key: "about", labelKey: "hub.tab.about", icon: ICONS.about }
     ];
@@ -479,6 +500,7 @@
                 true,
                 true
             ));
+        } else if (activeTabKey === "ui_tweaks") {
             appendRow(frag, createToggleRow(
                 t("feature.topics.name"),
                 t("feature.topics.summary"),
@@ -486,6 +508,25 @@
                 false,
                 true
             ));
+            for (var m = 0; m < TOPIC_TABS.length; m++) {
+                (function (topic) {
+                    var key = "YOUTV_TOPICS_HIDE_" + topic.key.toUpperCase();
+                    var current = getBool(key, true) ? "remove" : "keep";
+                    appendRow(frag, createPillRow(
+                        t(topic.titleKey),
+                        null,
+                        [
+                            { id: "keep", text: t("hub.action.keep") },
+                            { id: "remove", text: t("hub.action.remove") }
+                        ],
+                        current,
+                        function (id) {
+                            setBool(key, id === "remove");
+                            markRestartNeeded();
+                        }
+                    ));
+                })(TOPIC_TABS[m]);
+            }
         } else if (activeTabKey === "ryd") {
             appendRow(frag, createToggleRow(
                 t("feature.ryd.name"),
@@ -524,8 +565,7 @@
         currentRows.push(row);
     }
 
-    function createThreeWayRow(cat) {
-        var currentMode = getSponsorMode(cat.key);
+    function createPillRow(titleText, dotColor, options, currentId, onSelect) {
         var row = document.createElement("div");
         row.className = "birdy-yt-row";
         row.setAttribute("data-type", "3way");
@@ -534,33 +574,29 @@
         left.className = "birdy-yt-row-left";
         var titleWrap = document.createElement("div");
         titleWrap.className = "birdy-yt-row-title-wrap";
-        var dot = document.createElement("span");
-        dot.className = "birdy-yt-dot";
-        dot.style.backgroundColor = cat.color;
+        if (dotColor) {
+            var dot = document.createElement("span");
+            dot.className = "birdy-yt-dot";
+            dot.style.backgroundColor = dotColor;
+            titleWrap.appendChild(dot);
+        }
         var rowTitle = document.createElement("span");
         rowTitle.className = "birdy-yt-row-title";
-        rowTitle.textContent = t(cat.titleKey);
-        titleWrap.appendChild(dot);
+        rowTitle.textContent = titleText;
         titleWrap.appendChild(rowTitle);
         left.appendChild(titleWrap);
 
         var pillGroup = document.createElement("div");
         pillGroup.className = "birdy-yt-pills";
 
-        var modes = [
-            { id: "skip", text: t("hub.action.skip") },
-            { id: "prompt", text: t("hub.action.prompt") },
-            { id: "off", text: t("hub.action.off") }
-        ];
-
         var pills = [];
-        for (var i = 0; i < modes.length; i++) {
-            (function (m, idx) {
+        for (var i = 0; i < options.length; i++) {
+            (function (opt, idx) {
                 var pill = document.createElement("button");
-                pill.className = "birdy-yt-pill" + (currentMode === m.id ? " selected" : "");
-                pill.textContent = m.text;
+                pill.className = "birdy-yt-pill" + (currentId === opt.id ? " selected" : "");
+                pill.textContent = opt.text;
                 pill.onclick = function () {
-                    setSponsorMode(cat.key, m.id);
+                    onSelect(opt.id);
                     for (var p = 0; p < pills.length; p++) {
                         pills[p].classList.toggle("selected", p === idx);
                     }
@@ -569,13 +605,29 @@
                 };
                 pillGroup.appendChild(pill);
                 pills.push(pill);
-            })(modes[i], i);
+            })(options[i], i);
         }
 
         row._pills = pills;
         row.appendChild(left);
         row.appendChild(pillGroup);
         return row;
+    }
+
+    function createThreeWayRow(cat) {
+        return createPillRow(
+            t(cat.titleKey),
+            cat.color,
+            [
+                { id: "skip", text: t("hub.action.skip") },
+                { id: "prompt", text: t("hub.action.prompt") },
+                { id: "off", text: t("hub.action.off") }
+            ],
+            getSponsorMode(cat.key),
+            function (id) {
+                setSponsorMode(cat.key, id);
+            }
+        );
     }
 
     function createToggleRow(titleText, summaryText, storageKey, defaultVal, needsRestart, dotColor) {
