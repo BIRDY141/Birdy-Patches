@@ -834,6 +834,8 @@
 
         window.removeEventListener("keydown", onKeyDown, true);
         window.addEventListener("keydown", onKeyDown, true);
+        window.removeEventListener("keyup", stopEvent, true);
+        window.addEventListener("keyup", stopEvent, true);
         youtv.report("settings-hub: opened");
     }
 
@@ -841,6 +843,9 @@
         if (!screenEl) return;
         screenEl.classList.remove("show");
         window.removeEventListener("keydown", onKeyDown, true);
+        setTimeout(function () {
+            window.removeEventListener("keyup", stopEvent, true);
+        }, 250);
         youtv.report("settings-hub: closed");
     }
 
@@ -850,47 +855,10 @@
         isOpen: isHubOpen
     };
 
-    function matchesHubEntry(el) {
-        while (el && el !== document.body) {
-            var itemId = el.getAttribute && el.getAttribute("data-item-id");
-            if (itemId === "BIRDY_SETTINGS_HUB") return true;
-            var text = (el.textContent || "").trim();
-            if (text === t("hub.open") || text === t("hub.title")) return true;
-            el = el.parentElement;
-        }
-        return false;
-    }
-
     window.addEventListener("keydown", function (e) {
         if (isHubOpen()) return;
         var code = e.keyCode || e.which;
         if (code === 113 /* F2 */) {
-            stopEvent(e);
-            openHub();
-            return;
-        }
-        if (code === 13 || code === 23) {
-            var candidate = document.activeElement;
-            if (!matchesHubEntry(candidate)) {
-                candidate = null;
-                var focusedList = document.querySelectorAll("[class*='focused'], [focused='true'], [aria-selected='true']");
-                for (var i = 0; i < focusedList.length; i++) {
-                    if (matchesHubEntry(focusedList[i])) {
-                        candidate = focusedList[i];
-                        break;
-                    }
-                }
-            }
-            if (candidate && matchesHubEntry(candidate)) {
-                stopEvent(e);
-                openHub();
-            }
-        }
-    }, true);
-
-    document.addEventListener("click", function (e) {
-        if (isHubOpen()) return;
-        if (matchesHubEntry(e.target)) {
             stopEvent(e);
             openHub();
         }
