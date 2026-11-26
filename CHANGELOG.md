@@ -1,3 +1,9 @@
+## [1.13.4](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.3...v1.13.4) (2026-11-26)
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** re-show skip prompt when seeking back into a skipped segment ([9dd8674](https://github.com/BIRDY141/Birdy-Patches/commit/9dd8674d464d9941fb1c291fcb5e1005b4305c99))
+
 ## [1.13.3](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.2...v1.13.3) (2026-11-26)
 
 ### 🐛 Bug Fixes
