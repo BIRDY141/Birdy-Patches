@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-26T21:28:27",
-  "description": "## [1.13.5](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.4...v1.13.5) (2026-11-26)\n\n### 🐛 Bug Fixes\n\n* **sponsorblock:** cache seekbar markers to eliminate flickering during playback ([c20022d](https://github.com/BIRDY141/Birdy-Patches/commit/c20022db6e80e78f2c07530e6afa2d68a19be9b4))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.13.5/patches-1.13.5.mpp",
+  "created_at": "2026-11-26T21:35:35",
+  "description": "## [1.13.6](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.5...v1.13.6) (2026-11-26)\n\n### 🐛 Bug Fixes\n\n* **sponsorblock:** mount seekbar markers outside YouTube Incremental DOM to stop flickering ([33b6818](https://github.com/BIRDY141/Birdy-Patches/commit/33b6818a8b127d8648f81d62cac19e89223abe96))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.13.6/patches-1.13.6.mpp",
   "signature_download_url": "",
-  "version": "1.13.5"
+  "version": "1.13.6"
 }

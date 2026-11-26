@@ -1,3 +1,9 @@
+## [1.13.6](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.5...v1.13.6) (2026-11-26)
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** mount seekbar markers outside YouTube Incremental DOM to stop flickering ([33b6818](https://github.com/BIRDY141/Birdy-Patches/commit/33b6818a8b127d8648f81d62cac19e89223abe96))
+
 ## [1.13.5](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.4...v1.13.5) (2026-11-26)
 
 ### 🐛 Bug Fixes
