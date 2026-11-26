@@ -1,3 +1,9 @@
+## [1.10.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.9.0...v1.10.0) (2026-11-26)
+
+### ✨ New Features
+
+* YouTube TV 2-column settings screen UI for BirdyTV hub ([0f00cfa](https://github.com/BIRDY141/Birdy-Patches/commit/0f00cfa9dafdb76745f212adf45a16a2d0656785))
+
 ## [1.9.0](https://github.com/SEIFELDEEN15/Birdy-Patches/compare/v1.8.0...v1.9.0) (2026-11-25)
 
 ### ✨ New Features
