@@ -1,3 +1,9 @@
+## [1.14.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.14.0...v1.14.1) (2026-11-26)
+
+### 🐛 Bug Fixes
+
+* **ui:** fix Keep/Remove button handler in UI Tweaks and refine AMOLED black UI ([89054d2](https://github.com/BIRDY141/Birdy-Patches/commit/89054d24b0be047efa600bfb087b34fc48314652))
+
 ## [1.14.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.6...v1.14.0) (2026-11-26)
 
 ### ✨ New Features

@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-26T21:46:59",
-  "description": "## [1.14.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.13.6...v1.14.0) (2026-11-26)\n\n### ✨ New Features\n\n* **ui:** add UI Tweaks tab with topic filter and AMOLED black settings theme ([ed08502](https://github.com/BIRDY141/Birdy-Patches/commit/ed085024d4b7e86f07d71e9dcd6436dccba61dad))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.14.0/patches-1.14.0.mpp",
+  "created_at": "2026-11-26T21:55:27",
+  "description": "## [1.14.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.14.0...v1.14.1) (2026-11-26)\n\n### 🐛 Bug Fixes\n\n* **ui:** fix Keep/Remove button handler in UI Tweaks and refine AMOLED black UI ([89054d2](https://github.com/BIRDY141/Birdy-Patches/commit/89054d24b0be047efa600bfb087b34fc48314652))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.14.1/patches-1.14.1.mpp",
   "signature_download_url": "",
-  "version": "1.14.0"
+  "version": "1.14.1"
 }
