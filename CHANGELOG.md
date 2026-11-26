@@ -1,3 +1,9 @@
+## [1.13.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.12.0...v1.13.0) (2026-11-26)
+
+### ✨ New Features
+
+* restore 2-column tabbed YouTube TV UI and fix scrolling ([292b83c](https://github.com/BIRDY141/Birdy-Patches/commit/292b83c5b65a34581b67ce1ef8b7e1228b0ff31a))
+
 ## [1.12.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.11.0...v1.12.0) (2026-11-26)
 
 ### ✨ New Features
