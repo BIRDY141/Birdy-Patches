@@ -197,10 +197,9 @@
             ".birdy-skip-notice b, .farotv-skip-notice b { color: #ffffff; font-weight: 500; margin-left: 0.3rem; }" +
             ".birdy-skip-icon { width: 1.4rem; height: 1.4rem; fill: #ffffff; margin-left: 0.6rem; vertical-align: middle; flex-shrink: 0; }" +
             "[dir='rtl'] .birdy-skip-icon { margin-left: 0; margin-right: 0.6rem; transform: scaleX(-1); }" +
-            ".birdy-sb-track-markers { position: absolute; left: 0; right: 0; top: 50%; -webkit-transform: translateY(-50%); transform: translateY(-50%); height: 4px; max-height: 8px;" +
-            " pointer-events: none; z-index: 3; overflow: hidden; border-radius: 2px; }" +
+            ".birdy-sb-track-markers { position: fixed; left: 0; top: 0; width: 0; height: 4px; -webkit-transform: translateY(-50%); transform: translateY(-50%);" +
+            " pointer-events: none; z-index: 2147483640; overflow: hidden; border-radius: 2px; display: none; }" +
             ".birdy-sb-marker { position: absolute; top: 0; bottom: 0; height: 100%; border-radius: 1px; opacity: 0.95; pointer-events: none; }" +
-            "ytlr-progress-bar:focus .birdy-sb-track-markers, ytlr-progress-bar:focus-within .birdy-sb-track-markers, ytlr-multi-markers-player-bar-renderer:focus .birdy-sb-track-markers, .ytp-progress-bar:hover .birdy-sb-track-markers { height: 8px; }" +
             ".birdy-setting-prompt-button { outline: none; cursor: pointer; }");
         document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
     } catch (e) {}
@@ -344,7 +343,14 @@
     }
 
     // ---- seekbar colored markers (Picture 3) --------------------------------------------------
+    // Mounted on document.body (outside YouTube's Incremental DOM) so playhead updates never
+    // reconcile/delete the marker nodes and cause flickering.
     var lastMarkersKey = "";
+    var markersContainer = null;
+    var hasMarkers = false;
+    var lastBox = { left: -1, top: -1, width: -1, height: -1, opacity: -1, visible: false };
+    var syncRafId = 0;
+    var syncUntilMs = 0;
 
     function findProgressBar() {
         if (!document || typeof document.querySelector !== "function") return null;
@@ -379,12 +385,30 @@
         return null;
     }
 
+    function hideSeekbarContainer() {
+        if (markersContainer && lastBox.visible) {
+            markersContainer.style.display = "none";
+            lastBox.visible = false;
+        }
+    }
+
     function clearSeekbarMarkers() {
         lastMarkersKey = "";
+        hasMarkers = false;
+        lastBox = { left: -1, top: -1, width: -1, height: -1, opacity: -1, visible: false };
+        if (syncRafId && typeof cancelAnimationFrame === "function") {
+            cancelAnimationFrame(syncRafId);
+            syncRafId = 0;
+        }
+        if (markersContainer) {
+            markersContainer.textContent = "";
+            markersContainer.style.display = "none";
+        }
         if (!document || typeof document.querySelectorAll !== "function") return;
         try {
             var existing = document.querySelectorAll(".birdy-sb-track-markers");
             for (var i = 0; i < existing.length; i++) {
+                if (existing[i] === markersContainer) continue;
                 if (typeof existing[i].remove === "function") {
                     existing[i].remove();
                 } else if (existing[i].parentNode) {
@@ -394,13 +418,126 @@
         } catch (e) {}
     }
 
+    function getBarVisibilityAndOpacity(bar) {
+        if (!bar || (bar.isConnected === false)) return 0;
+        var opacity = 1;
+        var cur = bar;
+        try {
+            for (var i = 0; i < 8 && cur && cur !== document.body && cur !== document.documentElement; i++) {
+                if (window.getComputedStyle) {
+                    var cs = window.getComputedStyle(cur);
+                    if (cs) {
+                        if (cs.display === "none" || cs.visibility === "hidden") return 0;
+                        var op = parseFloat(cs.opacity);
+                        if (!isNaN(op)) {
+                            opacity *= op;
+                            if (opacity <= 0.02) return 0;
+                        }
+                    }
+                }
+                cur = cur.parentElement;
+            }
+        } catch (e) {}
+        return opacity;
+    }
+
+    function syncSeekbarPosition(bar) {
+        if (!markersContainer || !bar || typeof bar.getBoundingClientRect !== "function") {
+            hideSeekbarContainer();
+            return;
+        }
+        if (!seekbarFeature || !seekbarFeature.enabled() || !hasMarkers) {
+            hideSeekbarContainer();
+            return;
+        }
+        var rect = bar.getBoundingClientRect();
+        var winH = window.innerHeight || 1080;
+        if (!rect || rect.width <= 1 || rect.height <= 0 || rect.bottom <= 0 || rect.top >= winH) {
+            hideSeekbarContainer();
+            return;
+        }
+        var opacity = getBarVisibilityAndOpacity(bar);
+        if (opacity <= 0.02) {
+            hideSeekbarContainer();
+            return;
+        }
+
+        var left = Math.round(rect.left * 10) / 10;
+        var centerY = Math.round((rect.top + rect.height / 2) * 10) / 10;
+        var width = Math.round(rect.width * 10) / 10;
+        var isFocused = false;
+        try {
+            if (typeof bar.matches === "function" && bar.matches(":focus, :focus-within")) {
+                isFocused = true;
+            } else {
+                var pb = bar.closest ? bar.closest("ytlr-progress-bar, .ytlr-progress-bar") : null;
+                if (pb && typeof pb.matches === "function" && pb.matches(":focus, :focus-within")) isFocused = true;
+            }
+        } catch (e) {}
+        var height = isFocused ? 8 : 4;
+        var roundedOpacity = Math.round(opacity * 100) / 100;
+
+        if (!lastBox.visible) {
+            markersContainer.style.display = "block";
+            lastBox.visible = true;
+        }
+        if (lastBox.left !== left) {
+            markersContainer.style.left = left + "px";
+            lastBox.left = left;
+        }
+        if (lastBox.top !== centerY) {
+            markersContainer.style.top = centerY + "px";
+            lastBox.top = centerY;
+        }
+        if (lastBox.width !== width) {
+            markersContainer.style.width = width + "px";
+            lastBox.width = width;
+        }
+        if (lastBox.height !== height) {
+            markersContainer.style.height = height + "px";
+            lastBox.height = height;
+        }
+        if (lastBox.opacity !== roundedOpacity) {
+            markersContainer.style.opacity = String(roundedOpacity);
+            lastBox.opacity = roundedOpacity;
+        }
+    }
+
+    function kickSeekbarPositionSync(durationMs) {
+        if (typeof requestAnimationFrame !== "function") return;
+        var targetEnd = Date.now() + (durationMs || 600);
+        if (targetEnd > syncUntilMs) syncUntilMs = targetEnd;
+        if (syncRafId) return;
+        function step() {
+            syncRafId = 0;
+            if (!markersContainer || !hasMarkers) return;
+            var bar = findProgressBar();
+            syncSeekbarPosition(bar);
+            if (Date.now() < syncUntilMs) {
+                syncRafId = requestAnimationFrame(step);
+            }
+        }
+        syncRafId = requestAnimationFrame(step);
+    }
+
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+        window.addEventListener("keydown", function () {
+            if (segments && segments.length && seekbarFeature && seekbarFeature.enabled()) {
+                kickSeekbarPositionSync(700);
+            }
+        }, true);
+    }
+
     function updateSeekbarMarkers() {
         if (!seekbarFeature || !seekbarFeature.enabled()) {
             clearSeekbarMarkers();
             return;
         }
         var bar = findProgressBar();
-        if (!bar) return;
+        if (!bar) {
+            hideSeekbarContainer();
+            return;
+        }
         var video = document.querySelector ? document.querySelector("video") : null;
         if (!video || !isFinite(video.duration) || video.duration <= 0 || !segments.length) {
             clearSeekbarMarkers();
@@ -425,43 +562,44 @@
             return s.category + ":" + s.start.toFixed(1) + "-" + s.end.toFixed(1);
         }).join(",");
 
-        var container = typeof bar.querySelector === "function" ? bar.querySelector(".birdy-sb-track-markers") : null;
-        if (container && container.hasChildNodes() && markersKey === lastMarkersKey) {
-            return;
+        var mountRoot = (document && (document.body || document.documentElement)) || null;
+        if (!markersContainer && mountRoot && typeof document.createElement === "function") {
+            markersContainer = document.createElement("div");
+            markersContainer.className = "birdy-sb-track-markers";
+            mountRoot.appendChild(markersContainer);
+        } else if (markersContainer && mountRoot && markersContainer.parentNode !== mountRoot) {
+            mountRoot.appendChild(markersContainer);
+        }
+        if (!markersContainer) return;
+
+        if (!hasMarkers || markersKey !== lastMarkersKey) {
+            var fragment = document.createDocumentFragment ? document.createDocumentFragment() : document.createElement("div");
+            for (var j = 0; j < activeSegs.length; j++) {
+                var seg = activeSegs[j];
+                var color = CATEGORY_COLORS[seg.category];
+
+                var startPct = Math.max(0, Math.min(100, (seg.start / duration) * 100));
+                var endPct = Math.max(0, Math.min(100, (seg.end / duration) * 100));
+                var widthPct = endPct - startPct;
+                if (widthPct <= 0.05) continue;
+
+                var marker = document.createElement("div");
+                marker.className = "birdy-sb-marker";
+                if (marker.style) {
+                    marker.style.left = startPct.toFixed(2) + "%";
+                    marker.style.width = widthPct.toFixed(2) + "%";
+                    marker.style.backgroundColor = color;
+                }
+                if (typeof fragment.appendChild === "function") fragment.appendChild(marker);
+            }
+
+            markersContainer.textContent = "";
+            if (typeof markersContainer.appendChild === "function") markersContainer.appendChild(fragment);
+            lastMarkersKey = markersKey;
+            hasMarkers = true;
         }
 
-        if (!container && typeof document.createElement === "function") {
-            container = document.createElement("div");
-            container.className = "birdy-sb-track-markers";
-            if (bar.appendChild) bar.appendChild(container);
-        }
-        if (!container) return;
-
-        if (bar.style && (!bar.style.position || bar.style.position === "static")) {
-            bar.style.position = "relative";
-        }
-
-        var fragment = document.createDocumentFragment ? document.createDocumentFragment() : document.createElement("div");
-        for (var j = 0; j < activeSegs.length; j++) {
-            var seg = activeSegs[j];
-            var color = CATEGORY_COLORS[seg.category];
-
-            var startPct = Math.max(0, Math.min(100, (seg.start / duration) * 100));
-            var endPct = Math.max(0, Math.min(100, (seg.end / duration) * 100));
-            var widthPct = endPct - startPct;
-            if (widthPct <= 0.05) continue;
-
-            var marker = document.createElement("div");
-            marker.className = "birdy-sb-marker";
-            marker.style.left = startPct.toFixed(2) + "%";
-            marker.style.width = widthPct.toFixed(2) + "%";
-            marker.style.backgroundColor = color;
-            fragment.appendChild(marker);
-        }
-
-        container.textContent = "";
-        container.appendChild(fragment);
-        lastMarkersKey = markersKey;
+        syncSeekbarPosition(bar);
     }
 
     // ---- 3-choice settings page enhancer (On, Prompt to skip, Off) ----------------------------
