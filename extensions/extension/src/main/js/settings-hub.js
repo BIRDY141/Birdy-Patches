@@ -161,8 +161,8 @@
             " padding: 0 3.5rem 2rem; gap: 2.5rem; overflow: hidden; }" +
             ".birdy-yt-sidebar {" +
             " position: relative; width: 320px; height: 100%; box-sizing: border-box; flex-shrink: 0;" +
-            " overflow-y: auto; overflow-x: hidden; border-right: 1px solid rgba(255, 255, 255, 0.2);" +
-            " display: flex; flex-direction: column; gap: 0.35rem; padding: 0.25rem 1.5rem 2rem 0; }" +
+            " overflow: hidden; border-right: 1px solid rgba(255, 255, 255, 0.2);" +
+            " padding: 0.25rem 1.5rem 2rem 0; }" +
             ".birdy-yt-sec {" +
             " font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;" +
             " color: rgba(255, 255, 255, 0.5); padding: 0.35rem 1rem 0.45rem; flex-shrink: 0; }" +
@@ -175,8 +175,10 @@
             ".birdy-yt-cat.birdy-focus { background: #f1f1f1; color: #0f0f0f; font-weight: 700; }" +
             ".birdy-yt-content {" +
             " position: relative; flex: 1; height: 100%; box-sizing: border-box;" +
-            " overflow-y: auto; overflow-x: hidden;" +
-            " display: flex; flex-direction: column; gap: 0.45rem; padding: 0.25rem 0.5rem 3rem 0; }" +
+            " overflow: hidden; padding: 0.25rem 0.5rem 2rem 0; }" +
+            ".birdy-yt-list-inner {" +
+            " position: relative; display: flex; flex-direction: column; gap: 0.45rem;" +
+            " transition: transform 140ms ease-out; }" +
             ".birdy-yt-cat-header {" +
             " font-size: 1.5rem; font-weight: 700; color: #ffffff; margin: 0 0 0.6rem; padding: 0 1.25rem; flex-shrink: 0; }" +
             ".birdy-yt-restart-banner {" +
@@ -229,7 +231,9 @@
     // ---- Modal DOM & Focus Controller ---------------------------------------------------------
     var screenEl = null;
     var sidebarEl = null;
+    var sidebarInnerEl = null;
     var contentEl = null;
+    var contentInnerEl = null;
     var sidebarTabs = [];
     var currentRows = [];
     var focusedNodes = [];
@@ -276,10 +280,16 @@
 
         sidebarEl = document.createElement("div");
         sidebarEl.className = "birdy-yt-sidebar";
+        sidebarInnerEl = document.createElement("div");
+        sidebarInnerEl.className = "birdy-yt-list-inner";
+        sidebarEl.appendChild(sidebarInnerEl);
         buildSidebarOnce();
 
         contentEl = document.createElement("div");
         contentEl.className = "birdy-yt-content";
+        contentInnerEl = document.createElement("div");
+        contentInnerEl.className = "birdy-yt-list-inner";
+        contentEl.appendChild(contentInnerEl);
 
         main.appendChild(sidebarEl);
         main.appendChild(contentEl);
@@ -289,13 +299,13 @@
     }
 
     function buildSidebarOnce() {
-        sidebarEl.textContent = "";
+        sidebarInnerEl.textContent = "";
         sidebarTabs = [];
 
         var sec = document.createElement("div");
         sec.className = "birdy-yt-sec";
         sec.textContent = t("section.title", { brand: window.__youtvBranding || "BirdyTV" });
-        sidebarEl.appendChild(sec);
+        sidebarInnerEl.appendChild(sec);
 
         for (var i = 0; i < TABS.length; i++) {
             (function (tab, idx) {
@@ -317,7 +327,7 @@
                     focusArea = "sidebar";
                     updateFocusUI();
                 };
-                sidebarEl.appendChild(el);
+                sidebarInnerEl.appendChild(el);
                 sidebarTabs.push(el);
             })(TABS[i], i);
         }
@@ -341,22 +351,22 @@
     }
 
     function addRestartBannerIfNeeded() {
-        if (!pendingRestart || restartBannerInserted || !contentEl) return;
+        if (!pendingRestart || restartBannerInserted || !contentInnerEl) return;
         restartBannerInserted = true;
         var banner = document.createElement("div");
         banner.className = "birdy-yt-restart-banner";
         banner.textContent = t("restart.message");
 
-        var head = contentEl.querySelector(".birdy-yt-cat-header");
+        var head = contentInnerEl.querySelector(".birdy-yt-cat-header");
         if (head && head.nextSibling) {
-            contentEl.insertBefore(banner, head.nextSibling);
+            contentInnerEl.insertBefore(banner, head.nextSibling);
         } else {
-            contentEl.appendChild(banner);
+            contentInnerEl.appendChild(banner);
         }
 
         if (activeTabKey !== "about") {
             var restartBtn = createRestartButton();
-            contentEl.appendChild(restartBtn);
+            contentInnerEl.appendChild(restartBtn);
             currentRows.push(restartBtn);
         }
     }
@@ -372,9 +382,10 @@
     }
 
     function renderContent() {
-        if (!contentEl) return;
-        contentEl.textContent = "";
-        contentEl.scrollTop = 0;
+        if (!contentInnerEl) return;
+        contentInnerEl.textContent = "";
+        contentInnerEl._scrollY = 0;
+        contentInnerEl.style.transform = "translateY(0px)";
         currentRows = [];
         restartBannerInserted = false;
 
@@ -505,7 +516,7 @@
             appendRow(frag, createRestartButton());
         }
 
-        contentEl.appendChild(frag);
+        contentInnerEl.appendChild(frag);
     }
 
     function appendRow(frag, row) {
@@ -649,21 +660,28 @@
     }
 
     // ---- Scroll & Focus Controller ------------------------------------------------------------
-    function ensureVisible(container, el, isFirst) {
-        if (!container || !el) return;
+    function ensureVisible(viewport, inner, el, isFirst) {
+        if (!viewport || !inner || !el) return;
         if (isFirst) {
-            container.scrollTop = 0;
+            inner._scrollY = 0;
+            inner.style.transform = "translateY(0px)";
             return;
         }
+        var viewH = viewport.clientHeight;
+        if (!viewH) return;
         var elTop = el.offsetTop;
         var elBottom = elTop + el.offsetHeight;
-        var viewTop = container.scrollTop;
-        var viewBottom = viewTop + container.clientHeight;
-        var pad = 24;
-        if (elTop - pad < viewTop) {
-            container.scrollTop = Math.max(0, elTop - pad);
-        } else if (elBottom + pad > viewBottom) {
-            container.scrollTop = elBottom + pad - container.clientHeight;
+        var curY = inner._scrollY || 0;
+        var pad = 28;
+        var nextY = curY;
+        if (elTop - pad < curY) {
+            nextY = Math.max(0, elTop - pad);
+        } else if (elBottom + pad > curY + viewH) {
+            nextY = elBottom + pad - viewH;
+        }
+        if (nextY !== curY) {
+            inner._scrollY = nextY;
+            inner.style.transform = "translateY(-" + nextY + "px)";
         }
     }
 
@@ -688,7 +706,7 @@
             var tab = sidebarTabs[focusSidebarIndex];
             if (tab) {
                 addFocusedNode(tab);
-                ensureVisible(sidebarEl, tab, focusSidebarIndex === 0);
+                ensureVisible(sidebarEl, sidebarInnerEl, tab, focusSidebarIndex === 0);
             }
         } else {
             if (!currentRows.length) return;
@@ -700,7 +718,7 @@
             if (targetRow._pills && targetRow._pills[focusPillIndex]) {
                 addFocusedNode(targetRow._pills[focusPillIndex]);
             }
-            ensureVisible(contentEl, targetRow, focusContentIndex === 0);
+            ensureVisible(contentEl, contentInnerEl, targetRow, focusContentIndex === 0);
         }
     }
 
