@@ -344,6 +344,8 @@
     }
 
     // ---- seekbar colored markers (Picture 3) --------------------------------------------------
+    var lastMarkersKey = "";
+
     function findProgressBar() {
         if (!document || typeof document.querySelector !== "function") return null;
         // 1. Direct multi-markers player bar element or inner slider
@@ -378,6 +380,7 @@
     }
 
     function clearSeekbarMarkers() {
+        lastMarkersKey = "";
         if (!document || typeof document.querySelectorAll !== "function") return;
         try {
             var existing = document.querySelectorAll(".birdy-sb-track-markers");
@@ -405,31 +408,46 @@
         }
         var duration = video.duration;
 
+        var activeSegs = [];
+        for (var i = 0; i < segments.length; i++) {
+            var s = segments[i];
+            var isCategorySeekbar = seekbarFeature.settings.get(s.category + "_seekbar");
+            if (isCategorySeekbar !== false && CATEGORY_COLORS[s.category]) {
+                activeSegs.push(s);
+            }
+        }
+        if (!activeSegs.length) {
+            clearSeekbarMarkers();
+            return;
+        }
+
+        var markersKey = (videoId || "") + ":" + Math.round(duration) + ":" + activeSegs.map(function (s) {
+            return s.category + ":" + s.start.toFixed(1) + "-" + s.end.toFixed(1);
+        }).join(",");
+
         var container = typeof bar.querySelector === "function" ? bar.querySelector(".birdy-sb-track-markers") : null;
+        if (container && container.hasChildNodes() && markersKey === lastMarkersKey) {
+            return;
+        }
+
         if (!container && typeof document.createElement === "function") {
             container = document.createElement("div");
             container.className = "birdy-sb-track-markers";
             if (bar.appendChild) bar.appendChild(container);
         }
         if (!container) return;
-        try {
-            if (window.getComputedStyle && bar.style) {
-                if (window.getComputedStyle(bar).position === "static") {
-                    bar.style.position = "relative";
-                }
-            }
-        } catch (e) {}
 
-        container.textContent = "";
-        for (var i = 0; i < segments.length; i++) {
-            var s = segments[i];
-            var isCategorySeekbar = seekbarFeature.settings.get(s.category + "_seekbar");
-            if (isCategorySeekbar === false) continue;
-            var color = CATEGORY_COLORS[s.category];
-            if (!color) continue;
+        if (bar.style && (!bar.style.position || bar.style.position === "static")) {
+            bar.style.position = "relative";
+        }
 
-            var startPct = Math.max(0, Math.min(100, (s.start / duration) * 100));
-            var endPct = Math.max(0, Math.min(100, (s.end / duration) * 100));
+        var fragment = document.createDocumentFragment ? document.createDocumentFragment() : document.createElement("div");
+        for (var j = 0; j < activeSegs.length; j++) {
+            var seg = activeSegs[j];
+            var color = CATEGORY_COLORS[seg.category];
+
+            var startPct = Math.max(0, Math.min(100, (seg.start / duration) * 100));
+            var endPct = Math.max(0, Math.min(100, (seg.end / duration) * 100));
             var widthPct = endPct - startPct;
             if (widthPct <= 0.05) continue;
 
@@ -438,8 +456,12 @@
             marker.style.left = startPct.toFixed(2) + "%";
             marker.style.width = widthPct.toFixed(2) + "%";
             marker.style.backgroundColor = color;
-            container.appendChild(marker);
+            fragment.appendChild(marker);
         }
+
+        container.textContent = "";
+        container.appendChild(fragment);
+        lastMarkersKey = markersKey;
     }
 
     // ---- 3-choice settings page enhancer (On, Prompt to skip, Off) ----------------------------
