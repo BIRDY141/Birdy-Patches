@@ -626,8 +626,11 @@
 
         for (var i = 0; i < segments.length; i++) {
             var s = segments[i];
+            var mode = getCategoryMode(s.category);
+            if (mode === "prompt" && s.skipped && (t < s.start - 0.5 || t >= s.end)) {
+                s.skipped = false;
+            }
             if (t >= s.start && t < s.end - 0.5) {
-                var mode = getCategoryMode(s.category);
                 if (mode === "off") continue;
 
                 if (mode === "skip") {
