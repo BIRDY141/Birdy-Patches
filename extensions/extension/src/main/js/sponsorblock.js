@@ -67,24 +67,24 @@
     var segments = [];      // { start, end, category, label, actionKey, skipped, prompted }
 
     function currentVideoId() {
-        var match = /[?&]v=([A-Za-z0-9_-]{11})/.exec(location.hash || "");
+        var match = /[?&#]v=([A-Za-z0-9_-]{11})/.exec(location.hash || location.search || "");
         return match ? match[1] : null;
     }
 
     // 3 options per category: "skip" (automatic), "prompt" (manual overlay), "off" (disabled)
     function getCategoryMode(key) {
         if (!feature.enabled()) return "off";
+        var globalPrompt = feature.settings.get("prompt_all");
         var rawMode = null;
         try {
             var raw = localStorage.getItem("yt.leanback.default::YOUTV_SPONSORBLOCK_" + key.toUpperCase() + "_MODE");
             if (raw) rawMode = JSON.parse(raw);
         } catch (e) {}
-        if (rawMode === "skip" || rawMode === "prompt" || rawMode === "off") {
-            return rawMode;
-        }
+        if (rawMode === "off") return "off";
+        if (rawMode === "prompt") return "prompt";
+        if (rawMode === "skip") return globalPrompt ? "prompt" : "skip";
         var isManual = feature.settings.get(key + "_prompt");
         var isAuto = feature.settings.get(key);
-        var globalPrompt = feature.settings.get("prompt_all");
         if (isManual || (isAuto && globalPrompt)) return "prompt";
         if (isAuto) return "skip";
         return "off";
@@ -263,9 +263,8 @@
         }, 2500);
     }
 
-    // Manual Skip Prompt: sleek dark pill with "Skip sponsor |>" matching Picture 1 & 2
+    // Manual Skip Prompt: sleek dark pill with "Skip sponsor |>" shown for the entire segment
     var prompt = null;
-    var promptTimer = null;
     var activePromptSegment = null;
 
     function isPromptShowing() {
@@ -276,7 +275,6 @@
         if (!prompt) return;
         prompt.className = "birdy-skip-prompt farotv-skip-prompt";
         activePromptSegment = null;
-        clearTimeout(promptTimer);
         window.removeEventListener("keydown", onPromptKeyDown, true);
     }
 
@@ -338,20 +336,11 @@
         activePromptSegment = s;
         prompt.dir = window.farotvI18n.direction();
 
-        var video = document.querySelector("video");
-        var timeLeft = video ? Math.floor(s.end - video.currentTime) : 6;
-        var displaySeconds = Math.max(3, Math.min(8, timeLeft));
-
         updatePromptView();
         prompt.className = "birdy-skip-prompt farotv-skip-prompt show";
 
         window.removeEventListener("keydown", onPromptKeyDown, true);
         window.addEventListener("keydown", onPromptKeyDown, true);
-
-        clearTimeout(promptTimer);
-        promptTimer = setTimeout(function () {
-            hidePrompt();
-        }, displaySeconds * 1000);
     }
 
     // ---- seekbar colored markers (Picture 3) --------------------------------------------------
@@ -652,10 +641,14 @@
                 }
 
                 if (mode === "prompt") {
-                    if (s.prompted || s.skipped) continue;
-                    s.prompted = true;
-                    showPrompt(s);
-                    youtv.report("sponsorblock: prompt shown for " + s.label + " " + s.start.toFixed(1) + "-" + s.end.toFixed(1));
+                    if (s.skipped) continue;
+                    if (activePromptSegment !== s || !isPromptShowing()) {
+                        showPrompt(s);
+                        if (!s.prompted) {
+                            s.prompted = true;
+                            youtv.report("sponsorblock: prompt shown for " + s.label + " " + s.start.toFixed(1) + "-" + s.end.toFixed(1));
+                        }
+                    }
                     return;
                 }
             }
