@@ -1,7 +1,7 @@
-// BirdyTV Settings Hub: 1:1 copy of YouTube TV's native Settings screen UI.
-// Left column: uppercase section headers + scrollable list of settings separated by a thin
-// vertical divider. Right pane: centered illustration, bold title, summary, and pill buttons.
-// TrustedHTML-safe DOM (zero innerHTML), direct scrollTop scrolling, and low-CPU optimizations.
+// BirdyTV Settings Hub: 2-column YouTube TV (Cobalt Leanback) Settings UI.
+// Left column: categories with YouTube TV rounded pill focus & thin vertical divider.
+// Right column: category settings list with explicit viewport height for reliable scrolling.
+// TrustedHTML-safe DOM, direct scrollTop tracking, and low-CPU optimizations.
 (function () {
     if (!window.youtv) return;
 
@@ -85,51 +85,50 @@
         } catch (e) {}
     }
 
-    // ---- SVG Illustrations (YouTube TV Settings style, built via createElementNS) -------------
+    // ---- SVG Icons (created via createElementNS for TrustedHTML compatibility) ----------------
     var SVG_NS = "http://www.w3.org/2000/svg";
-    var ART = {
+    var ICONS = {
         sponsorblock: [
-            ["path", { d: "M22 76 H122", stroke: "#3FD3FF", "stroke-width": "6", "stroke-linecap": "round" }],
-            ["path", { d: "M54 76 H90", stroke: "#FF4E45", "stroke-width": "10", "stroke-linecap": "round" }],
-            ["path", { d: "M42 54 C54 20 90 20 102 54", stroke: "#FFE27A", "stroke-width": "5", fill: "none", "stroke-linecap": "round" }],
-            ["path", { d: "M94 48 L102 56 L110 46", stroke: "#FFE27A", "stroke-width": "5", fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" }],
-            ["circle", { cx: "42", cy: "76", r: "7", fill: "#19E3B1" }],
-            ["circle", { cx: "102", cy: "76", r: "7", fill: "#19E3B1" }]
+            ["path", { d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" }],
+            ["path", { d: "m9 12 2 2 4-4" }]
+        ],
+        seekbar: [
+            ["circle", { cx: "13.5", cy: "6.5", r: "0.7", fill: "currentColor" }],
+            ["circle", { cx: "17.5", cy: "10.5", r: "0.7", fill: "currentColor" }],
+            ["circle", { cx: "8.5", cy: "7.5", r: "0.7", fill: "currentColor" }],
+            ["circle", { cx: "6.5", cy: "12.5", r: "0.7", fill: "currentColor" }],
+            ["path", { d: "M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" }]
         ],
         ads: [
-            ["rect", { x: "30", y: "24", width: "84", height: "58", rx: "12", fill: "#0598C9" }],
-            ["path", { d: "M28 20 L116 88", stroke: "#FF4E45", "stroke-width": "9", "stroke-linecap": "round" }],
-            ["path", { d: "M28 20 L44 32", stroke: "#FFE27A", "stroke-width": "9", "stroke-linecap": "round" }],
-            ["circle", { cx: "122", cy: "22", r: "4", fill: "#3FD3FF" }]
+            ["circle", { cx: "12", cy: "12", r: "10" }],
+            ["path", { d: "m4.9 4.9 14.2 14.2" }]
         ],
         player: [
-            ["rect", { x: "24", y: "18", width: "96", height: "60", rx: "10", fill: "#0598C9" }],
-            ["polygon", { points: "64 34 84 48 64 62", fill: "#FFE27A" }],
-            ["path", { d: "M30 90 H114 M30 100 H114", stroke: "#3FD3FF", "stroke-width": "4", "stroke-linecap": "round" }],
-            ["circle", { cx: "56", cy: "90", r: "6", fill: "#19E3B1" }],
-            ["circle", { cx: "92", cy: "100", r: "6", fill: "#FF4E45" }]
+            ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "3" }],
+            ["polygon", { points: "10 9 16 12 10 15 10 9", fill: "currentColor", stroke: "none" }]
         ],
         shorts: [
-            ["rect", { x: "50", y: "14", width: "44", height: "78", rx: "10", fill: "#0598C9" }],
-            ["polygon", { points: "66 41 82 53 66 65", fill: "#FFE27A" }],
-            ["path", { d: "M36 22 L108 86", stroke: "#FF4E45", "stroke-width": "9", "stroke-linecap": "round" }]
+            ["polygon", { points: "13 2 3 14 12 14 11 22 21 10 12 10 13 2" }]
         ],
         ryd: [
-            ["rect", { x: "26", y: "24", width: "16", height: "48", rx: "4", fill: "#3FD3FF" }],
-            ["path", { d: "M48 24 H86 C94 24 98 28 99 34 L104 60 C105 66 101 70 95 70 H76 L80 86 C81 92 77 96 72 94 L54 70 H48 Z", fill: "#0598C9" }],
-            ["rect", { x: "96", y: "76", width: "32", height: "18", rx: "9", fill: "#FFE27A" }]
+            ["path", { d: "M17 14V2" }],
+            ["path", { d: "M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z" }]
         ],
         about: [
-            ["rect", { x: "30", y: "20", width: "84", height: "64", rx: "16", fill: "#FF2028" }],
-            ["polygon", { points: "62 38 88 52 62 66", fill: "#FFFFFF" }],
-            ["circle", { cx: "120", cy: "22", r: "4", fill: "#3FD3FF" }]
+            ["circle", { cx: "12", cy: "12", r: "10" }],
+            ["line", { x1: "12", y1: "16", x2: "12", y2: "12" }],
+            ["line", { x1: "12", y1: "8", x2: "12.01", y2: "8" }]
         ]
     };
 
-    function createArtSvg(artKey, dotColor) {
+    function createSvgIcon(shapes) {
         var svg = document.createElementNS(SVG_NS, "svg");
-        svg.setAttribute("viewBox", "0 0 144 108");
-        var shapes = ART[artKey] || ART.about;
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("fill", "none");
+        svg.setAttribute("stroke", "currentColor");
+        svg.setAttribute("stroke-width", "2");
+        svg.setAttribute("stroke-linecap", "round");
+        svg.setAttribute("stroke-linejoin", "round");
         for (var i = 0; i < shapes.length; i++) {
             var node = document.createElementNS(SVG_NS, shapes[i][0]);
             var attrs = shapes[i][1];
@@ -140,204 +139,118 @@
             }
             svg.appendChild(node);
         }
-        if (dotColor) {
-            var badge = document.createElementNS(SVG_NS, "circle");
-            badge.setAttribute("cx", "118");
-            badge.setAttribute("cy", "26");
-            badge.setAttribute("r", "10");
-            badge.setAttribute("fill", dotColor);
-            svg.appendChild(badge);
-        }
         return svg;
     }
 
-    // ---- Styles (Exact YouTube TV Settings Screenshot Copy) -----------------------------------
+    // ---- Styles (YouTube TV Settings UI) ------------------------------------------------------
     var sheet = new CSSStyleSheet();
     try {
         sheet.replaceSync(
             ".birdy-yt-screen {" +
             " position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 2147483647;" +
             " background: #0f1014; color: #f1f1f1; display: none; flex-direction: column;" +
-            " font-family: 'YouTube Sans', Roboto, Arial, sans-serif; }" +
+            " font-family: 'YouTube Sans', Roboto, Arial, sans-serif; box-sizing: border-box; }" +
             ".birdy-yt-screen.show { display: flex; }" +
             ".birdy-yt-topbar {" +
-            " display: flex; align-items: center; justify-content: space-between;" +
-            " padding: 2.2rem 3.5rem 1.2rem; flex-shrink: 0; }" +
-            ".birdy-yt-page-title { font-size: 2.3rem; font-weight: 700; margin: 0; color: #ffffff; letter-spacing: -0.01em; }" +
+            " display: flex; align-items: center; justify-content: space-between; height: 92px; box-sizing: border-box;" +
+            " padding: 2rem 3.5rem 1rem; flex-shrink: 0; }" +
+            ".birdy-yt-page-title { font-size: 2.2rem; font-weight: 700; margin: 0; color: #ffffff; letter-spacing: -0.01em; }" +
             ".birdy-yt-hint { font-size: 0.96rem; color: rgba(255, 255, 255, 0.55); font-weight: 500; }" +
-            ".birdy-yt-body { display: flex; flex: 1; min-height: 0; padding: 0 3.5rem 2.2rem; overflow: hidden; }" +
-            ".birdy-yt-left {" +
-            " position: relative; width: 350px; flex-shrink: 0; min-height: 0; overflow-y: auto;" +
-            " border-right: 1px solid rgba(255, 255, 255, 0.22); padding: 0.25rem 1.6rem 2.5rem 0;" +
-            " display: flex; flex-direction: column; gap: 0.2rem; }" +
+            ".birdy-yt-main {" +
+            " display: flex; height: calc(100vh - 92px); box-sizing: border-box;" +
+            " padding: 0 3.5rem 2rem; gap: 2.5rem; overflow: hidden; }" +
+            ".birdy-yt-sidebar {" +
+            " position: relative; width: 320px; height: 100%; box-sizing: border-box; flex-shrink: 0;" +
+            " overflow-y: auto; overflow-x: hidden; border-right: 1px solid rgba(255, 255, 255, 0.2);" +
+            " display: flex; flex-direction: column; gap: 0.35rem; padding: 0.25rem 1.5rem 2rem 0; }" +
             ".birdy-yt-sec {" +
-            " font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;" +
-            " color: rgba(255, 255, 255, 0.52); padding: 1.15rem 1rem 0.35rem; flex-shrink: 0; }" +
-            ".birdy-yt-sec:first-child { padding-top: 0.25rem; }" +
-            ".birdy-yt-nav-item {" +
-            " display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;" +
-            " padding: 0.78rem 1rem; border-radius: 10px; font-size: 1.1rem; font-weight: 500;" +
-            " color: #e5e5e5; cursor: pointer; flex-shrink: 0; }" +
-            ".birdy-yt-nav-item.selected { background: rgba(255, 255, 255, 0.14); color: #ffffff; font-weight: 600; }" +
-            ".birdy-yt-nav-item.birdy-focus { background: #f1f1f1; color: #0f0f0f; font-weight: 700; }" +
-            ".birdy-yt-nav-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }" +
-            ".birdy-yt-nav-val { font-size: 0.84rem; font-weight: 600; color: rgba(255, 255, 255, 0.55); flex-shrink: 0; }" +
-            ".birdy-yt-nav-item.birdy-focus .birdy-yt-nav-val { color: rgba(15, 15, 15, 0.7); }" +
-            ".birdy-yt-right {" +
-            " flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center;" +
-            " justify-content: center; text-align: center; padding: 2rem 4rem; gap: 1.15rem; }" +
-            ".birdy-yt-art { width: 150px; height: 112px; display: flex; align-items: center; justify-content: center; }" +
-            ".birdy-yt-art svg { width: 100%; height: 100%; }" +
-            ".birdy-yt-detail-title { font-size: 2rem; font-weight: 700; margin: 0; color: #ffffff; max-width: 680px; }" +
-            ".birdy-yt-detail-summary { font-size: 1.08rem; color: rgba(255, 255, 255, 0.72); line-height: 1.45; max-width: 620px; margin: 0; }" +
-            ".birdy-yt-restart-note {" +
-            " padding: 0.55rem 1.1rem; border-radius: 8px; background: rgba(62, 166, 255, 0.14);" +
-            " border: 1px solid rgba(62, 166, 255, 0.4); color: #7cc4ff; font-size: 0.94rem; font-weight: 600; }" +
-            ".birdy-yt-btn-group { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.9rem; margin-top: 0.85rem; }" +
-            ".birdy-yt-pill-btn {" +
-            " min-width: 220px; padding: 1rem 2.2rem; border-radius: 9999px; border: 2px solid transparent;" +
-            " font-size: 1.12rem; font-weight: 600; cursor: pointer; outline: none;" +
-            " background: rgba(255, 255, 255, 0.14); color: #f1f1f1; }" +
-            ".birdy-yt-pill-btn.active { border-color: rgba(255, 255, 255, 0.45); }" +
-            ".birdy-yt-pill-btn.birdy-focus { background: #ffffff; color: #0f0f0f; border-color: #ffffff; font-weight: 700; }"
+            " font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;" +
+            " color: rgba(255, 255, 255, 0.5); padding: 0.35rem 1rem 0.45rem; flex-shrink: 0; }" +
+            ".birdy-yt-cat {" +
+            " display: flex; align-items: center; gap: 0.95rem; padding: 0.88rem 1.15rem; border-radius: 10px;" +
+            " font-size: 1.12rem; font-weight: 500; color: #dcdcdc; cursor: pointer; flex-shrink: 0; }" +
+            ".birdy-yt-cat-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }" +
+            ".birdy-yt-cat-icon svg { width: 20px; height: 20px; }" +
+            ".birdy-yt-cat.active { background: rgba(255, 255, 255, 0.14); color: #ffffff; font-weight: 600; }" +
+            ".birdy-yt-cat.birdy-focus { background: #f1f1f1; color: #0f0f0f; font-weight: 700; }" +
+            ".birdy-yt-content {" +
+            " position: relative; flex: 1; height: 100%; box-sizing: border-box;" +
+            " overflow-y: auto; overflow-x: hidden;" +
+            " display: flex; flex-direction: column; gap: 0.45rem; padding: 0.25rem 0.5rem 3rem 0; }" +
+            ".birdy-yt-cat-header {" +
+            " font-size: 1.5rem; font-weight: 700; color: #ffffff; margin: 0 0 0.6rem; padding: 0 1.25rem; flex-shrink: 0; }" +
+            ".birdy-yt-restart-banner {" +
+            " margin: 0 0 0.6rem; padding: 0.85rem 1.25rem; border-radius: 10px;" +
+            " background: rgba(62, 166, 255, 0.14); border: 1px solid rgba(62, 166, 255, 0.45);" +
+            " color: #7cc4ff; font-size: 1rem; font-weight: 600; flex-shrink: 0; }" +
+            ".birdy-yt-row {" +
+            " display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;" +
+            " padding: 1rem 1.3rem; border-radius: 10px; background: rgba(255, 255, 255, 0.04);" +
+            " color: #f1f1f1; flex-shrink: 0; cursor: pointer; }" +
+            ".birdy-yt-row.birdy-focus { background: #f1f1f1; color: #0f0f0f; }" +
+            ".birdy-yt-row[data-type='3way'].birdy-focus { background: rgba(255, 255, 255, 0.14); color: #ffffff; }" +
+            ".birdy-yt-row-left { display: flex; flex-direction: column; gap: 0.2rem; flex: 1; min-width: 0; }" +
+            ".birdy-yt-row-title-wrap { display: flex; align-items: center; gap: 0.7rem; }" +
+            ".birdy-yt-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }" +
+            ".birdy-yt-row-title { font-size: 1.14rem; font-weight: 500; color: inherit; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-row-title { font-weight: 700; }" +
+            ".birdy-yt-row-summary { font-size: 0.92rem; color: rgba(255, 255, 255, 0.62); line-height: 1.35; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-row-summary { color: #3f3f3f; }" +
+            ".birdy-yt-row[data-type='3way'].birdy-focus .birdy-yt-row-summary { color: #cccccc; }" +
+            ".birdy-yt-switch-wrap { display: flex; align-items: center; gap: 0.85rem; flex-shrink: 0; }" +
+            ".birdy-yt-switch-state { font-size: 0.94rem; font-weight: 500; color: rgba(255, 255, 255, 0.6); min-width: 64px; text-align: right; }" +
+            ".birdy-yt-switch-state.on { color: #ffffff; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-switch-state { color: #0f0f0f; font-weight: 700; }" +
+            ".birdy-yt-switch {" +
+            " position: relative; width: 46px; height: 26px; border-radius: 9999px; flex-shrink: 0;" +
+            " background: #717171; border: none; padding: 0; cursor: pointer; outline: none; }" +
+            ".birdy-yt-switch.on { background: #3ea6ff; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-switch { background: #8e8e8e; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-switch.on { background: #0f0f0f; }" +
+            ".birdy-yt-switch::after {" +
+            " content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px;" +
+            " border-radius: 50%; background: #f1f1f1; }" +
+            ".birdy-yt-switch.on::after { transform: translateX(20px); background: #ffffff; }" +
+            ".birdy-yt-pills { display: flex; align-items: center; gap: 0.45rem; flex-shrink: 0; }" +
+            ".birdy-yt-pill {" +
+            " padding: 0.55rem 1.05rem; border-radius: 9999px; font-size: 0.94rem; font-weight: 600;" +
+            " background: rgba(255, 255, 255, 0.12); color: #dcdcdc; border: 2px solid transparent; cursor: pointer; outline: none; }" +
+            ".birdy-yt-pill.selected { background: #3ea6ff; color: #0f0f0f; font-weight: 700; }" +
+            ".birdy-yt-pill.birdy-focus { background: #ffffff; color: #0f0f0f; border-color: #ffffff; font-weight: 700; }" +
+            ".birdy-yt-btn {" +
+            " padding: 0.9rem 1.8rem; border-radius: 9999px; font-size: 1.06rem; font-weight: 600;" +
+            " background: rgba(255, 255, 255, 0.14); color: #f1f1f1; border: none; cursor: pointer;" +
+            " outline: none; align-self: flex-start; margin: 0.65rem 0 0 1.25rem; flex-shrink: 0; }" +
+            ".birdy-yt-btn.birdy-focus { background: #f1f1f1; color: #0f0f0f; font-weight: 700; }"
         );
         document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
     } catch (e) {}
 
-    // ---- Menu Items Model ---------------------------------------------------------------------
-    function buildEntries() {
-        var entries = [];
-
-        entries.push({ section: t("hub.tab.ads") });
-        entries.push({
-            type: "toggle", art: "ads",
-            title: t("feature.ads.name"), summary: t("feature.ads.summary"),
-            key: "YOUTV_ADS", def: true
-        });
-        entries.push({
-            type: "toggle", art: "ads",
-            title: t("feature.premium-promos.name"), summary: t("feature.premium-promos.summary"),
-            key: "YOUTV_PREMIUM_PROMOS", def: true
-        });
-
-        entries.push({ section: t("hub.tab.shorts") });
-        entries.push({
-            type: "toggle", art: "shorts", restart: true,
-            title: t("feature.shorts.name"), summary: t("feature.shorts.summary"),
-            key: "YOUTV_SHORTS", def: true
-        });
-        entries.push({
-            type: "toggle", art: "shorts", restart: true,
-            title: t("feature.topics.name"), summary: t("feature.topics.summary"),
-            key: "YOUTV_TOPICS", def: false
-        });
-        entries.push({
-            type: "toggle", art: "ryd",
-            title: t("feature.ryd.name"), summary: t("feature.ryd.summary"),
-            key: "YOUTV_RYD", def: true
-        });
-
-        entries.push({ section: t("hub.tab.sponsorblock") });
-        entries.push({
-            type: "toggle", art: "sponsorblock",
-            title: t("feature.sponsorblock.name"), summary: t("feature.sponsorblock.summary"),
-            key: "YOUTV_SPONSORBLOCK", def: true
-        });
-        entries.push({
-            type: "toggle", art: "sponsorblock",
-            title: t("sponsor.prompt_all.title"), summary: t("sponsor.prompt_all.summary"),
-            key: "YOUTV_SPONSORBLOCK_PROMPT_ALL", def: false
-        });
-        for (var i = 0; i < CATEGORIES.length; i++) {
-            entries.push({
-                type: "3way", art: "sponsorblock",
-                cat: CATEGORIES[i],
-                title: t(CATEGORIES[i].titleKey),
-                summary: t("feature.sponsorblock.summary")
-            });
-        }
-
-        entries.push({ section: t("hub.tab.seekbar") });
-        entries.push({
-            type: "toggle", art: "sponsorblock",
-            title: t("feature.sponsorblock_colors.name"), summary: t("feature.sponsorblock_colors.summary"),
-            key: "YOUTV_SPONSORBLOCK_COLORS", def: true
-        });
-        for (var j = 0; j < CATEGORIES.length; j++) {
-            var c = CATEGORIES[j];
-            entries.push({
-                type: "toggle", art: "sponsorblock", dotColor: c.color,
-                title: t(c.titleKey),
-                summary: t("sponsor." + c.key + ".seekbar.summary"),
-                key: "YOUTV_SPONSORBLOCK_COLORS_" + c.key.toUpperCase() + "_SEEKBAR",
-                def: c.key === "sponsor" || c.key === "selfpromo" || c.key === "interaction"
-            });
-        }
-
-        entries.push({ section: t("hub.tab.player") });
-        entries.push({
-            type: "toggle", art: "player",
-            title: t("feature.player.name"), summary: t("feature.player.summary"),
-            key: "YOUTV_PLAYER", def: true
-        });
-        for (var k = 0; k < PLAYER_BUTTONS.length; k++) {
-            var b = PLAYER_BUTTONS[k];
-            entries.push({
-                type: "toggle", art: "player",
-                title: t(b.titleKey),
-                summary: b.summaryKey ? t(b.summaryKey) : t("feature.player.summary"),
-                key: "YOUTV_PLAYER_" + b.key.toUpperCase(),
-                def: false
-            });
-        }
-
-        entries.push({ section: t("hub.tab.about") });
-        var ver = window.__farotvVersion ? "v" + window.__farotvVersion : "";
-        var ytVer = window.__youtubeVersion ? "YouTube TV " + window.__youtubeVersion : "Android TV Cobalt";
-        entries.push({
-            type: "action", art: "about",
-            title: (window.__youtvBranding || "BirdyTV") + (ver ? " " + ver : ""),
-            summary: "BIRDY141/Birdy-Patches • " + ytVer,
-            buttonText: t("hub.restart_app"),
-            onAction: function () { location.reload(); }
-        });
-
-        return entries;
-    }
-
-    // ---- DOM & Focus State --------------------------------------------------------------------
+    // ---- Modal DOM & Focus Controller ---------------------------------------------------------
     var screenEl = null;
-    var leftEl = null;
-    var artEl = null;
-    var detailTitleEl = null;
-    var detailSummaryEl = null;
-    var restartNoteEl = null;
-    var btnGroupEl = null;
+    var sidebarEl = null;
+    var contentEl = null;
+    var sidebarTabs = [];
+    var currentRows = [];
+    var focusedNodes = [];
+    var restartBannerInserted = false;
 
-    var navItems = []; // { entry, el, valEl }
-    var rightButtons = [];
-    var focusArea = "left"; // "left" or "right"
-    var focusLeftIndex = 0;
-    var focusRightIndex = 0;
-    var prevFocusEl = null;
-    var prevSelectedEl = null;
+    var activeTabKey = "sponsorblock";
+    var focusArea = "sidebar"; // "sidebar" or "content"
+    var focusSidebarIndex = 0;
+    var focusContentIndex = 0;
+    var focusPillIndex = 0;
     var pendingRestart = false;
 
-    function modeShortText(mode) {
-        if (mode === "skip") return t("hub.action.skip");
-        if (mode === "prompt") return t("hub.action.prompt");
-        return t("hub.action.off");
-    }
-
-    function entryStatusText(entry) {
-        if (entry.type === "toggle") {
-            return getBool(entry.key, entry.def) ? t("hub.enabled") : t("hub.disabled");
-        }
-        if (entry.type === "3way") {
-            return modeShortText(getSponsorMode(entry.cat.key));
-        }
-        return "";
-    }
+    var TABS = [
+        { key: "sponsorblock", labelKey: "hub.tab.sponsorblock", icon: ICONS.sponsorblock },
+        { key: "seekbar", labelKey: "hub.tab.seekbar", icon: ICONS.seekbar },
+        { key: "ads", labelKey: "hub.tab.ads", icon: ICONS.ads },
+        { key: "player", labelKey: "hub.tab.player", icon: ICONS.player },
+        { key: "shorts", labelKey: "hub.tab.shorts", icon: ICONS.shorts },
+        { key: "ryd", labelKey: "hub.tab.ryd", icon: ICONS.ryd },
+        { key: "about", labelKey: "hub.tab.about", icon: ICONS.about }
+    ];
 
     function createScreen() {
         if (screenEl) return;
@@ -346,170 +259,393 @@
 
         var topbar = document.createElement("div");
         topbar.className = "birdy-yt-topbar";
+
         var pageTitle = document.createElement("h1");
         pageTitle.className = "birdy-yt-page-title";
         pageTitle.textContent = t("hub.title");
+
         var hint = document.createElement("span");
         hint.className = "birdy-yt-hint";
         hint.textContent = t("hub.nav.hint");
+
         topbar.appendChild(pageTitle);
         topbar.appendChild(hint);
 
-        var body = document.createElement("div");
-        body.className = "birdy-yt-body";
+        var main = document.createElement("div");
+        main.className = "birdy-yt-main";
 
-        leftEl = document.createElement("div");
-        leftEl.className = "birdy-yt-left";
-        buildLeftList();
+        sidebarEl = document.createElement("div");
+        sidebarEl.className = "birdy-yt-sidebar";
+        buildSidebarOnce();
 
-        var rightEl = document.createElement("div");
-        rightEl.className = "birdy-yt-right";
+        contentEl = document.createElement("div");
+        contentEl.className = "birdy-yt-content";
 
-        artEl = document.createElement("div");
-        artEl.className = "birdy-yt-art";
-        detailTitleEl = document.createElement("h2");
-        detailTitleEl.className = "birdy-yt-detail-title";
-        detailSummaryEl = document.createElement("p");
-        detailSummaryEl.className = "birdy-yt-detail-summary";
-        restartNoteEl = document.createElement("div");
-        restartNoteEl.className = "birdy-yt-restart-note";
-        restartNoteEl.style.display = "none";
-        restartNoteEl.textContent = t("restart.message");
-        btnGroupEl = document.createElement("div");
-        btnGroupEl.className = "birdy-yt-btn-group";
-
-        rightEl.appendChild(artEl);
-        rightEl.appendChild(detailTitleEl);
-        rightEl.appendChild(detailSummaryEl);
-        rightEl.appendChild(restartNoteEl);
-        rightEl.appendChild(btnGroupEl);
-
-        body.appendChild(leftEl);
-        body.appendChild(rightEl);
+        main.appendChild(sidebarEl);
+        main.appendChild(contentEl);
         screenEl.appendChild(topbar);
-        screenEl.appendChild(body);
+        screenEl.appendChild(main);
         document.body.appendChild(screenEl);
     }
 
-    function buildLeftList() {
-        leftEl.textContent = "";
-        navItems = [];
-        var entries = buildEntries();
-        var frag = document.createDocumentFragment();
+    function buildSidebarOnce() {
+        sidebarEl.textContent = "";
+        sidebarTabs = [];
 
-        for (var i = 0; i < entries.length; i++) {
-            var item = entries[i];
-            if (item.section) {
-                var sec = document.createElement("div");
-                sec.className = "birdy-yt-sec";
-                sec.textContent = item.section;
-                frag.appendChild(sec);
-                continue;
-            }
+        var sec = document.createElement("div");
+        sec.className = "birdy-yt-sec";
+        sec.textContent = t("section.title", { brand: window.__youtvBranding || "BirdyTV" });
+        sidebarEl.appendChild(sec);
 
-            (function (entry, idx) {
-                var row = document.createElement("div");
-                row.className = "birdy-yt-nav-item";
+        for (var i = 0; i < TABS.length; i++) {
+            (function (tab, idx) {
+                var el = document.createElement("div");
+                el.className = "birdy-yt-cat" + (tab.key === activeTabKey ? " active" : "");
+                el.setAttribute("data-key", tab.key);
+
+                var iconWrap = document.createElement("span");
+                iconWrap.className = "birdy-yt-cat-icon";
+                iconWrap.appendChild(createSvgIcon(tab.icon));
 
                 var label = document.createElement("span");
-                label.className = "birdy-yt-nav-label";
-                label.textContent = entry.title;
+                label.textContent = t(tab.labelKey);
 
-                var val = document.createElement("span");
-                val.className = "birdy-yt-nav-val";
-                val.textContent = entryStatusText(entry);
-
-                row.appendChild(label);
-                row.appendChild(val);
-
-                row.onclick = function () {
-                    focusLeftIndex = idx;
-                    focusArea = "left";
-                    renderDetailPane();
+                el.appendChild(iconWrap);
+                el.appendChild(label);
+                el.onclick = function () {
+                    selectTab(idx);
+                    focusArea = "sidebar";
                     updateFocusUI();
                 };
-
-                frag.appendChild(row);
-                navItems.push({ entry: entry, el: row, valEl: val });
-            })(item, navItems.length);
+                sidebarEl.appendChild(el);
+                sidebarTabs.push(el);
+            })(TABS[i], i);
         }
-
-        leftEl.appendChild(frag);
     }
 
-    function renderDetailPane() {
-        var current = navItems[focusLeftIndex];
-        if (!current) return;
-        var entry = current.entry;
-
-        artEl.textContent = "";
-        artEl.appendChild(createArtSvg(entry.art, entry.dotColor || (entry.cat && entry.cat.color)));
-        detailTitleEl.textContent = entry.title;
-        detailSummaryEl.textContent = entry.summary || "";
-        restartNoteEl.style.display = pendingRestart ? "block" : "none";
-
-        btnGroupEl.textContent = "";
-        rightButtons = [];
-
-        if (entry.type === "toggle") {
-            var isOn = getBool(entry.key, entry.def);
-            var btn = document.createElement("button");
-            btn.className = "birdy-yt-pill-btn";
-            btn.textContent = isOn ? t("hub.enabled") : t("hub.disabled");
-            btn.onclick = function () {
-                var next = !getBool(entry.key, entry.def);
-                setBool(entry.key, next);
-                if (entry.restart) pendingRestart = true;
-                current.valEl.textContent = entryStatusText(entry);
-                renderDetailPane();
-                updateFocusUI();
-            };
-            btnGroupEl.appendChild(btn);
-            rightButtons.push(btn);
-
-            if (pendingRestart) {
-                var rBtn = document.createElement("button");
-                rBtn.className = "birdy-yt-pill-btn";
-                rBtn.textContent = t("hub.restart_app");
-                rBtn.onclick = function () { location.reload(); };
-                btnGroupEl.appendChild(rBtn);
-                rightButtons.push(rBtn);
-            }
-            focusRightIndex = 0;
-        } else if (entry.type === "3way") {
-            var curMode = getSponsorMode(entry.cat.key);
-            var modes = [
-                { id: "skip", text: t("hub.action.skip") },
-                { id: "prompt", text: t("hub.action.prompt") },
-                { id: "off", text: t("hub.action.off") }
-            ];
-            focusRightIndex = 0;
-            for (var i = 0; i < modes.length; i++) {
-                (function (m, idx) {
-                    var pBtn = document.createElement("button");
-                    pBtn.className = "birdy-yt-pill-btn" + (curMode === m.id ? " active" : "");
-                    pBtn.textContent = m.text;
-                    if (curMode === m.id) focusRightIndex = idx;
-                    pBtn.onclick = function () {
-                        setSponsorMode(entry.cat.key, m.id);
-                        current.valEl.textContent = entryStatusText(entry);
-                        renderDetailPane();
-                        focusRightIndex = idx;
-                        updateFocusUI();
-                    };
-                    btnGroupEl.appendChild(pBtn);
-                    rightButtons.push(pBtn);
-                })(modes[i], i);
-            }
-        } else if (entry.type === "action") {
-            var aBtn = document.createElement("button");
-            aBtn.className = "birdy-yt-pill-btn";
-            aBtn.textContent = entry.buttonText;
-            aBtn.onclick = entry.onAction;
-            btnGroupEl.appendChild(aBtn);
-            rightButtons.push(aBtn);
-            focusRightIndex = 0;
+    function updateSidebarActive() {
+        for (var i = 0; i < sidebarTabs.length; i++) {
+            sidebarTabs[i].classList.toggle("active", TABS[i].key === activeTabKey);
         }
+    }
+
+    function selectTab(idx) {
+        if (idx < 0 || idx >= TABS.length) return;
+        focusSidebarIndex = idx;
+        var nextKey = TABS[idx].key;
+        if (activeTabKey !== nextKey) {
+            activeTabKey = nextKey;
+            updateSidebarActive();
+            renderContent();
+        }
+    }
+
+    function addRestartBannerIfNeeded() {
+        if (!pendingRestart || restartBannerInserted || !contentEl) return;
+        restartBannerInserted = true;
+        var banner = document.createElement("div");
+        banner.className = "birdy-yt-restart-banner";
+        banner.textContent = t("restart.message");
+
+        var head = contentEl.querySelector(".birdy-yt-cat-header");
+        if (head && head.nextSibling) {
+            contentEl.insertBefore(banner, head.nextSibling);
+        } else {
+            contentEl.appendChild(banner);
+        }
+
+        if (activeTabKey !== "about") {
+            var restartBtn = createRestartButton();
+            contentEl.appendChild(restartBtn);
+            currentRows.push(restartBtn);
+        }
+    }
+
+    function createRestartButton() {
+        var restartBtn = document.createElement("button");
+        restartBtn.className = "birdy-yt-btn";
+        restartBtn.textContent = t("hub.restart_app");
+        restartBtn.onclick = function () {
+            location.reload();
+        };
+        return restartBtn;
+    }
+
+    function renderContent() {
+        if (!contentEl) return;
+        contentEl.textContent = "";
+        contentEl.scrollTop = 0;
+        currentRows = [];
+        restartBannerInserted = false;
+
+        var frag = document.createDocumentFragment();
+        var currentTab = TABS[focusSidebarIndex];
+        if (currentTab) {
+            var head = document.createElement("h2");
+            head.className = "birdy-yt-cat-header";
+            head.textContent = t(currentTab.labelKey);
+            frag.appendChild(head);
+        }
+
+        if (pendingRestart) {
+            restartBannerInserted = true;
+            var banner = document.createElement("div");
+            banner.className = "birdy-yt-restart-banner";
+            banner.textContent = t("restart.message");
+            frag.appendChild(banner);
+        }
+
+        if (activeTabKey === "sponsorblock") {
+            appendRow(frag, createToggleRow(
+                t("feature.sponsorblock.name"),
+                t("feature.sponsorblock.summary"),
+                "YOUTV_SPONSORBLOCK",
+                true
+            ));
+            appendRow(frag, createToggleRow(
+                t("sponsor.prompt_all.title"),
+                t("sponsor.prompt_all.summary"),
+                "YOUTV_SPONSORBLOCK_PROMPT_ALL",
+                false
+            ));
+            for (var i = 0; i < CATEGORIES.length; i++) {
+                appendRow(frag, createThreeWayRow(CATEGORIES[i]));
+            }
+        } else if (activeTabKey === "seekbar") {
+            appendRow(frag, createToggleRow(
+                t("feature.sponsorblock_colors.name"),
+                t("feature.sponsorblock_colors.summary"),
+                "YOUTV_SPONSORBLOCK_COLORS",
+                true
+            ));
+            for (var j = 0; j < CATEGORIES.length; j++) {
+                var cat = CATEGORIES[j];
+                var key = "YOUTV_SPONSORBLOCK_COLORS_" + cat.key.toUpperCase() + "_SEEKBAR";
+                var def = cat.key === "sponsor" || cat.key === "selfpromo" || cat.key === "interaction";
+                appendRow(frag, createToggleRow(
+                    t(cat.titleKey),
+                    t("sponsor." + cat.key + ".seekbar.summary"),
+                    key,
+                    def,
+                    false,
+                    cat.color
+                ));
+            }
+        } else if (activeTabKey === "ads") {
+            appendRow(frag, createToggleRow(
+                t("feature.ads.name"),
+                t("feature.ads.summary"),
+                "YOUTV_ADS",
+                true
+            ));
+            appendRow(frag, createToggleRow(
+                t("feature.premium-promos.name"),
+                t("feature.premium-promos.summary"),
+                "YOUTV_PREMIUM_PROMOS",
+                true
+            ));
+        } else if (activeTabKey === "player") {
+            appendRow(frag, createToggleRow(
+                t("feature.player.name"),
+                t("feature.player.summary"),
+                "YOUTV_PLAYER",
+                true
+            ));
+            for (var k = 0; k < PLAYER_BUTTONS.length; k++) {
+                var btn = PLAYER_BUTTONS[k];
+                appendRow(frag, createToggleRow(
+                    t(btn.titleKey),
+                    btn.summaryKey ? t(btn.summaryKey) : "",
+                    "YOUTV_PLAYER_" + btn.key.toUpperCase(),
+                    false
+                ));
+            }
+        } else if (activeTabKey === "shorts") {
+            appendRow(frag, createToggleRow(
+                t("feature.shorts.name"),
+                t("feature.shorts.summary"),
+                "YOUTV_SHORTS",
+                true,
+                true
+            ));
+            appendRow(frag, createToggleRow(
+                t("feature.topics.name"),
+                t("feature.topics.summary"),
+                "YOUTV_TOPICS",
+                false,
+                true
+            ));
+        } else if (activeTabKey === "ryd") {
+            appendRow(frag, createToggleRow(
+                t("feature.ryd.name"),
+                t("feature.ryd.summary"),
+                "YOUTV_RYD",
+                true
+            ));
+        } else if (activeTabKey === "about") {
+            var repoRow = document.createElement("div");
+            repoRow.className = "birdy-yt-row";
+            var ver = window.__farotvVersion ? "v" + window.__farotvVersion : "";
+            var ytVer = window.__youtubeVersion ? "YouTube TV " + window.__youtubeVersion : "Android TV Cobalt";
+            var repoLeft = document.createElement("div");
+            repoLeft.className = "birdy-yt-row-left";
+            var repoTitle = document.createElement("span");
+            repoTitle.className = "birdy-yt-row-title";
+            repoTitle.textContent = (window.__youtvBranding || "BirdyTV") + (ver ? " " + ver : "");
+            var repoSummary = document.createElement("span");
+            repoSummary.className = "birdy-yt-row-summary";
+            repoSummary.textContent = "BIRDY141/Birdy-Patches • " + ytVer;
+            repoLeft.appendChild(repoTitle);
+            repoLeft.appendChild(repoSummary);
+            repoRow.appendChild(repoLeft);
+            frag.appendChild(repoRow);
+        }
+
+        if (pendingRestart || activeTabKey === "about") {
+            appendRow(frag, createRestartButton());
+        }
+
+        contentEl.appendChild(frag);
+    }
+
+    function appendRow(frag, row) {
+        frag.appendChild(row);
+        currentRows.push(row);
+    }
+
+    function createThreeWayRow(cat) {
+        var currentMode = getSponsorMode(cat.key);
+        var row = document.createElement("div");
+        row.className = "birdy-yt-row";
+        row.setAttribute("data-type", "3way");
+
+        var left = document.createElement("div");
+        left.className = "birdy-yt-row-left";
+        var titleWrap = document.createElement("div");
+        titleWrap.className = "birdy-yt-row-title-wrap";
+        var dot = document.createElement("span");
+        dot.className = "birdy-yt-dot";
+        dot.style.backgroundColor = cat.color;
+        var rowTitle = document.createElement("span");
+        rowTitle.className = "birdy-yt-row-title";
+        rowTitle.textContent = t(cat.titleKey);
+        titleWrap.appendChild(dot);
+        titleWrap.appendChild(rowTitle);
+        left.appendChild(titleWrap);
+
+        var pillGroup = document.createElement("div");
+        pillGroup.className = "birdy-yt-pills";
+
+        var modes = [
+            { id: "skip", text: t("hub.action.skip") },
+            { id: "prompt", text: t("hub.action.prompt") },
+            { id: "off", text: t("hub.action.off") }
+        ];
+
+        var pills = [];
+        for (var i = 0; i < modes.length; i++) {
+            (function (m, idx) {
+                var pill = document.createElement("button");
+                pill.className = "birdy-yt-pill" + (currentMode === m.id ? " selected" : "");
+                pill.textContent = m.text;
+                pill.onclick = function () {
+                    setSponsorMode(cat.key, m.id);
+                    for (var p = 0; p < pills.length; p++) {
+                        pills[p].classList.toggle("selected", p === idx);
+                    }
+                    focusPillIndex = idx;
+                    updateFocusUI();
+                };
+                pillGroup.appendChild(pill);
+                pills.push(pill);
+            })(modes[i], i);
+        }
+
+        row._pills = pills;
+        row.appendChild(left);
+        row.appendChild(pillGroup);
+        return row;
+    }
+
+    function createToggleRow(titleText, summaryText, storageKey, defaultVal, needsRestart, dotColor) {
+        var isEnabled = getBool(storageKey, defaultVal);
+        var row = document.createElement("div");
+        row.className = "birdy-yt-row";
+        row.setAttribute("data-type", "toggle");
+
+        var left = document.createElement("div");
+        left.className = "birdy-yt-row-left";
+
+        var titleWrap = document.createElement("div");
+        titleWrap.className = "birdy-yt-row-title-wrap";
+        if (dotColor) {
+            var dot = document.createElement("span");
+            dot.className = "birdy-yt-dot";
+            dot.style.backgroundColor = dotColor;
+            titleWrap.appendChild(dot);
+        }
+        var rowTitle = document.createElement("span");
+        rowTitle.className = "birdy-yt-row-title";
+        rowTitle.textContent = titleText;
+        titleWrap.appendChild(rowTitle);
+        left.appendChild(titleWrap);
+
+        if (summaryText) {
+            var rowSummary = document.createElement("span");
+            rowSummary.className = "birdy-yt-row-summary";
+            rowSummary.textContent = summaryText;
+            left.appendChild(rowSummary);
+        }
+
+        var wrap = document.createElement("div");
+        wrap.className = "birdy-yt-switch-wrap";
+
+        var stateLabel = document.createElement("span");
+        stateLabel.className = "birdy-yt-switch-state" + (isEnabled ? " on" : "");
+        stateLabel.textContent = isEnabled ? t("hub.enabled") : t("hub.disabled");
+
+        var switchBtn = document.createElement("button");
+        switchBtn.className = "birdy-yt-switch" + (isEnabled ? " on" : "");
+        switchBtn.setAttribute("aria-label", stateLabel.textContent);
+
+        function applyToggle() {
+            isEnabled = !isEnabled;
+            setBool(storageKey, isEnabled);
+            switchBtn.classList.toggle("on", isEnabled);
+            stateLabel.classList.toggle("on", isEnabled);
+            var txt = isEnabled ? t("hub.enabled") : t("hub.disabled");
+            stateLabel.textContent = txt;
+            switchBtn.setAttribute("aria-label", txt);
+            if (needsRestart) {
+                pendingRestart = true;
+                addRestartBannerIfNeeded();
+            }
+        }
+
+        row.onclick = function () {
+            applyToggle();
+        };
+        row._toggle = applyToggle;
+
+        wrap.appendChild(stateLabel);
+        wrap.appendChild(switchBtn);
+        row.appendChild(left);
+        row.appendChild(wrap);
+        return row;
+    }
+
+    function syncPillIndexToSelected(row) {
+        if (!row || !row._pills) {
+            focusPillIndex = 0;
+            return;
+        }
+        for (var i = 0; i < row._pills.length; i++) {
+            if (row._pills[i].classList.contains("selected")) {
+                focusPillIndex = i;
+                return;
+            }
+        }
+        focusPillIndex = 0;
     }
 
     // ---- Scroll & Focus Controller ------------------------------------------------------------
@@ -519,38 +655,52 @@
             container.scrollTop = 0;
             return;
         }
-        var cRect = container.getBoundingClientRect();
-        var eRect = el.getBoundingClientRect();
-        var pad = 20;
-        if (eRect.top - pad < cRect.top) {
-            container.scrollTop -= (cRect.top - (eRect.top - pad));
-        } else if (eRect.bottom + pad > cRect.bottom) {
-            container.scrollTop += ((eRect.bottom + pad) - cRect.bottom);
+        var elTop = el.offsetTop;
+        var elBottom = elTop + el.offsetHeight;
+        var viewTop = container.scrollTop;
+        var viewBottom = viewTop + container.clientHeight;
+        var pad = 24;
+        if (elTop - pad < viewTop) {
+            container.scrollTop = Math.max(0, elTop - pad);
+        } else if (elBottom + pad > viewBottom) {
+            container.scrollTop = elBottom + pad - container.clientHeight;
         }
+    }
+
+    function clearFocusedNodes() {
+        for (var i = 0; i < focusedNodes.length; i++) {
+            focusedNodes[i].classList.remove("birdy-focus");
+        }
+        focusedNodes.length = 0;
+    }
+
+    function addFocusedNode(el) {
+        if (!el) return;
+        el.classList.add("birdy-focus");
+        focusedNodes.push(el);
     }
 
     function updateFocusUI() {
         if (!screenEl) return;
-        if (prevFocusEl) prevFocusEl.classList.remove("birdy-focus");
-        if (prevSelectedEl) prevSelectedEl.classList.remove("selected");
-        prevFocusEl = null;
-        prevSelectedEl = null;
+        clearFocusedNodes();
 
-        var current = navItems[focusLeftIndex];
-        if (!current) return;
-
-        ensureVisible(leftEl, current.el, focusLeftIndex === 0);
-
-        if (focusArea === "left") {
-            current.el.classList.add("birdy-focus");
-            prevFocusEl = current.el;
-        } else {
-            current.el.classList.add("selected");
-            prevSelectedEl = current.el;
-            if (rightButtons[focusRightIndex]) {
-                rightButtons[focusRightIndex].classList.add("birdy-focus");
-                prevFocusEl = rightButtons[focusRightIndex];
+        if (focusArea === "sidebar") {
+            var tab = sidebarTabs[focusSidebarIndex];
+            if (tab) {
+                addFocusedNode(tab);
+                ensureVisible(sidebarEl, tab, focusSidebarIndex === 0);
             }
+        } else {
+            if (!currentRows.length) return;
+            if (focusContentIndex >= currentRows.length) focusContentIndex = currentRows.length - 1;
+            var targetRow = currentRows[focusContentIndex];
+            if (!targetRow) return;
+
+            addFocusedNode(targetRow);
+            if (targetRow._pills && targetRow._pills[focusPillIndex]) {
+                addFocusedNode(targetRow._pills[focusPillIndex]);
+            }
+            ensureVisible(contentEl, targetRow, focusContentIndex === 0);
         }
     }
 
@@ -567,8 +717,8 @@
         // BACK: 27 (Escape), 4 (Android Back), 10009 (Tizen Back)
         if (code === 27 || code === 4 || code === 10009 || e.key === "Escape" || e.key === "GoBack" || e.key === "BrowserBack") {
             stopEvent(e);
-            if (focusArea === "right") {
-                focusArea = "left";
+            if (focusArea === "content") {
+                focusArea = "sidebar";
                 updateFocusUI();
             } else {
                 closeHub();
@@ -576,48 +726,68 @@
             return;
         }
 
-        if (focusArea === "left") {
+        if (focusArea === "sidebar") {
             if (code === 38) { // UP
                 stopEvent(e);
-                if (focusLeftIndex > 0) {
-                    focusLeftIndex--;
-                    renderDetailPane();
+                if (focusSidebarIndex > 0) {
+                    selectTab(focusSidebarIndex - 1);
                     updateFocusUI();
                 }
             } else if (code === 40) { // DOWN
                 stopEvent(e);
-                if (focusLeftIndex < navItems.length - 1) {
-                    focusLeftIndex++;
-                    renderDetailPane();
+                if (focusSidebarIndex < TABS.length - 1) {
+                    selectTab(focusSidebarIndex + 1);
                     updateFocusUI();
                 }
             } else if (code === 39 || code === 13 || code === 23) { // RIGHT or OK
                 stopEvent(e);
-                if (rightButtons.length > 0) {
-                    focusArea = "right";
+                if (currentRows.length > 0) {
+                    focusArea = "content";
+                    focusContentIndex = 0;
+                    syncPillIndexToSelected(currentRows[0]);
                     updateFocusUI();
                 }
             }
         } else {
-            if (code === 37) { // LEFT
+            var curRow = currentRows[focusContentIndex];
+
+            if (code === 38) { // UP
                 stopEvent(e);
-                if (focusRightIndex > 0) {
-                    focusRightIndex--;
+                if (focusContentIndex > 0) {
+                    focusContentIndex--;
+                    syncPillIndexToSelected(currentRows[focusContentIndex]);
+                    updateFocusUI();
+                }
+            } else if (code === 40) { // DOWN
+                stopEvent(e);
+                if (focusContentIndex < currentRows.length - 1) {
+                    focusContentIndex++;
+                    syncPillIndexToSelected(currentRows[focusContentIndex]);
+                    updateFocusUI();
+                }
+            } else if (code === 37) { // LEFT
+                stopEvent(e);
+                if (curRow && curRow._pills && focusPillIndex > 0) {
+                    focusPillIndex--;
                     updateFocusUI();
                 } else {
-                    focusArea = "left";
+                    focusArea = "sidebar";
                     updateFocusUI();
                 }
             } else if (code === 39) { // RIGHT
                 stopEvent(e);
-                if (focusRightIndex < rightButtons.length - 1) {
-                    focusRightIndex++;
+                if (curRow && curRow._pills && focusPillIndex < curRow._pills.length - 1) {
+                    focusPillIndex++;
                     updateFocusUI();
                 }
             } else if (code === 13 || code === 23) { // OK / ENTER
                 stopEvent(e);
-                if (rightButtons[focusRightIndex]) {
-                    rightButtons[focusRightIndex].click();
+                if (curRow && curRow._pills && curRow._pills[focusPillIndex]) {
+                    curRow._pills[focusPillIndex].click();
+                } else if (curRow && curRow._toggle) {
+                    curRow._toggle();
+                } else if (curRow) {
+                    curRow.click();
                 }
             }
         }
@@ -627,13 +797,21 @@
         return !!(screenEl && screenEl.classList.contains("show"));
     }
 
-    function openHub() {
+    function openHub(initialTab) {
         createScreen();
+        if (initialTab) {
+            for (var i = 0; i < TABS.length; i++) {
+                if (TABS[i].key === initialTab) {
+                    activeTabKey = initialTab;
+                    focusSidebarIndex = i;
+                    break;
+                }
+            }
+        }
         screenEl.classList.add("show");
-        focusArea = "left";
-        focusLeftIndex = 0;
-        buildLeftList();
-        renderDetailPane();
+        updateSidebarActive();
+        renderContent();
+        focusArea = "sidebar";
         updateFocusUI();
 
         window.removeEventListener("keydown", onKeyDown, true);
