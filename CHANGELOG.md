@@ -1,3 +1,10 @@
+## [1.22.12](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.11...v1.22.12) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **build:** add mavenCentral to pluginManagement repositories for transitive plugin dependencies ([d7b6ec0](https://github.com/BIRDY141/Birdy-Patches/commit/d7b6ec0c75c47f96a26898366e319943140e3d44))
+* **speed,settings:** suppress default speed dialog, launch 1-to-1 custom drawer, and fix Birdy settings overlap ([12a6a68](https://github.com/BIRDY141/Birdy-Patches/commit/12a6a68bdfe6d602726a83b3290d505ac6dd951d))
+
 ## [1.22.11](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.10...v1.22.11) (2026-11-27)
 
 ### 🐛 Bug Fixes

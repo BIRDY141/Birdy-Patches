@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-27T18:24:29",
-  "description": "## [1.22.11](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.10...v1.22.11) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **speed:** complete 1-to-1 re-implementation from scratch for native speed menu ([9a51542](https://github.com/BIRDY141/Birdy-Patches/commit/9a515421d1058c6fbda8dabf80089d735df4750f))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.11/patches-1.22.11.mpp",
+  "created_at": "2026-11-27T18:40:21",
+  "description": "## [1.22.12](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.11...v1.22.12) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **build:** add mavenCentral to pluginManagement repositories for transitive plugin dependencies ([d7b6ec0](https://github.com/BIRDY141/Birdy-Patches/commit/d7b6ec0c75c47f96a26898366e319943140e3d44))\n* **speed,settings:** suppress default speed dialog, launch 1-to-1 custom drawer, and fix Birdy settings overlap ([12a6a68](https://github.com/BIRDY141/Birdy-Patches/commit/12a6a68bdfe6d602726a83b3290d505ac6dd951d))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.12/patches-1.22.12.mpp",
   "signature_download_url": "",
-  "version": "1.22.11"
+  "version": "1.22.12"
 }
