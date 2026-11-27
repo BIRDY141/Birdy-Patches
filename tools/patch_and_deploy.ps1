@@ -46,15 +46,14 @@ if (Test-Path "tv_ip.txt") {
 Write-Host "Connecting to TV: $tvIp"
 & $adbExe connect $tvIp
 
-Write-Host "Installing to TV..."
-$installOut = (& $adbExe install -r $outApk 2>&1)
-Write-Host $installOut
+Write-Host "Clean reinstalling to TV to refresh launcher banner and caches..."
+& $adbExe uninstall app.tvpatches.android.youtube.tv
+& $adbExe shell pm clear com.google.android.tvlauncher
+& $adbExe shell pm clear com.android.providers.tv
 
-if ($installOut -match "INSTALL_FAILED_UPDATE_INCOMPATIBLE|signatures do not match") {
-    Write-Host "Signature mismatch, reinstalling cleanly..."
-    & $adbExe uninstall app.tvpatches.android.youtube.tv
-    & $adbExe install -r $outApk
-}
+Write-Host "Installing to TV..."
+$installOut = (& $adbExe install $outApk 2>&1)
+Write-Host $installOut
 
 Write-Host "Launching BirdyTV on TV..."
 & $adbExe shell monkey -p app.tvpatches.android.youtube.tv 1

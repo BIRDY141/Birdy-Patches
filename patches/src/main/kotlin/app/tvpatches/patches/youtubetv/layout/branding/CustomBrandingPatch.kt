@@ -57,41 +57,11 @@ private val brandingResourcePatch = resourcePatch {
         }
 
         // Turn off Cobalt's built-in splash (YouTube logo); SplashOverlay shows FaroTV's instead.
-        // Point both <application> and <activity> icon/banner attributes to fresh resource names
-        // (birdy_red_*) so aapt compiles them cleanly and Android TV launcher drops any stale cache.
         resourceXml("AndroidManifest.xml").use { manifest ->
             manifest.root.elements("meta-data")
                 .filter { it.attribute("android:name") == "cobalt.ENABLE_SPLASH_SCREEN" }
                 .forEach { it.setAttribute("android:value", "false") }
-            val app = manifest.root.elements("application").firstOrNull()
-            if (app != null) {
-                app.setAttribute("android:icon", "@mipmap/birdy_red_launcher")
-                if (app.attribute("android:roundIcon") != null) {
-                    app.setAttribute("android:roundIcon", "@mipmap/birdy_red_launcher")
-                }
-                app.setAttribute("android:banner", "@drawable/birdy_red_banner")
-                app.elements("activity").forEach { act ->
-                    if (act.attribute("android:icon") != null) {
-                        act.setAttribute("android:icon", "@mipmap/birdy_red_launcher")
-                    }
-                    if (act.attribute("android:roundIcon") != null) {
-                        act.setAttribute("android:roundIcon", "@mipmap/birdy_red_launcher")
-                    }
-                    if (act.attribute("android:banner") != null) {
-                        act.setAttribute("android:banner", "@drawable/birdy_red_banner")
-                    }
-                }
-            }
         }
-
-        val iconTargets = mapOf(
-            "mipmap-mdpi/ic_launcher.png" to "mipmap-mdpi/birdy_red_launcher.png",
-            "mipmap-hdpi/ic_launcher.png" to "mipmap-hdpi/birdy_red_launcher.png",
-            "mipmap-xhdpi/ic_launcher.png" to "mipmap-xhdpi/birdy_red_launcher.png",
-            "mipmap-xxhdpi/ic_launcher.png" to "mipmap-xxhdpi/birdy_red_launcher.png",
-            "mipmap-xxxhdpi/ic_launcher.png" to "mipmap-xxxhdpi/birdy_red_launcher.png",
-            "drawable/app_banner.png" to "drawable/birdy_red_banner.png",
-        )
 
         IMAGES.forEach { image ->
             val bundled = object {}.javaClass.classLoader.getResourceAsStream("youtubetv/branding/$image")
@@ -99,14 +69,6 @@ private val brandingResourcePatch = resourcePatch {
             val target = resourceFile("res/$image", false)
             target.parentFile.mkdirs()
             bundled.use { input -> target.outputStream().use { input.copyTo(it) } }
-
-            val alias = iconTargets[image]
-            if (alias != null) {
-                val aliasStream = object {}.javaClass.classLoader.getResourceAsStream("youtubetv/branding/$image")
-                val aliasTarget = resourceFile("res/$alias", true)
-                aliasTarget.parentFile.mkdirs()
-                aliasStream?.use { input -> aliasTarget.outputStream().use { input.copyTo(it) } }
-            }
         }
     }
 }
