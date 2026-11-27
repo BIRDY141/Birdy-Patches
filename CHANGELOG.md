@@ -1,3 +1,9 @@
+## [1.22.3](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.2...v1.22.3) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **branding,speed:** use fresh birdy_red_* resource names and mount idom-safe speed picker overlay ([2da045f](https://github.com/BIRDY141/Birdy-Patches/commit/2da045f86a863e89c117fdd66167b3d35ac3b93d))
+
 ## [1.22.2](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.1...v1.22.2) (2026-11-27)
 
 ### 🔧 Improvements

@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-27T14:02:33",
-  "description": "## [1.22.2](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.1...v1.22.2) (2026-11-27)\n\n### 🔧 Improvements\n\n* **js:** remove full-DOM D-pad scans in sponsorblock/dearrow and fix speed popup detection ([bc4ddcb](https://github.com/BIRDY141/Birdy-Patches/commit/bc4ddcb0969a34b3e82afa9c671f641bd455fcce))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.2/patches-1.22.2.mpp",
+  "created_at": "2026-11-27T14:10:58",
+  "description": "## [1.22.3](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.2...v1.22.3) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **branding,speed:** use fresh birdy_red_* resource names and mount idom-safe speed picker overlay ([2da045f](https://github.com/BIRDY141/Birdy-Patches/commit/2da045f86a863e89c117fdd66167b3d35ac3b93d))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.3/patches-1.22.3.mpp",
   "signature_download_url": "",
-  "version": "1.22.2"
+  "version": "1.22.3"
 }
