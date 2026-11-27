@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-27T14:10:58",
-  "description": "## [1.22.3](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.2...v1.22.3) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **branding,speed:** use fresh birdy_red_* resource names and mount idom-safe speed picker overlay ([2da045f](https://github.com/BIRDY141/Birdy-Patches/commit/2da045f86a863e89c117fdd66167b3d35ac3b93d))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.3/patches-1.22.3.mpp",
+  "created_at": "2026-11-27T14:47:13",
+  "description": "## [1.22.4](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.3...v1.22.4) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **speed,branding:** populate speed options in native menu container and restore stock icon/banner resource mapping ([70933bb](https://github.com/BIRDY141/Birdy-Patches/commit/70933bb00600c982a2f775d9393149fdc0bac3a2))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.4/patches-1.22.4.mpp",
   "signature_download_url": "",
-  "version": "1.22.3"
+  "version": "1.22.4"
 }

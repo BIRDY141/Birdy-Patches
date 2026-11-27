@@ -1,3 +1,9 @@
+## [1.22.4](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.3...v1.22.4) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **speed,branding:** populate speed options in native menu container and restore stock icon/banner resource mapping ([70933bb](https://github.com/BIRDY141/Birdy-Patches/commit/70933bb00600c982a2f775d9393149fdc0bac3a2))
+
 ## [1.22.3](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.2...v1.22.3) (2026-11-27)
 
 ### 🐛 Bug Fixes
