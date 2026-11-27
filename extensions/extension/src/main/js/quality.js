@@ -785,10 +785,29 @@
             var st = document.createElement("style");
             st.id = "birdy-speed-styles";
             st.appendChild(document.createTextNode(
-                ".birdy-speed-container { height: auto !important; max-height: 72vh !important; overflow-y: auto !important; overflow-x: hidden !important; display: flex !important; flex-direction: column !important; }\n" +
-                ".birdy-speed-row { outline: none !important; cursor: pointer; flex-shrink: 0 !important; min-height: 48px !important; display: flex !important; align-items: center !important; }\n" +
-                ".birdy-speed-row:focus, .birdy-speed-row[focused], .birdy-speed-row.focused { background: #ffffff !important; color: #0f0f0f !important; }\n" +
-                ".birdy-speed-row:focus *, .birdy-speed-row[focused] *, .birdy-speed-row.focused * { color: #0f0f0f !important; fill: #0f0f0f !important; }\n"
+                "[role='dialog'], [role='listbox'], [role='menu'], ytlr-dialog-renderer, ytlr-menu-renderer, .birdy-speed-container {\n" +
+                "  height: auto !important;\n" +
+                "  max-height: 85vh !important;\n" +
+                "  overflow-y: auto !important;\n" +
+                "  overflow-x: hidden !important;\n" +
+                "}\n" +
+                ".birdy-speed-row {\n" +
+                "  outline: none !important;\n" +
+                "  cursor: pointer;\n" +
+                "  flex-shrink: 0 !important;\n" +
+                "  min-height: 48px !important;\n" +
+                "  height: 48px !important;\n" +
+                "  display: flex !important;\n" +
+                "  align-items: center !important;\n" +
+                "}\n" +
+                ".birdy-speed-row:focus, .birdy-speed-row[focused], .birdy-speed-row.focused {\n" +
+                "  background: #ffffff !important;\n" +
+                "  color: #0f0f0f !important;\n" +
+                "}\n" +
+                ".birdy-speed-row:focus *, .birdy-speed-row[focused] *, .birdy-speed-row.focused * {\n" +
+                "  color: #0f0f0f !important;\n" +
+                "  fill: #0f0f0f !important;\n" +
+                "}\n"
             ));
             (document.head || document.documentElement || document.body).appendChild(st);
         } catch (e) {}
@@ -897,19 +916,16 @@
 
         ensureSpeedStyles();
 
-        // Enable smooth scrolling on container and its parent
+        // Unclip all ancestors from row up to document.body so the whole speed list is visible
         try {
-            container.classList.add("birdy-speed-container");
-            container.style.setProperty("height", "auto", "important");
-            container.style.setProperty("max-height", "72vh", "important");
-            container.style.setProperty("overflow-y", "auto", "important");
-            container.style.setProperty("overflow-x", "hidden", "important");
-            container.style.setProperty("display", "flex", "important");
-            container.style.setProperty("flex-direction", "column", "important");
-            if (container.parentElement) {
-                container.parentElement.style.setProperty("height", "auto", "important");
-                container.parentElement.style.setProperty("max-height", "85vh", "important");
-                container.parentElement.style.setProperty("overflow", "visible", "important");
+            var anc = row.parentElement;
+            while (anc && anc !== document.body) {
+                anc.classList.add("birdy-speed-container");
+                anc.style.setProperty("height", "auto", "important");
+                anc.style.setProperty("max-height", "85vh", "important");
+                anc.style.setProperty("overflow-y", "auto", "important");
+                anc.style.setProperty("overflow-x", "hidden", "important");
+                anc = anc.parentElement;
             }
         } catch (e) {}
 
