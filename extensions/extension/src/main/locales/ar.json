@@ -57,6 +57,8 @@
   "player.stats.title": "إخفاء إحصاءات لمحبي التفاصيل",
   "player.related.title": "إخفاء مقاطع الفيديو ذات الصلة",
   "player.related.summary": "إخفاء صف الفيديوهات أسفل المشغل",
+  "player.show_pip.title": "إظهار زر صورة داخل صورة (PiP)",
+  "player.show_pip.summary": "إضافة زر PiP إلى شريط أزرار المشغل",
   "sponsor.prompt_all.title": "السؤال قبل التخطي لجميع المقاطع",
   "sponsor.prompt_all.summary": "إظهار إشعار على الشاشة للضغط على OK للتخطي بدلاً من التخطي التلقائي",
   "sponsor.prompt.action": "اضغط OK للتخطي: ",

@@ -57,6 +57,8 @@
   "player.stats.title": "Ocultar Estadísticas para nerds",
   "player.related.title": "Ocultar videos relacionados",
   "player.related.summary": "Oculta la fila de videos debajo del reproductor",
+  "player.show_pip.title": "Mostrar botón de Imagen en imagen (PiP)",
+  "player.show_pip.summary": "Añade un botón PiP a los controles del reproductor",
   "sponsor.prompt_all.title": "Preguntar antes de saltar por defecto",
   "sponsor.prompt_all.summary": "Muestra un aviso en pantalla para pulsar OK en lugar de saltar automáticamente",
   "sponsor.prompt.action": "Pulsa OK para saltar: ",

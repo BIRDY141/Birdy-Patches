@@ -31,7 +31,8 @@
         { key: "thanks", titleKey: "player.thanks.title" },
         { key: "report", titleKey: "player.report.title" },
         { key: "stats", titleKey: "player.stats.title" },
-        { key: "related", titleKey: "player.related.title", summaryKey: "player.related.summary" }
+        { key: "related", titleKey: "player.related.title", summaryKey: "player.related.summary" },
+        { key: "show_pip", titleKey: "player.show_pip.title", summaryKey: "player.show_pip.summary", defaultVal: false }
     ];
 
     var TOPIC_TABS = [
@@ -618,7 +619,7 @@
                     t(btn.titleKey),
                     btn.summaryKey ? t(btn.summaryKey) : "",
                     "YOUTV_PLAYER_" + btn.key.toUpperCase(),
-                    false
+                    btn.defaultVal !== undefined ? btn.defaultVal : false
                 ));
             }
         } else if (activeTabKey === "video") {
@@ -639,17 +640,6 @@
                 getString("YOUTV_VIDEO_SPEED", "1"),
                 function (id) {
                     setString("YOUTV_VIDEO_SPEED", id);
-                    if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
-                }
-            ));
-            appendRow(frag, createToggleRow(
-                t("video.pip.title"),
-                t("video.pip.summary"),
-                "YOUTV_VIDEO_PIP",
-                true,
-                false,
-                null,
-                function () {
                     if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
                 }
             ));

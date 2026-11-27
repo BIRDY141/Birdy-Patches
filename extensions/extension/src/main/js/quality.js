@@ -663,21 +663,21 @@
                     flags.web_player_disable_playback_speed = false;
                     flags.tv_enable_playback_rate = true;
                     flags.enable_playback_rate_on_tv = true;
+                    flags.enable_playback_speed_for_tv = true;
+                    flags.cobalt_enable_playback_rate = true;
                 }
             }
         } catch (e) {}
         if (player && !player._birdySpeedPatched && typeof player.getAvailablePlaybackRates === "function") {
             player._birdySpeedPatched = true;
             try {
-                var origGetRates = player.getAvailablePlaybackRates;
                 player.getAvailablePlaybackRates = function () {
-                    var res = origGetRates.apply(this, arguments);
-                    if (!Array.isArray(res) || res.length <= 1) return SPEED_RATES.slice();
                     return SPEED_RATES.slice();
                 };
             } catch (e) {}
         }
     }
+    unlockSpeedOnEnvironment(null);
 
     var lastSpeedVid = null;
     var lastSpeedRate = 1;
@@ -710,27 +710,10 @@
         } catch (e) {}
     }
 
-    var lastPipEnabled = null;
-    var lastPlayingState = null;
-
-    function syncPipState() {
-        var pipOn = getBoolSetting(VIDEO_PIP_KEY, true);
-        if (pipOn !== lastPipEnabled) {
-            lastPipEnabled = pipOn;
-            youtv.report("@pip " + (pipOn ? "1" : "0"));
-        }
-        var video = typeof document !== "undefined" ? document.querySelector("video") : null;
-        var playing = !!(video && !video.paused && !video.ended && video.readyState >= 2);
-        if (playing !== lastPlayingState) {
-            lastPlayingState = playing;
-            youtv.report("@playing " + (playing ? "1" : "0"));
-        }
-    }
-
     function applyAllTweaks(forceNow) {
         if (typeof document === "undefined") return;
-        syncPipState();
         var player = findPlayer();
+        unlockSpeedOnEnvironment(player);
         if (!player) return;
         var isShort = isCurrentShort(player);
         var vid = getVideoId(player);
@@ -750,9 +733,6 @@
             video.addEventListener("playing", onEvt);
             video.addEventListener("durationchange", onEvt);
             video.addEventListener("ratechange", onEvt);
-            video.addEventListener("play", syncPipState);
-            video.addEventListener("pause", syncPipState);
-            video.addEventListener("ended", syncPipState);
         }
         var player = findPlayer();
         if (player && !player._birdyQualityBound && typeof player.addEventListener === "function") {

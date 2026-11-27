@@ -57,6 +57,8 @@
   "player.stats.title": "Hide Stats for nerds",
   "player.related.title": "Hide related videos",
   "player.related.summary": "Hides the videos row below the player",
+  "player.show_pip.title": "Show Picture-in-Picture (PiP) button",
+  "player.show_pip.summary": "Adds a PiP button to the player controls bar",
   "sponsor.prompt_all.title": "Prompt to skip all segments",
   "sponsor.prompt_all.summary": "Show an on-screen prompt to press OK to skip instead of automatically skipping",
   "sponsor.prompt.action": "Press OK to skip: ",

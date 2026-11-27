@@ -36,8 +36,7 @@ public final class PipHelper {
     }
 
     public static void onUserLeaveHint(Activity activity) {
-        if (!pipEnabled || !videoPlaying) return;
-        enterPip(activity);
+        // PiP is triggered explicitly via the player PiP button (@enterpip).
     }
 
     public static void enterPipNow() {
