@@ -777,7 +777,7 @@
         applyAllTweaks(true);
     };
 
-    // ---- 1-to-1 Native-Look Speed Menu -----------------------------------------------------
+    // ---- 1-to-1 Native-Look Custom Speed Drawer --------------------------------------------
     var speedSheet = null;
     function ensureSpeedStyles() {
         if (speedSheet || typeof document === "undefined") return;
@@ -812,20 +812,41 @@
                 "  color: #0f0f0f !important;\n" +
                 "  fill: #0f0f0f !important;\n" +
                 "}\n" +
-                "#birdy-speed-container::-webkit-scrollbar { display: none !important; width: 0 !important; }\n"
+                "#birdy-speed-list::-webkit-scrollbar { display: none !important; width: 0 !important; }\n"
             );
             document.adoptedStyleSheets = document.adoptedStyleSheets.concat([speedSheet]);
         } catch (e) {}
     }
 
+    function isSettingsHubActive() {
+        if (typeof document === "undefined") return false;
+        try {
+            if (window.birdyTvSettingsHub && typeof window.birdyTvSettingsHub.isOpen === "function" && window.birdyTvSettingsHub.isOpen()) {
+                return true;
+            }
+        } catch (e) {}
+        return !!document.querySelector(".birdy-yt-screen.show, #birdytv-settings-hub, .farotv-hub-screen");
+    }
+
+    function isSpeedMenuItem(el) {
+        if (!el || isSettingsHubActive()) return false;
+        if (el.closest && el.closest(".birdy-yt-screen, #birdytv-settings-hub, .farotv-hub-screen, [class*='hub']")) return false;
+        var t = (el.textContent || "").trim();
+        if (/Video speed/i.test(t)) return false;
+        return (/Speed|سرعة التشغيل|Velocidad/i.test(t) && /Normal|\d+(\.\d+)?x/i.test(t)) ||
+               /^(Speed|Playback speed|سرعة التشغيل|Velocidad)$/i.test(t);
+    }
+
     function findSpeedHeading() {
-        if (typeof document === "undefined") return null;
+        if (typeof document === "undefined" || isSettingsHubActive()) return null;
         var headers = document.querySelectorAll("h1, h2, h3, h4, div, span, ytlr-dialog-title");
         for (var h = 0; h < headers.length; h++) {
             var head = headers[h];
             if (head.children && head.children.length > 2) continue;
+            if (head.closest && head.closest(".birdy-yt-screen, #birdytv-settings-hub, .farotv-hub-screen, [class*='hub']")) continue;
             var ht = (head.textContent || "").trim();
-            if (/^(Video speed|Playback speed|سرعة التشغيل|Velocidad de reproducción|Velocidad)$/i.test(ht)) {
+            // Strictly match dialog title "Video speed", NEVER "Playback speed"
+            if (/^(Video speed|سرعة التشغيل|Velocidad de reproducción)$/i.test(ht)) {
                 var r = head.getBoundingClientRect();
                 if (r && r.height > 0) return head;
             }
@@ -847,21 +868,13 @@
         return svg;
     }
 
-    function closeSpeedMenu() {
-        var c = document.getElementById("birdy-speed-container");
-        if (c && c.parentNode) c.parentNode.removeChild(c);
-
-        var backBtn = document.querySelector("ytlr-dialog-header-renderer button, [aria-label*='Back'], [aria-label*='close']");
-        if (backBtn && typeof backBtn.click === "function") {
-            try { backBtn.click(); return; } catch (e) {}
-        }
-
-        [27, 4].forEach(function (code) {
-            try {
-                var evt = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, keyCode: code, which: code });
-                (document.activeElement || document.body || window).dispatchEvent(evt);
-            } catch (e) {}
-        });
+    function closeCustomSpeedDrawer() {
+        var drawer = document.getElementById("birdy-custom-speed-drawer");
+        if (drawer && drawer.parentNode) drawer.parentNode.removeChild(drawer);
+        var backdrop = document.getElementById("birdy-speed-backdrop");
+        if (backdrop && backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+        var old = document.getElementById("birdy-speed-container");
+        if (old && old.parentNode) old.parentNode.removeChild(old);
     }
 
     function updateSettingsMenuSubtitle(rate) {
@@ -871,7 +884,7 @@
         for (var i = 0; i < items.length; i++) {
             var it = items[i];
             var text = (it.textContent || "").trim();
-            if (/Speed|سرعة التشغيل|Velocidad/i.test(text) && !/Video speed|Playback speed/i.test(text)) {
+            if (/Speed|سرعة التشغيل|Velocidad/i.test(text) && !/Video speed/i.test(text)) {
                 var subs = it.querySelectorAll("ytlr-formatted-string, span, div");
                 for (var s = 0; s < subs.length; s++) {
                     var st = (subs[s].textContent || "").trim();
@@ -883,45 +896,21 @@
         }
     }
 
-    function renderSpeedMenu() {
+    function openCustomSpeedDrawer() {
         if (typeof document === "undefined") return;
-        if (!document.querySelector("video")) {
-            var orphaned = document.getElementById("birdy-speed-container");
-            if (orphaned && orphaned.parentNode) orphaned.parentNode.removeChild(orphaned);
-            return;
-        }
+        if (isSettingsHubActive()) return;
 
         var player = findPlayer();
         var isShort = isCurrentShort(player);
         if (!getBoolSetting(isShort ? SHORTS_CUSTOM_SPEED_KEY : VIDEO_CUSTOM_SPEED_KEY, true)) return;
 
-        var head = findSpeedHeading();
-        var container = document.getElementById("birdy-speed-container");
-
-        // If drawer is closed, remove our custom menu
-        if (!head) {
-            if (container && container.parentNode) {
-                container.parentNode.removeChild(container);
+        // Hide any default YouTube TV speed dialog that might be on screen
+        var nativeSpeedHeader = findSpeedHeading();
+        if (nativeSpeedHeader) {
+            var nativeDialog = nativeSpeedHeader.closest("ytlr-dialog-renderer, [role='dialog'], .ytlr-dialog-renderer") || nativeSpeedHeader.parentElement;
+            if (nativeDialog) {
+                nativeDialog.style.setProperty("display", "none", "important");
             }
-            return;
-        }
-
-        // Drawer is open! Hide native items so only our clean 1-to-1 list appears
-        var anc = head.parentElement;
-        for (var d = 0; d < 8 && anc && anc !== document.body; d++) {
-            var natives = anc.querySelectorAll("ytlr-menu-item-renderer, ytlr-menu-section-renderer, iron-list, [role='menuitem'], [role='option'], [role='radio']");
-            for (var n = 0; n < natives.length; n++) {
-                if (!natives[n].classList.contains("birdy-speed-item")) {
-                    natives[n].style.setProperty("display", "none", "important");
-                }
-            }
-            anc = anc.parentElement;
-        }
-
-        // Clean up old legacy clone elements if any
-        var oldClones = document.querySelectorAll(".birdy-speed-clone, .birdy-speed-row");
-        for (var oc = 0; oc < oldClones.length; oc++) {
-            if (oldClones[oc].parentNode) oldClones[oc].parentNode.removeChild(oldClones[oc]);
         }
 
         ensureSpeedStyles();
@@ -929,56 +918,85 @@
         var speedKey = isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY;
         var currentRate = parseFloat(getStringSetting(speedKey, "1")) || 1;
 
-        // Position accurately under the heading
-        var rect = head.getBoundingClientRect();
-        var topPos = Math.round(rect.bottom + 16);
-        var leftPos = Math.round(rect.left);
-        var widthPos = Math.round(window.innerWidth - leftPos - 48);
-        if (widthPos < 350 || widthPos > 700) widthPos = 610;
-        var maxHeightPos = Math.round(window.innerHeight - topPos - 32);
-
-        // If container already exists and has correct count, update checks and positions
-        if (container) {
-            container.style.top = topPos + "px";
-            container.style.left = leftPos + "px";
-            container.style.width = widthPos + "px";
-            container.style.maxHeight = maxHeightPos + "px";
-            var existingItems = container.querySelectorAll(".birdy-speed-item");
-            if (existingItems.length === SPEED_RATES.length) {
-                for (var ei = 0; ei < existingItems.length; ei++) {
-                    var eRate = parseFloat(existingItems[ei].getAttribute("data-rate"));
-                    var eSel = Math.abs(eRate - currentRate) < 0.01;
-                    var eSvg = existingItems[ei].querySelector("svg");
-                    if (eSvg) eSvg.style.visibility = eSel ? "visible" : "hidden";
-                    existingItems[ei].setAttribute("aria-checked", eSel ? "true" : "false");
-                }
-                return;
+        var existing = document.getElementById("birdy-custom-speed-drawer");
+        if (existing) {
+            // Already open, refresh checkmarks
+            var existingItems = existing.querySelectorAll(".birdy-speed-item");
+            for (var ei = 0; ei < existingItems.length; ei++) {
+                var eRate = parseFloat(existingItems[ei].getAttribute("data-rate"));
+                var isSel = Math.abs(eRate - currentRate) < 0.01;
+                var eSvg = existingItems[ei].querySelector("svg");
+                if (eSvg) eSvg.style.visibility = isSel ? "visible" : "hidden";
+                existingItems[ei].setAttribute("aria-checked", isSel ? "true" : "false");
             }
-            while (container.firstChild) container.removeChild(container.firstChild);
-        } else {
-            container = document.createElement("div");
-            container.id = "birdy-speed-container";
-            container.setAttribute("role", "menu");
-            container.setAttribute("tabindex", "-1");
-            (document.body || document.documentElement).appendChild(container);
+            return;
         }
 
-        container.style.cssText =
+        // 1. Semi-transparent backdrop
+        var backdrop = document.createElement("div");
+        backdrop.id = "birdy-speed-backdrop";
+        backdrop.style.cssText =
             "position: fixed !important; " +
-            "top: " + topPos + "px !important; " +
-            "left: " + leftPos + "px !important; " +
-            "width: " + widthPos + "px !important; " +
-            "max-height: " + maxHeightPos + "px !important; " +
+            "top: 0 !important; " +
+            "left: 0 !important; " +
+            "width: 100vw !important; " +
+            "height: 100vh !important; " +
+            "background: rgba(0, 0, 0, 0.4) !important; " +
+            "z-index: 2147483640 !important;";
+        backdrop.onclick = function () {
+            closeCustomSpeedDrawer();
+        };
+        (document.body || document.documentElement).appendChild(backdrop);
+
+        // 2. Custom Speed Drawer (1-to-1 match of YouTube TV right sheet)
+        var drawer = document.createElement("div");
+        drawer.id = "birdy-custom-speed-drawer";
+        drawer.setAttribute("role", "dialog");
+        drawer.setAttribute("aria-modal", "true");
+        drawer.setAttribute("aria-label", "Video speed");
+        drawer.setAttribute("tabindex", "-1");
+        drawer.style.cssText =
+            "position: fixed !important; " +
+            "top: 0 !important; " +
+            "right: 0 !important; " +
+            "width: 620px !important; " +
+            "height: 100vh !important; " +
+            "background: #0f0f0f !important; " +
+            "box-shadow: -12px 0 48px rgba(0, 0, 0, 0.95) !important; " +
+            "z-index: 2147483645 !important; " +
+            "padding: 44px 44px 32px 44px !important; " +
+            "box-sizing: border-box !important; " +
+            "display: flex !important; " +
+            "flex-direction: column !important; " +
+            "outline: none !important;";
+
+        // 3. Header title
+        var title = document.createElement("div");
+        title.className = "birdy-speed-drawer-title";
+        title.textContent = (youtv && youtv.t ? youtv.t("video.speed.title") : null) || "Video speed";
+        title.style.cssText =
+            "font-size: 28px !important; " +
+            "font-weight: 700 !important; " +
+            "color: #f1f1f1 !important; " +
+            "margin-bottom: 24px !important; " +
+            "font-family: Roboto, 'YouTube Sans', sans-serif !important;";
+        drawer.appendChild(title);
+
+        // 4. Scrollable list container
+        var list = document.createElement("div");
+        list.id = "birdy-speed-list";
+        list.setAttribute("role", "menu");
+        list.style.cssText =
             "display: flex !important; " +
             "flex-direction: column !important; " +
             "gap: 10px !important; " +
+            "max-height: calc(100vh - 120px) !important; " +
             "overflow-y: auto !important; " +
             "overflow-x: hidden !important; " +
-            "z-index: 2147483647 !important; " +
-            "box-sizing: border-box !important; " +
-            "padding: 4px 6px 40px 0 !important; " +
+            "scrollbar-width: none !important; " +
             "outline: none !important; " +
-            "scrollbar-width: none !important;";
+            "padding-bottom: 20px !important;";
+        drawer.appendChild(list);
 
         function onSelectRate(rate) {
             try {
@@ -987,9 +1005,17 @@
             lastSpeedRate = rate;
             applyAllTweaks(true);
             updateSettingsMenuSubtitle(rate);
-            youtv.report("speed: applied " + rate + "x from custom menu");
+            youtv.report("speed: applied " + rate + "x from custom drawer");
 
-            closeSpeedMenu();
+            closeCustomSpeedDrawer();
+
+            // Dismiss native settings menu as well
+            [27, 4].forEach(function (code) {
+                try {
+                    var evt = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, keyCode: code, which: code });
+                    (document.activeElement || document.body || window).dispatchEvent(evt);
+                } catch (e) {}
+            });
 
             setTimeout(function () { applyAllTweaks(true); }, 100);
             setTimeout(function () { applyAllTweaks(true); }, 300);
@@ -1033,13 +1059,13 @@
                     onSelectRate(rate);
                 };
 
-                container.appendChild(item);
+                list.appendChild(item);
                 itemsList.push(item);
                 if (isSelected) activeItem = item;
             })(i);
         }
 
-        // Wire D-pad navigation across all speed pills
+        // Wire D-pad navigation
         for (var k = 0; k < itemsList.length; k++) {
             (function (idx) {
                 var el = itemsList[idx];
@@ -1065,13 +1091,15 @@
                     } else if (code === 4 || code === 27 || code === 37) { // Back / Escape / Left
                         if (ev && ev.preventDefault) ev.preventDefault();
                         if (ev && ev.stopPropagation) ev.stopPropagation();
-                        closeSpeedMenu();
+                        closeCustomSpeedDrawer();
                     }
                 };
             })(k);
         }
 
-        // Initial focus on the currently selected rate
+        (document.body || document.documentElement).appendChild(drawer);
+
+        // Initial focus on active rate
         var targetToFocus = activeItem || itemsList[0];
         if (targetToFocus && typeof targetToFocus.focus === "function") {
             setTimeout(function () {
@@ -1084,14 +1112,81 @@
             }, 30);
         }
 
-        youtv.report("speed: 1-to-1 menu populated with " + SPEED_RATES.length + " rates");
+        youtv.report("speed: custom drawer opened with " + SPEED_RATES.length + " rates");
     }
 
-    // Instant observation of DOM mutations so the menu opens with all rates immediately
+    function checkSpeedMenuState() {
+        if (typeof document === "undefined") return;
+
+        // If settings hub is open, make sure speed drawer is completely absent
+        if (isSettingsHubActive()) {
+            closeCustomSpeedDrawer();
+            return;
+        }
+
+        var player = findPlayer();
+        var isShort = isCurrentShort(player);
+        if (!getBoolSetting(isShort ? SHORTS_CUSTOM_SPEED_KEY : VIDEO_CUSTOM_SPEED_KEY, true)) return;
+
+        // Check if YouTube TV opened its native speed dialog
+        var head = findSpeedHeading();
+        if (head) {
+            // Hide the default speed dialog completely
+            var nativeDialog = head.closest("ytlr-dialog-renderer, [role='dialog'], .ytlr-dialog-renderer") || head.parentElement;
+            if (nativeDialog) {
+                nativeDialog.style.setProperty("display", "none", "important");
+            }
+            // Open our custom speed drawer in its place
+            openCustomSpeedDrawer();
+        }
+    }
+
+    // Intercept clicks and Enter keys on the "Speed" item in the settings menu
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+        window.addEventListener("keydown", function (e) {
+            if (isSettingsHubActive()) return;
+            var code = e.keyCode || e.which;
+            if (code === 13 || code === 23 || code === 66) {
+                var active = document.activeElement;
+                var focused = document.querySelector(".focused, [focused]");
+                if (isSpeedMenuItem(active) || isSpeedMenuItem(focused)) {
+                    var player = findPlayer();
+                    var isShort = isCurrentShort(player);
+                    if (getBoolSetting(isShort ? SHORTS_CUSTOM_SPEED_KEY : VIDEO_CUSTOM_SPEED_KEY, true)) {
+                        if (e.preventDefault) e.preventDefault();
+                        if (e.stopPropagation) e.stopPropagation();
+                        openCustomSpeedDrawer();
+                        return;
+                    }
+                }
+            }
+            checkSpeedMenuState();
+        }, true);
+
+        window.addEventListener("click", function (e) {
+            if (isSettingsHubActive()) return;
+            var target = e.target;
+            while (target && target !== document.body) {
+                if (isSpeedMenuItem(target)) {
+                    var player = findPlayer();
+                    var isShort = isCurrentShort(player);
+                    if (getBoolSetting(isShort ? SHORTS_CUSTOM_SPEED_KEY : VIDEO_CUSTOM_SPEED_KEY, true)) {
+                        if (e.preventDefault) e.preventDefault();
+                        if (e.stopPropagation) e.stopPropagation();
+                        openCustomSpeedDrawer();
+                        return;
+                    }
+                }
+                target = target.parentElement;
+            }
+        }, true);
+    }
+
+    // Observe DOM mutations
     if (typeof window !== "undefined" && typeof MutationObserver !== "undefined") {
         try {
             var speedObserver = new MutationObserver(function () {
-                renderSpeedMenu();
+                checkSpeedMenuState();
             });
             var targetRoot = document.body || document.documentElement;
             if (targetRoot) {
@@ -1100,27 +1195,12 @@
         } catch (e) {}
     }
 
-    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
-        window.addEventListener("focusin", function () {
-            renderSpeedMenu();
-        }, true);
-
-        window.addEventListener("keydown", function (e) {
-            var code = e.keyCode || e.which;
-            if (code === 13 || code === 23 || code === 38 || code === 40 || code === 37 || code === 39) {
-                renderSpeedMenu();
-                setTimeout(renderSpeedMenu, 40);
-                setTimeout(renderSpeedMenu, 150);
-            }
-        }, true);
-    }
-
     if (typeof setInterval === "function") {
         setInterval(function () {
             if (typeof document !== "undefined" && document.hidden) return;
             bindVideoListeners();
             applyAllTweaks(false);
-            renderSpeedMenu();
+            checkSpeedMenuState();
         }, 400);
     }
 })();
