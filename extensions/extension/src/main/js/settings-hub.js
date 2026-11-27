@@ -113,21 +113,6 @@
         { id: "4", text: "4x" }
     ];
 
-    function startupTabOptionsList() {
-        return [
-            { id: "default", text: t("ui_tweaks.startup_tab.default") },
-            { id: "subscriptions", text: t("ui_tweaks.startup_tab.subscriptions") },
-            { id: "library", text: t("ui_tweaks.startup_tab.library") },
-            { id: "gaming", text: t("ui_tweaks.startup_tab.gaming") },
-            { id: "music", text: t("ui_tweaks.startup_tab.music") },
-            { id: "news", text: t("ui_tweaks.startup_tab.news") },
-            { id: "sports", text: t("ui_tweaks.startup_tab.sports") },
-            { id: "podcasts", text: t("ui_tweaks.startup_tab.podcasts") },
-            { id: "movies", text: t("ui_tweaks.startup_tab.movies") },
-            { id: "shorts", text: t("ui_tweaks.startup_tab.shorts") }
-        ];
-    }
-
     function languageOptionsList() {
         return [
             { id: "auto", text: t("about.language.auto") },
@@ -782,15 +767,6 @@
                 }
             ));
         } else if (activeTabKey === "ui_tweaks") {
-            appendRow(frag, createDropdownRow(
-                t("ui_tweaks.startup_tab.title"),
-                t("ui_tweaks.startup_tab.summary"),
-                startupTabOptionsList(),
-                getString("YOUTV_STARTUP_TAB", "default"),
-                function (id) {
-                    setString("YOUTV_STARTUP_TAB", id);
-                }
-            ));
             appendRow(frag, createToggleRow(
                 t("feature.topics.name"),
                 t("feature.topics.summary"),
@@ -1438,124 +1414,4 @@
             openHub();
         }
     }, true);
-
-    // ---- Startup Tab Navigator ----------------------------------------------------------------
-    (function initStartupTab() {
-        if (typeof window === "undefined" || typeof document === "undefined") return;
-        var tabKey = getString("YOUTV_STARTUP_TAB", "default");
-        if (!tabKey || tabKey === "default" || tabKey === "home") return;
-
-        var targetBrowseId = null;
-        var primaryBrowseId = null;
-        var targetTextRegex = null;
-        if (tabKey === "subscriptions") {
-            primaryBrowseId = "FEsubscriptions";
-            targetBrowseId = "FEsubscriptions";
-            targetTextRegex = /Subscriptions|الاشتراكات|Suscripciones/i;
-        } else if (tabKey === "library") {
-            primaryBrowseId = "FEmy_youtube";
-            targetBrowseId = /FEmy_youtube|FElibrary/;
-            targetTextRegex = /Library|المكتبة|Biblioteca/i;
-        } else if (tabKey === "gaming") {
-            primaryBrowseId = "FEtopics_gaming";
-            targetBrowseId = "FEtopics_gaming";
-            targetTextRegex = /Gaming|ألعاب|Videojuegos/i;
-        } else if (tabKey === "music") {
-            primaryBrowseId = "FEtopics_music";
-            targetBrowseId = "FEtopics_music";
-            targetTextRegex = /Music|الموسيقى|Música/i;
-        } else if (tabKey === "news") {
-            primaryBrowseId = "FEtopics_news";
-            targetBrowseId = "FEtopics_news";
-            targetTextRegex = /News|الأخبار|Noticias/i;
-        } else if (tabKey === "sports") {
-            primaryBrowseId = "FEtopics_sports";
-            targetBrowseId = "FEtopics_sports";
-            targetTextRegex = /Sports|الرياضة|Deportes/i;
-        } else if (tabKey === "podcasts") {
-            primaryBrowseId = "FEtopics_podcasts";
-            targetBrowseId = "FEtopics_podcasts";
-            targetTextRegex = /Podcasts|البودكاست/i;
-        } else if (tabKey === "movies") {
-            primaryBrowseId = "FEtopics_movies";
-            targetBrowseId = "FEtopics_movies";
-            targetTextRegex = /Movies|الأفلام|Películas/i;
-        } else if (tabKey === "shorts") {
-            primaryBrowseId = "FEshorts";
-            targetBrowseId = "FEshorts";
-            targetTextRegex = /Shorts/i;
-        }
-        if (!primaryBrowseId) return;
-
-        var applied = false;
-        var attempts = 0;
-        var maxAttempts = 120; // poll every 400ms over ~48 seconds so account picking is covered
-        var timer = setInterval(function () {
-            attempts++;
-            if (attempts > maxAttempts || applied) {
-                clearInterval(timer);
-                return;
-            }
-
-            // Only attempt navigation when the main guide rail is rendered (past the account picker)
-            var guideEntries = document.querySelectorAll("ytlr-guide-entry-renderer, .ytlr-guide-entry-renderer");
-            if (!guideEntries || guideEntries.length < 3) return;
-
-            var curHash = window.location.hash || "";
-            var targetHash = (tabKey === "shorts") ? "#/shorts" : ("#/browse?browseId=" + primaryBrowseId);
-
-            // 1. Deep link hash navigation
-            if (!curHash || curHash === "#/" || curHash === "#/browse" || curHash.indexOf("FEwhat_to_watch") !== -1) {
-                try {
-                    window.location.hash = targetHash;
-                    window.dispatchEvent(new Event("hashchange"));
-                } catch (e) {}
-            }
-
-            // 2. Click the matching guide rail entry
-            for (var i = 0; i < guideEntries.length; i++) {
-                var entry = guideEntries[i];
-                var txt = (entry.textContent || entry.getAttribute("aria-label") || "").trim();
-                var href = entry.getAttribute ? (entry.getAttribute("href") || entry.getAttribute("data-browse-id") || "") : "";
-                var matched = false;
-                if (href && (href.indexOf(primaryBrowseId) !== -1 || (tabKey === "shorts" && href.indexOf("shorts") !== -1))) {
-                    matched = true;
-                }
-                if (!matched && targetTextRegex && targetTextRegex.test(txt)) {
-                    matched = true;
-                }
-                if (!matched && entry.__data && entry.__data.navigationEndpoint) {
-                    var bId = entry.__data.navigationEndpoint.browseEndpoint && entry.__data.navigationEndpoint.browseEndpoint.browseId;
-                    if (bId) {
-                        if (typeof targetBrowseId === "string" && bId === targetBrowseId) matched = true;
-                        if (targetBrowseId instanceof RegExp && targetBrowseId.test(bId)) matched = true;
-                    }
-                }
-                if (matched) {
-                    applied = true;
-                    clearInterval(timer);
-                    youtv.report("startup: clicked guide entry for " + tabKey);
-                    try { entry.click(); } catch (e) {}
-                    try {
-                        var inner = entry.querySelector("a, button, [role='button'], [role='tab'], .ytlr-guide-entry-renderer-content");
-                        if (inner) inner.click();
-                    } catch (e2) {}
-                    try {
-                        entry.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
-                    } catch (e3) {}
-                    try {
-                        entry.dispatchEvent(new CustomEvent("tap", { bubbles: true, cancelable: true }));
-                    } catch (e4) {}
-                    return;
-                }
-            }
-
-            // 3. Verify if URL hash has reached target
-            if (window.location.hash && window.location.hash.indexOf(primaryBrowseId) !== -1) {
-                applied = true;
-                clearInterval(timer);
-                youtv.report("startup: locked onto hash route " + tabKey);
-            }
-        }, 400);
-    })();
 })();
