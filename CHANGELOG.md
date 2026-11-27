@@ -1,3 +1,9 @@
+## [1.23.2](https://github.com/BIRDY141/Birdy-Patches/compare/v1.23.1...v1.23.2) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **speed:** apply 38px title, 98px pill containers, and 680px native-width drawer ([8219188](https://github.com/BIRDY141/Birdy-Patches/commit/82191882cc4da229b2ab08a32dd17bde331fef28))
+
 ## [1.23.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.23.0...v1.23.1) (2026-11-27)
 
 ### 🐛 Bug Fixes
