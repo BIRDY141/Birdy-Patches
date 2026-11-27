@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-27T13:02:46",
-  "description": "## [1.20.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.19.1...v1.20.0) (2026-11-27)\n\n### ✨ New Features\n\n* **pip,speed:** trigger PiP via player button only and unlock speed menu ([387bf81](https://github.com/BIRDY141/Birdy-Patches/commit/387bf81029300f078996fb7dd4db386827b3e15a))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.20.0/patches-1.20.0.mpp",
+  "created_at": "2026-11-27T13:11:58",
+  "description": "## [1.20.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.20.0...v1.20.1) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **pip,speed:** move PiP button next to comments with icon/click handler and poll speed rates ([0372c04](https://github.com/BIRDY141/Birdy-Patches/commit/0372c045cbc5f488f17c953384fa63a22636dca2))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.20.1/patches-1.20.1.mpp",
   "signature_download_url": "",
-  "version": "1.20.0"
+  "version": "1.20.1"
 }

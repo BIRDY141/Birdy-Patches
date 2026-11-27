@@ -1,3 +1,9 @@
+## [1.20.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.20.0...v1.20.1) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **pip,speed:** move PiP button next to comments with icon/click handler and poll speed rates ([0372c04](https://github.com/BIRDY141/Birdy-Patches/commit/0372c045cbc5f488f17c953384fa63a22636dca2))
+
 ## [1.20.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.19.1...v1.20.0) (2026-11-27)
 
 ### ✨ New Features
