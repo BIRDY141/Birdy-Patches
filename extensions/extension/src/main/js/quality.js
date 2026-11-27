@@ -668,7 +668,7 @@
                 }
             }
         } catch (e) {}
-        if (player && !player._birdySpeedPatched && typeof player.getAvailablePlaybackRates === "function") {
+        if (player && !player._birdySpeedPatched) {
             player._birdySpeedPatched = true;
             try {
                 player.getAvailablePlaybackRates = function () {
@@ -678,6 +678,12 @@
         }
     }
     unlockSpeedOnEnvironment(null);
+
+    if (typeof setInterval === "function") {
+        setInterval(function () {
+            unlockSpeedOnEnvironment(findPlayer());
+        }, 250);
+    }
 
     var lastSpeedVid = null;
     var lastSpeedRate = 1;

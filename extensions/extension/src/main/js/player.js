@@ -77,7 +77,8 @@
     }
 
     function injectPipButton(controls) {
-        var targetList = Array.isArray(controls.settingActions) ? controls.settingActions : null;
+        var targetList = Array.isArray(controls.engagementActions) ? controls.engagementActions
+            : (Array.isArray(controls.settingActions) ? controls.settingActions : null);
         if (!targetList) return;
         for (var i = 0; i < targetList.length; i++) {
             var br = targetList[i] && targetList[i].button && targetList[i].button.buttonRenderer;
@@ -93,7 +94,8 @@
             button: {
                 buttonRenderer: {
                     itemId: "BIRDY_PIP_BUTTON",
-                    icon: { iconType: "MINIPLAYER" },
+                    icon: { iconType: "OPEN_IN_NEW" },
+                    text: { runs: [{ text: "PiP" }] },
                     tooltip: "Picture-in-Picture",
                     accessibility: { label: "Picture-in-Picture" },
                     accessibilityData: { accessibilityData: { label: "Picture-in-Picture" } },
@@ -102,6 +104,29 @@
                 }
             }
         });
+    }
+
+    function isPipElement(el) {
+        var cur = el;
+        while (cur && cur !== document.documentElement) {
+            if (cur.getAttribute && cur.getAttribute("aria-label") === "Picture-in-Picture") return true;
+            cur = cur.parentElement;
+        }
+        return false;
+    }
+
+    if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+        document.addEventListener("click", function (e) {
+            if (isPipElement(e.target)) {
+                youtv.report("@enterpip");
+            }
+        }, true);
+        document.addEventListener("keydown", function (e) {
+            var code = e.keyCode || e.which;
+            if ((code === 13 || code === 23) && isPipElement(document.activeElement)) {
+                youtv.report("@enterpip");
+            }
+        }, true);
     }
 
     function unlockSpeedButton(controls) {
