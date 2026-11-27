@@ -84,6 +84,25 @@ private val brandingResourcePatch = resourcePatch {
             ?.use { it.readBytes() }
             ?: throw IllegalStateException("Bundled image drawable/app_banner.png missing")
 
+        val iconBytes = object {}.javaClass.classLoader.getResourceAsStream("youtubetv/branding/mipmap-xhdpi/ic_launcher.png")
+            ?.use { it.readBytes() }
+
+        // Overwrite stock Android TV banner (320x180) obfuscated as res/dN.png in stock APK
+        listOf("res/dN.png", "res/drawable/dN.png", "res/drawable-xhdpi/dN.png").forEach { path ->
+            try {
+                resourceFile(path, false).writeBytes(bannerBytes)
+            } catch (e: Exception) {}
+        }
+
+        // Overwrite stock obfuscated launcher icons across all densities
+        if (iconBytes != null) {
+            listOf("res/o-.png", "res/fN.png", "res/RJ.png", "res/D0.png", "res/L-.png", "res/FS.png", "res/KG.png", "res/yn.png").forEach { path ->
+                try {
+                    resourceFile(path, false).writeBytes(iconBytes)
+                } catch (e: Exception) {}
+            }
+        }
+
         // Overwrite any decoded file containing 'banner' in all densities
         listDecodableFiles("res/**").forEach { path ->
             if (path.contains("banner", ignoreCase = true) && path.endsWith(".png", ignoreCase = true)) {

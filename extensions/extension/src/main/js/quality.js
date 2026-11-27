@@ -801,16 +801,16 @@
                 "  to { opacity: 0; }\n" +
                 "}\n" +
                 ".birdy-speed-drawer {\n" +
-                "  animation: birdyDrawerSlideIn 0.22s cubic-bezier(0.05, 0.7, 0.1, 1.0) forwards !important;\n" +
+                "  animation: birdyDrawerSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;\n" +
                 "}\n" +
                 ".birdy-speed-drawer.closing {\n" +
-                "  animation: birdyDrawerSlideOut 0.16s cubic-bezier(0.3, 0.0, 0.8, 0.15) forwards !important;\n" +
+                "  animation: birdyDrawerSlideOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards !important;\n" +
                 "}\n" +
                 ".birdy-speed-backdrop {\n" +
-                "  animation: birdyBackdropFadeIn 0.2s ease-out forwards !important;\n" +
+                "  animation: birdyBackdropFadeIn 0.3s ease-out forwards !important;\n" +
                 "}\n" +
                 ".birdy-speed-backdrop.closing {\n" +
-                "  animation: birdyBackdropFadeOut 0.16s ease-in forwards !important;\n" +
+                "  animation: birdyBackdropFadeOut 0.22s ease-in forwards !important;\n" +
                 "}\n" +
                 ".birdy-speed-item {\n" +
                 "  display: flex !important;\n" +
@@ -870,8 +870,8 @@
         var headers = document.querySelectorAll("h1, h2, h3, h4, div, span, ytlr-dialog-title");
         for (var h = 0; h < headers.length; h++) {
             var head = headers[h];
+            if (head.closest && head.closest("#birdy-custom-speed-drawer, .birdy-speed-drawer, .birdy-speed-backdrop, .birdy-yt-screen, #birdytv-settings-hub, .farotv-hub-screen, [class*='hub']")) continue;
             if (head.children && head.children.length > 2) continue;
-            if (head.closest && head.closest(".birdy-yt-screen, #birdytv-settings-hub, .farotv-hub-screen, [class*='hub']")) continue;
             var ht = (head.textContent || "").trim();
             // Strictly match dialog title "Video speed", NEVER "Playback speed"
             if (/^(Video speed|سرعة التشغيل|Velocidad de reproducción)$/i.test(ht)) {
@@ -905,7 +905,7 @@
         if (backdrop) backdrop.classList.add("closing");
 
         // Restore visibility of any native dialogs
-        var nativeDialogs = document.querySelectorAll("ytlr-dialog-renderer, [role='dialog'], .ytlr-dialog-renderer");
+        var nativeDialogs = document.querySelectorAll("ytlr-dialog-renderer, [role='dialog']:not([data-birdy-drawer]), .ytlr-dialog-renderer");
         for (var nd = 0; nd < nativeDialogs.length; nd++) {
             if (nativeDialogs[nd] !== drawer) {
                 nativeDialogs[nd].style.removeProperty("opacity");
@@ -916,7 +916,7 @@
         setTimeout(function () {
             if (drawer && drawer.parentNode) drawer.parentNode.removeChild(drawer);
             if (backdrop && backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
-        }, 170);
+        }, 230);
 
         var old = document.getElementById("birdy-speed-container");
         if (old && old.parentNode) old.parentNode.removeChild(old);
@@ -949,9 +949,10 @@
         var isShort = isCurrentShort(player);
         if (!getBoolSetting(isShort ? SHORTS_CUSTOM_SPEED_KEY : VIDEO_CUSTOM_SPEED_KEY, true)) return;
 
-        // Hide any default YouTube TV speed dialog or settings panel underneath
-        var nativeDialogs = document.querySelectorAll("ytlr-dialog-renderer, [role='dialog'], .ytlr-dialog-renderer");
+        // Hide any default YouTube TV speed dialog or settings panel underneath (NEVER hide our own drawer)
+        var nativeDialogs = document.querySelectorAll("ytlr-dialog-renderer, [role='dialog']:not([data-birdy-drawer]), .ytlr-dialog-renderer");
         for (var nd = 0; nd < nativeDialogs.length; nd++) {
+            if (nativeDialogs[nd].id === "birdy-custom-speed-drawer" || nativeDialogs[nd].classList.contains("birdy-speed-drawer")) continue;
             nativeDialogs[nd].style.setProperty("opacity", "0", "important");
             nativeDialogs[nd].style.setProperty("pointer-events", "none", "important");
         }
@@ -996,6 +997,7 @@
         var drawer = document.createElement("div");
         drawer.id = "birdy-custom-speed-drawer";
         drawer.className = "birdy-speed-drawer";
+        drawer.setAttribute("data-birdy-drawer", "true");
         drawer.setAttribute("role", "dialog");
         drawer.setAttribute("aria-modal", "true");
         drawer.setAttribute("aria-label", "Video speed");
@@ -1179,9 +1181,9 @@
         // Check if YouTube TV opened its native speed dialog
         var head = findSpeedHeading();
         if (head) {
-            // Hide the default speed dialog completely
-            var nativeDialog = head.closest("ytlr-dialog-renderer, [role='dialog'], .ytlr-dialog-renderer") || head.parentElement;
-            if (nativeDialog) {
+            // Hide the default speed dialog completely (NEVER our own drawer)
+            var nativeDialog = head.closest("ytlr-dialog-renderer, [role='dialog']:not([data-birdy-drawer]), .ytlr-dialog-renderer") || head.parentElement;
+            if (nativeDialog && nativeDialog.id !== "birdy-custom-speed-drawer" && !nativeDialog.classList.contains("birdy-speed-drawer")) {
                 nativeDialog.style.setProperty("display", "none", "important");
             }
             // Open our custom speed drawer in its place
