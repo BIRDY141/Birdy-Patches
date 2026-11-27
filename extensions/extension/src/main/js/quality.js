@@ -81,7 +81,7 @@
         try {
             var raw = localStorage.getItem(STORAGE_PREFIX + key);
             if (!raw) return def;
-            var parsed = JSON.parse(raw);
+            var parsed = youtv.rawParse(raw);
             if (typeof parsed === "string") return parsed;
             if (parsed && typeof parsed.data === "string") return parsed.data;
         } catch (e) {}
@@ -92,7 +92,7 @@
         try {
             var raw = localStorage.getItem(STORAGE_PREFIX + key);
             if (raw !== null) {
-                var parsed = JSON.parse(raw);
+                var parsed = youtv.rawParse(raw);
                 if (parsed && typeof parsed.data === "boolean") return parsed.data;
             }
         } catch (e) {}
@@ -347,51 +347,59 @@
         return out;
     }
 
+    var inOnApiResponse = false;
+
     function onApiResponse(response, settings, text) {
-        if (youtv.mentions(text, ["reelWatchEndpoint", "isShortsEligible", "reelPlayerOverlayRenderer"])) {
-            collectShortsIds(response, 0);
-        }
-
-        var isShortResp = !!(
-            (response.videoDetails && response.videoDetails.isShortsEligible) ||
-            (response.videoDetails && shortsVideoIds.has(response.videoDetails.videoId)) ||
-            (response.microformat && response.microformat.playerMicroformatRenderer &&
-                typeof response.microformat.playerMicroformatRenderer.canonicalUrl === "string" &&
-                response.microformat.playerMicroformatRenderer.canonicalUrl.indexOf("/shorts/") !== -1)
-        );
-
-        // 1. Original Audio in /player
-        var origAudio = getBoolSetting(isShortResp ? SHORTS_ORIG_AUDIO_KEY : VIDEO_ORIG_AUDIO_KEY, false);
-        if (origAudio && response.streamingData) {
-            applyOriginalAudioToResponse(response);
-        }
-
-        // 2. Captions & More Auto-Translate in /player
-        var captionLang = getStringSetting(isShortResp ? SHORTS_CAPTION_KEY : VIDEO_CAPTION_KEY, "auto");
-        var moreTrans = getBoolSetting(isShortResp ? SHORTS_MORE_TRANS_KEY : VIDEO_MORE_TRANS_KEY, false);
-        if ((captionLang !== "auto" || moreTrans) && response.captions) {
-            applyCaptionsToResponse(response, captionLang, moreTrans);
-        }
-
-        // 3. Original Titles
-        var wantVideoOrigTitle = getBoolSetting(VIDEO_ORIG_TITLE_KEY, false);
-        var wantShortsOrigTitle = getBoolSetting(SHORTS_ORIG_TITLE_KEY, false);
-        if ((wantVideoOrigTitle || wantShortsOrigTitle) &&
-            youtv.mentions(text, ["tileRenderer", "gridVideoRenderer", "videoRenderer", "compactVideoRenderer", "videoDetails"])) {
-            var targets = collectTitleTargets(response, 0, false, []);
-            for (var i = 0; i < targets.length; i++) {
-                (function (target) {
-                    var shouldRestore = target.isShort ? wantShortsOrigTitle : wantVideoOrigTitle;
-                    if (!shouldRestore) return;
-                    fetchOriginalTitle(target.videoId, function (origTitle) {
-                        if (!origTitle) return;
-                        if (target.titleObj) setTitleObj(target.titleObj, origTitle);
-                        if (target.videoDetails && typeof target.videoDetails.title === "string") {
-                            target.videoDetails.title = origTitle;
-                        }
-                    });
-                })(targets[i]);
+        if (inOnApiResponse) return;
+        inOnApiResponse = true;
+        try {
+            if (youtv.mentions(text, ["reelWatchEndpoint", "isShortsEligible", "reelPlayerOverlayRenderer"])) {
+                collectShortsIds(response, 0);
             }
+
+            var isShortResp = !!(
+                (response.videoDetails && response.videoDetails.isShortsEligible) ||
+                (response.videoDetails && shortsVideoIds.has(response.videoDetails.videoId)) ||
+                (response.microformat && response.microformat.playerMicroformatRenderer &&
+                    typeof response.microformat.playerMicroformatRenderer.canonicalUrl === "string" &&
+                    response.microformat.playerMicroformatRenderer.canonicalUrl.indexOf("/shorts/") !== -1)
+            );
+
+            // 1. Original Audio in /player
+            var origAudio = getBoolSetting(isShortResp ? SHORTS_ORIG_AUDIO_KEY : VIDEO_ORIG_AUDIO_KEY, false);
+            if (origAudio && response.streamingData) {
+                applyOriginalAudioToResponse(response);
+            }
+
+            // 2. Captions & More Auto-Translate in /player
+            var captionLang = getStringSetting(isShortResp ? SHORTS_CAPTION_KEY : VIDEO_CAPTION_KEY, "auto");
+            var moreTrans = getBoolSetting(isShortResp ? SHORTS_MORE_TRANS_KEY : VIDEO_MORE_TRANS_KEY, false);
+            if ((captionLang !== "auto" || moreTrans) && response.captions) {
+                applyCaptionsToResponse(response, captionLang, moreTrans);
+            }
+
+            // 3. Original Titles
+            var wantVideoOrigTitle = getBoolSetting(VIDEO_ORIG_TITLE_KEY, false);
+            var wantShortsOrigTitle = getBoolSetting(SHORTS_ORIG_TITLE_KEY, false);
+            if ((wantVideoOrigTitle || wantShortsOrigTitle) &&
+                youtv.mentions(text, ["tileRenderer", "gridVideoRenderer", "videoRenderer", "compactVideoRenderer", "videoDetails"])) {
+                var targets = collectTitleTargets(response, 0, false, []);
+                for (var i = 0; i < targets.length; i++) {
+                    (function (target) {
+                        var shouldRestore = target.isShort ? wantShortsOrigTitle : wantVideoOrigTitle;
+                        if (!shouldRestore) return;
+                        fetchOriginalTitle(target.videoId, function (origTitle) {
+                            if (!origTitle) return;
+                            if (target.titleObj) setTitleObj(target.titleObj, origTitle);
+                            if (target.videoDetails && typeof target.videoDetails.title === "string") {
+                                target.videoDetails.title = origTitle;
+                            }
+                        });
+                    })(targets[i]);
+                }
+            }
+        } finally {
+            inOnApiResponse = false;
         }
     }
 
