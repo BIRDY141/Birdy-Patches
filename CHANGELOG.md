@@ -1,3 +1,9 @@
+## [1.21.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.21.0...v1.21.1) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **branding:** trigger release with restored original red logo and banner ([88555b8](https://github.com/BIRDY141/Birdy-Patches/commit/88555b8c831da1c921a6be9d96a98ecee4324dd2))
+
 ## [1.21.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.20.1...v1.21.0) (2026-11-27)
 
 ### ✨ New Features
