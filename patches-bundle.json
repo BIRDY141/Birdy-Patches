@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-27T11:49:50",
-  "description": "## [1.17.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.16.0...v1.17.0) (2026-11-27)\n\n### ✨ New Features\n\n* **video,shorts:** add caption language, auto-translate, original title, and original audio settings ([377a7ea](https://github.com/BIRDY141/Birdy-Patches/commit/377a7ea379e8c6efe5019f2731bf92d0cb786126))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.17.0/patches-1.17.0.mpp",
+  "created_at": "2026-11-27T12:02:47",
+  "description": "## [1.17.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.17.0...v1.17.1) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **quality:** use youtv.rawParse to prevent JSON.parse recursion freeze ([6763c33](https://github.com/BIRDY141/Birdy-Patches/commit/6763c337e7174e2e5dce0321b55ba24d2b8caf7b))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.17.1/patches-1.17.1.mpp",
   "signature_download_url": "",
-  "version": "1.17.0"
+  "version": "1.17.1"
 }

@@ -1,3 +1,9 @@
+## [1.17.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.17.0...v1.17.1) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **quality:** use youtv.rawParse to prevent JSON.parse recursion freeze ([6763c33](https://github.com/BIRDY141/Birdy-Patches/commit/6763c337e7174e2e5dce0321b55ba24d2b8caf7b))
+
 ## [1.17.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.16.0...v1.17.0) (2026-11-27)
 
 ### ✨ New Features
