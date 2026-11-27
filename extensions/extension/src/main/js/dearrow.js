@@ -385,7 +385,7 @@
     }
 
     function syncDomThumbnails() {
-        if (!feature.enabled() || typeof document === "undefined" || !document.querySelectorAll) return;
+        if (!feature.enabled() || typeof document === "undefined" || !document.querySelectorAll || document.hidden) return;
         var useThumbs = feature.settings.get("thumbnails") !== false;
         var showThumbIcon = feature.settings.get("show_thumb_icon") !== false;
         if (!useThumbs || !appliedThumbs.size) return;

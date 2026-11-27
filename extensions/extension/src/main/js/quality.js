@@ -84,25 +84,34 @@
         }
     }
 
-    function getStringSetting(key, def) {
+    var decodedCache = Object.create(null);
+
+    function getDecodedSetting(key) {
         try {
             var raw = localStorage.getItem(STORAGE_PREFIX + key);
-            if (!raw) return def;
-            var parsed = youtv.rawParse(raw);
-            if (typeof parsed === "string") return parsed;
-            if (parsed && typeof parsed.data === "string") return parsed.data;
+            var entry = decodedCache[key];
+            if (!entry || entry.raw !== raw) {
+                var val;
+                if (raw !== null) {
+                    try { val = youtv.rawParse(raw); } catch (e) {}
+                }
+                entry = decodedCache[key] = { raw: raw, val: val };
+            }
+            return entry.val;
         } catch (e) {}
+        return undefined;
+    }
+
+    function getStringSetting(key, def) {
+        var parsed = getDecodedSetting(key);
+        if (typeof parsed === "string") return parsed;
+        if (parsed && typeof parsed.data === "string") return parsed.data;
         return def;
     }
 
     function getBoolSetting(key, def) {
-        try {
-            var raw = localStorage.getItem(STORAGE_PREFIX + key);
-            if (raw !== null) {
-                var parsed = youtv.rawParse(raw);
-                if (parsed && typeof parsed.data === "boolean") return parsed.data;
-            }
-        } catch (e) {}
+        var parsed = getDecodedSetting(key);
+        if (parsed && typeof parsed.data === "boolean") return parsed.data;
         return !!def;
     }
 
@@ -657,19 +666,22 @@
     }
 
     function unlockSpeedOnEnvironment(player) {
-        try {
-            if (window.ytcfg && typeof window.ytcfg.get === "function") {
-                var flags = window.ytcfg.get("EXPERIMENT_FLAGS");
-                if (flags && typeof flags === "object") {
-                    flags.html5_disable_playback_rate_on_tv = false;
-                    flags.web_player_disable_playback_speed = false;
-                    flags.tv_enable_playback_rate = true;
-                    flags.enable_playback_rate_on_tv = true;
-                    flags.enable_playback_speed_for_tv = true;
-                    flags.cobalt_enable_playback_rate = true;
+        if (!window._birdyYtcfgSpeedUnlocked) {
+            try {
+                if (window.ytcfg && typeof window.ytcfg.get === "function") {
+                    var flags = window.ytcfg.get("EXPERIMENT_FLAGS");
+                    if (flags && typeof flags === "object") {
+                        flags.html5_disable_playback_rate_on_tv = false;
+                        flags.web_player_disable_playback_speed = false;
+                        flags.tv_enable_playback_rate = true;
+                        flags.enable_playback_rate_on_tv = true;
+                        flags.enable_playback_speed_for_tv = true;
+                        flags.cobalt_enable_playback_rate = true;
+                        window._birdyYtcfgSpeedUnlocked = true;
+                    }
                 }
-            }
-        } catch (e) {}
+            } catch (e) {}
+        }
         if (player && !player._birdySpeedPatched) {
             player._birdySpeedPatched = true;
             try {
@@ -680,12 +692,6 @@
         }
     }
     unlockSpeedOnEnvironment(null);
-
-    if (typeof setInterval === "function") {
-        setInterval(function () {
-            unlockSpeedOnEnvironment(findPlayer());
-        }, 250);
-    }
 
     var lastSpeedVid = null;
     var lastSpeedRate = 1;
@@ -757,13 +763,6 @@
         applyAllTweaks(true);
     };
 
-    if (typeof setInterval === "function") {
-        setInterval(function () {
-            bindVideoListeners();
-            applyAllTweaks(false);
-        }, 1200);
-    }
-
     // ---- Custom Speed Picker inside YouTube's native "Video speed" container ------------------
     try {
         if (typeof CSSStyleSheet !== "undefined" && document && document.adoptedStyleSheets) {
@@ -820,7 +819,7 @@
 
             var text = (popup.textContent || "").trim();
             if (!/^(Video speed|Playback speed|Velocidad|سرعة التشغيل)/i.test(text)) continue;
-            if (text.length > 160) continue; // Only replace the compact speed list, not unrelated full menus
+            if (text.length > 160) continue;
 
             var normalEl = null;
             var allEls = popup.querySelectorAll("*");
@@ -848,7 +847,7 @@
             wrap.className = "birdy-speed-list";
 
             var itemEls = [];
-            var initIdx = 3; // 1x default
+            var initIdx = 3;
             for (var r = 0; r < SPEED_RATES.length; r++) {
                 (function (rate, idx) {
                     var isSel = Math.abs(rate - currentRate) < 0.01;
@@ -887,12 +886,18 @@
 
     if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
         document.addEventListener("keydown", function (e) {
-            if (!activeSpeedMenu) return;
+            var code = e.keyCode || e.which;
+            if (!activeSpeedMenu) {
+                if (code === 13 || code === 23) {
+                    setTimeout(enhanceNativeSpeedContainer, 80);
+                    setTimeout(enhanceNativeSpeedContainer, 240);
+                }
+                return;
+            }
             if (!document.body.contains(activeSpeedMenu.popup) || activeSpeedMenu.popup.offsetParent === null) {
                 activeSpeedMenu = null;
                 return;
             }
-            var code = e.keyCode || e.which;
             if (code === 38) { // UP
                 e.preventDefault(); e.stopPropagation();
                 if (activeSpeedMenu.focusIdx > 0) {
@@ -916,6 +921,11 @@
     }
 
     if (typeof setInterval === "function") {
-        setInterval(enhanceNativeSpeedContainer, 250);
+        setInterval(function () {
+            if (typeof document !== "undefined" && document.hidden) return;
+            bindVideoListeners();
+            applyAllTweaks(false);
+            enhanceNativeSpeedContainer();
+        }, 800);
     }
 })();
