@@ -135,6 +135,7 @@
   "hub.tab.seekbar": "ألوان شريط التقدم",
   "hub.tab.ads": "حظر الإعلانات",
   "hub.tab.player": "أزرار المشغل",
+  "hub.tab.video": "الفيديو",
   "hub.tab.shorts": "مقاطع Shorts",
   "hub.tab.ui_tweaks": "تعديلات الواجهة",
   "hub.tab.dearrow": "DeArrow",
@@ -154,5 +155,18 @@
   "topics.movies.title": "الأفلام والتلفزيون",
   "hub.enabled": "مفعّل",
   "hub.disabled": "معطّل",
-  "hub.restart_app": "إعادة تشغيل YouTube لتطبيق التغييرات"
+  "hub.restart_app": "إعادة تشغيل YouTube لتطبيق التغييرات",
+  "video.quality.title": "فرض جودة الفيديو",
+  "video.quality.summary": "تثبيت دقة التشغيل تلقائياً لمقاطع الفيديو العادية",
+  "shorts.quality.title": "فرض جودة Shorts",
+  "shorts.quality.summary": "تثبيت دقة التشغيل تلقائياً لمقاطع YouTube Shorts",
+  "quality.auto": "تلقائي (الافتراضي)",
+  "quality.hd2160": "2160p (4K)",
+  "quality.hd1440": "1440p (2K)",
+  "quality.hd1080": "1080p (HD)",
+  "quality.hd720": "720p (HD)",
+  "quality.large": "480p",
+  "quality.medium": "360p",
+  "quality.small": "240p",
+  "quality.tiny": "144p"
 }

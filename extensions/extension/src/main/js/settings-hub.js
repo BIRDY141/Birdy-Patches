@@ -42,6 +42,24 @@
         { key: "movies", titleKey: "topics.movies.title" }
     ];
 
+    var QUALITY_OPTIONS = [
+        { id: "auto", labelKey: "quality.auto" },
+        { id: "hd2160", labelKey: "quality.hd2160" },
+        { id: "hd1440", labelKey: "quality.hd1440" },
+        { id: "hd1080", labelKey: "quality.hd1080" },
+        { id: "hd720", labelKey: "quality.hd720" },
+        { id: "large", labelKey: "quality.large" },
+        { id: "medium", labelKey: "quality.medium" },
+        { id: "small", labelKey: "quality.small" },
+        { id: "tiny", labelKey: "quality.tiny" }
+    ];
+
+    function qualityOptionsList() {
+        return QUALITY_OPTIONS.map(function (q) {
+            return { id: q.id, text: t(q.labelKey) };
+        });
+    }
+
     // ---- Storage helpers ----------------------------------------------------------------------
     function getBool(key, def) {
         try {
@@ -57,6 +75,24 @@
     function setBool(key, val) {
         try {
             localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify({ data: !!val }));
+        } catch (e) {}
+    }
+
+    function getString(key, def) {
+        try {
+            var raw = localStorage.getItem(STORAGE_PREFIX + key);
+            if (raw !== null) {
+                var parsed = JSON.parse(raw);
+                if (typeof parsed === "string") return parsed;
+                if (parsed && typeof parsed.data === "string") return parsed.data;
+            }
+        } catch (e) {}
+        return def !== undefined ? def : "";
+    }
+
+    function setString(key, val) {
+        try {
+            localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(String(val)));
         } catch (e) {}
     }
 
@@ -115,6 +151,11 @@
         player: [
             ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "3" }],
             ["polygon", { points: "10 9 16 12 10 15 10 9", fill: "currentColor", stroke: "none" }]
+        ],
+        video: [
+            ["rect", { x: "2", y: "3", width: "20", height: "14", rx: "2" }],
+            ["line", { x1: "8", y1: "21", x2: "16", y2: "21" }],
+            ["line", { x1: "12", y1: "17", x2: "12", y2: "21" }]
         ],
         shorts: [
             ["polygon", { points: "13 2 3 14 12 14 11 22 21 10 12 10 13 2" }]
@@ -248,7 +289,36 @@
             " padding: 0.95rem 1.85rem; border-radius: 9999px; font-size: 1.06rem; font-weight: 600;" +
             " background: #000000; color: #f5f5f5; border: 1.5px solid rgba(255, 255, 255, 0.25); cursor: pointer;" +
             " outline: none; align-self: flex-start; margin: 0.75rem 0 0 0.25rem; flex-shrink: 0; }" +
-            ".birdy-yt-btn.birdy-focus { background: #ffffff; color: #000000; border-color: #ffffff; font-weight: 700; box-shadow: 0 0 18px rgba(255, 255, 255, 0.25); }"
+            ".birdy-yt-btn.birdy-focus { background: #ffffff; color: #000000; border-color: #ffffff; font-weight: 700; box-shadow: 0 0 18px rgba(255, 255, 255, 0.25); }" +
+            ".birdy-yt-select {" +
+            " display: inline-flex; align-items: center; gap: 0.65rem; padding: 0.55rem 1.1rem;" +
+            " border-radius: 10px; font-size: 0.96rem; font-weight: 600;" +
+            " background: #0c0c0c; color: #f5f5f5; border: 1.5px solid rgba(255, 255, 255, 0.22);" +
+            " flex-shrink: 0; cursor: pointer; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-select {" +
+            " background: #141414; color: #ffffff; border-color: #000000; }" +
+            ".birdy-yt-dropdown-backdrop {" +
+            " position: fixed; inset: 0; z-index: 2147483647; background: rgba(0, 0, 0, 0.8);" +
+            " display: flex; align-items: center; justify-content: center; }" +
+            ".birdy-yt-dropdown-menu {" +
+            " width: 460px; max-width: 85vw; max-height: 76vh; background: #050505;" +
+            " border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 16px;" +
+            " box-shadow: 0 24px 64px rgba(0, 0, 0, 0.95); padding: 1.25rem;" +
+            " display: flex; flex-direction: column; gap: 0.75rem; box-sizing: border-box; }" +
+            ".birdy-yt-dropdown-title {" +
+            " font-size: 1.28rem; font-weight: 700; color: #ffffff; padding: 0.25rem 0.5rem 0.6rem;" +
+            " border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin: 0; flex-shrink: 0; }" +
+            ".birdy-yt-dropdown-viewport {" +
+            " position: relative; overflow: hidden; max-height: 56vh; flex: 1; }" +
+            ".birdy-yt-dropdown-opt {" +
+            " display: flex; align-items: center; justify-content: space-between; width: 100%;" +
+            " padding: 0.85rem 1.1rem; border-radius: 11px; font-size: 1.05rem; font-weight: 500;" +
+            " background: #000000; color: #dcdcdc; border: 1px solid rgba(255, 255, 255, 0.08);" +
+            " cursor: pointer; text-align: left; box-sizing: border-box; }" +
+            ".birdy-yt-dropdown-opt.selected { border-color: #3ea6ff; color: #3ea6ff; font-weight: 600; }" +
+            ".birdy-yt-dropdown-opt.birdy-focus {" +
+            " background: #ffffff; color: #000000; border-color: #ffffff; font-weight: 700;" +
+            " box-shadow: 0 0 18px rgba(255, 255, 255, 0.22); }"
         );
         document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
     } catch (e) {}
@@ -276,6 +346,7 @@
         { key: "seekbar", labelKey: "hub.tab.seekbar", icon: ICONS.seekbar },
         { key: "ads", labelKey: "hub.tab.ads", icon: ICONS.ads },
         { key: "player", labelKey: "hub.tab.player", icon: ICONS.player },
+        { key: "video", labelKey: "hub.tab.video", icon: ICONS.video },
         { key: "shorts", labelKey: "hub.tab.shorts", icon: ICONS.shorts },
         { key: "ui_tweaks", labelKey: "hub.tab.ui_tweaks", icon: ICONS.ui_tweaks },
         { key: "dearrow", labelKey: "hub.tab.dearrow", icon: ICONS.dearrow },
@@ -498,6 +569,17 @@
                     false
                 ));
             }
+        } else if (activeTabKey === "video") {
+            appendRow(frag, createDropdownRow(
+                t("video.quality.title"),
+                t("video.quality.summary"),
+                qualityOptionsList(),
+                getString("YOUTV_QUALITY_VIDEO", "auto"),
+                function (id) {
+                    setString("YOUTV_QUALITY_VIDEO", id);
+                    if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
+                }
+            ));
         } else if (activeTabKey === "shorts") {
             appendRow(frag, createToggleRow(
                 t("feature.shorts.name"),
@@ -505,6 +587,16 @@
                 "YOUTV_SHORTS",
                 true,
                 true
+            ));
+            appendRow(frag, createDropdownRow(
+                t("shorts.quality.title"),
+                t("shorts.quality.summary"),
+                qualityOptionsList(),
+                getString("YOUTV_QUALITY_SHORTS", "auto"),
+                function (id) {
+                    setString("YOUTV_QUALITY_SHORTS", id);
+                    if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
+                }
             ));
         } else if (activeTabKey === "ui_tweaks") {
             appendRow(frag, createToggleRow(
@@ -741,6 +833,142 @@
         return row;
     }
 
+    var activeDropdown = null;
+
+    function closeDropdown() {
+        if (!activeDropdown) return;
+        if (activeDropdown.backdrop && activeDropdown.backdrop.parentNode) {
+            activeDropdown.backdrop.parentNode.removeChild(activeDropdown.backdrop);
+        }
+        activeDropdown = null;
+        updateFocusUI();
+    }
+
+    function updateDropdownFocus() {
+        if (!activeDropdown) return;
+        var opts = activeDropdown.optionEls;
+        for (var i = 0; i < opts.length; i++) {
+            opts[i].classList.toggle("birdy-focus", i === activeDropdown.focusIdx);
+        }
+        var target = opts[activeDropdown.focusIdx];
+        if (target) {
+            ensureVisible(activeDropdown.viewport, activeDropdown.inner, target, activeDropdown.focusIdx === 0);
+        }
+    }
+
+    function openDropdown(titleText, options, currentId, onSelect) {
+        closeDropdown();
+        if (!screenEl) return;
+
+        var backdrop = document.createElement("div");
+        backdrop.className = "birdy-yt-dropdown-backdrop";
+        backdrop.onclick = function (e) {
+            if (e.target === backdrop) closeDropdown();
+        };
+
+        var menu = document.createElement("div");
+        menu.className = "birdy-yt-dropdown-menu";
+
+        var heading = document.createElement("h3");
+        heading.className = "birdy-yt-dropdown-title";
+        heading.textContent = titleText;
+
+        var viewport = document.createElement("div");
+        viewport.className = "birdy-yt-dropdown-viewport";
+        var inner = document.createElement("div");
+        inner.className = "birdy-yt-list-inner";
+        inner._scrollY = 0;
+
+        var optionEls = [];
+        var initialIdx = 0;
+        for (var i = 0; i < options.length; i++) {
+            (function (opt, idx) {
+                if (opt.id === currentId) initialIdx = idx;
+                var btn = document.createElement("button");
+                btn.className = "birdy-yt-dropdown-opt" + (opt.id === currentId ? " selected" : "");
+
+                var label = document.createElement("span");
+                label.textContent = opt.text;
+                var check = document.createElement("span");
+                check.textContent = opt.id === currentId ? "\u2713" : "";
+
+                btn.appendChild(label);
+                btn.appendChild(check);
+                btn.onclick = function () {
+                    onSelect(opt.id, opt.text);
+                    closeDropdown();
+                };
+                inner.appendChild(btn);
+                optionEls.push(btn);
+            })(options[i], i);
+        }
+
+        viewport.appendChild(inner);
+        menu.appendChild(heading);
+        menu.appendChild(viewport);
+        backdrop.appendChild(menu);
+        screenEl.appendChild(backdrop);
+
+        activeDropdown = {
+            backdrop: backdrop,
+            viewport: viewport,
+            inner: inner,
+            optionEls: optionEls,
+            focusIdx: initialIdx
+        };
+        updateDropdownFocus();
+    }
+
+    function createDropdownRow(titleText, summaryText, options, currentId, onSelect) {
+        var selectedId = currentId;
+        function findLabel(id) {
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].id === id) return options[i].text;
+            }
+            return options[0] ? options[0].text : id;
+        }
+
+        var row = document.createElement("div");
+        row.className = "birdy-yt-row";
+        row.setAttribute("data-type", "dropdown");
+
+        var left = document.createElement("div");
+        left.className = "birdy-yt-row-left";
+        var titleWrap = document.createElement("div");
+        titleWrap.className = "birdy-yt-row-title-wrap";
+        var rowTitle = document.createElement("span");
+        rowTitle.className = "birdy-yt-row-title";
+        rowTitle.textContent = titleText;
+        titleWrap.appendChild(rowTitle);
+        left.appendChild(titleWrap);
+
+        if (summaryText) {
+            var rowSummary = document.createElement("span");
+            rowSummary.className = "birdy-yt-row-summary";
+            rowSummary.textContent = summaryText;
+            left.appendChild(rowSummary);
+        }
+
+        var selectBtn = document.createElement("button");
+        selectBtn.className = "birdy-yt-select";
+        selectBtn.textContent = findLabel(selectedId) + "  \u25BE";
+
+        function triggerOpen() {
+            openDropdown(titleText, options, selectedId, function (nextId, nextText) {
+                selectedId = nextId;
+                selectBtn.textContent = nextText + "  \u25BE";
+                onSelect(nextId);
+            });
+        }
+
+        row.onclick = triggerOpen;
+        row._openDropdown = triggerOpen;
+
+        row.appendChild(left);
+        row.appendChild(selectBtn);
+        return row;
+    }
+
     function syncPillIndexToSelected(row) {
         if (!row || !row._pills) {
             focusPillIndex = 0;
@@ -828,6 +1056,31 @@
         if (!isHubOpen()) return;
         var code = e.keyCode || e.which;
 
+        if (activeDropdown) {
+            if (code === 27 || code === 4 || code === 10009 || code === 37 ||
+                e.key === "Escape" || e.key === "GoBack" || e.key === "BrowserBack") {
+                stopEvent(e);
+                closeDropdown();
+            } else if (code === 38) { // UP
+                stopEvent(e);
+                if (activeDropdown.focusIdx > 0) {
+                    activeDropdown.focusIdx--;
+                    updateDropdownFocus();
+                }
+            } else if (code === 40) { // DOWN
+                stopEvent(e);
+                if (activeDropdown.focusIdx < activeDropdown.optionEls.length - 1) {
+                    activeDropdown.focusIdx++;
+                    updateDropdownFocus();
+                }
+            } else if (code === 13 || code === 23) { // OK / ENTER
+                stopEvent(e);
+                var optBtn = activeDropdown.optionEls[activeDropdown.focusIdx];
+                if (optBtn) optBtn.click();
+            }
+            return;
+        }
+
         // BACK: 27 (Escape), 4 (Android Back), 10009 (Tizen Back)
         if (code === 27 || code === 4 || code === 10009 || e.key === "Escape" || e.key === "GoBack" || e.key === "BrowserBack") {
             stopEvent(e);
@@ -896,7 +1149,9 @@
                 }
             } else if (code === 13 || code === 23) { // OK / ENTER
                 stopEvent(e);
-                if (curRow && curRow._pills && curRow._pills[focusPillIndex]) {
+                if (curRow && curRow._openDropdown) {
+                    curRow._openDropdown();
+                } else if (curRow && curRow._pills && curRow._pills[focusPillIndex]) {
                     curRow._pills[focusPillIndex].click();
                 } else if (curRow && curRow._toggle) {
                     curRow._toggle();
@@ -936,6 +1191,7 @@
     }
 
     function closeHub() {
+        closeDropdown();
         if (!screenEl) return;
         screenEl.classList.remove("show");
         window.removeEventListener("keydown", onKeyDown, true);

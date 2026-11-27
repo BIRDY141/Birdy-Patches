@@ -135,6 +135,7 @@
   "hub.tab.seekbar": "Colores de barra",
   "hub.tab.ads": "Bloqueo de anuncios",
   "hub.tab.player": "Botones del reproductor",
+  "hub.tab.video": "Video",
   "hub.tab.shorts": "Shorts",
   "hub.tab.ui_tweaks": "Ajustes de interfaz",
   "hub.tab.dearrow": "DeArrow",
@@ -154,5 +155,18 @@
   "topics.movies.title": "Películas y TV",
   "hub.enabled": "Activado",
   "hub.disabled": "Desactivado",
-  "hub.restart_app": "Reiniciar YouTube para aplicar cambios"
+  "hub.restart_app": "Reiniciar YouTube para aplicar cambios",
+  "video.quality.title": "Forzar calidad de video",
+  "video.quality.summary": "Fija automáticamente la resolución de reproducción para videos normales",
+  "shorts.quality.title": "Forzar calidad de Shorts",
+  "shorts.quality.summary": "Fija automáticamente la resolución de reproducción para YouTube Shorts",
+  "quality.auto": "Automático (Predeterminado)",
+  "quality.hd2160": "2160p (4K)",
+  "quality.hd1440": "1440p (2K)",
+  "quality.hd1080": "1080p (HD)",
+  "quality.hd720": "720p (HD)",
+  "quality.large": "480p",
+  "quality.medium": "360p",
+  "quality.small": "240p",
+  "quality.tiny": "144p"
 }
