@@ -1,3 +1,9 @@
+## [1.22.2](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.1...v1.22.2) (2026-11-27)
+
+### 🔧 Improvements
+
+* **js:** remove full-DOM D-pad scans in sponsorblock/dearrow and fix speed popup detection ([bc4ddcb](https://github.com/BIRDY141/Birdy-Patches/commit/bc4ddcb0969a34b3e82afa9c671f641bd455fcce))
+
 ## [1.22.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.0...v1.22.1) (2026-11-27)
 
 ### 🔧 Improvements
