@@ -1,3 +1,9 @@
+## [1.19.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.19.0...v1.19.1) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **pip:** use invoke-static/range for p0 register > v15 ([5d257d6](https://github.com/BIRDY141/Birdy-Patches/commit/5d257d6275e88173cf0ba3fcaca3a6bd31d5eafa))
+
 ## [1.19.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.18.0...v1.19.0) (2026-11-27)
 
 ### ✨ New Features
