@@ -1,3 +1,9 @@
+## [1.27.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.26.0...v1.27.0) (2026-11-27)
+
+### ✨ New Features
+
+* **settings:** remove startup tab feature ([1ff0f59](https://github.com/BIRDY141/Birdy-Patches/commit/1ff0f593bb8c7e9dc7ca44b0a85b3b200af45e8b))
+
 ## [1.26.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.25.0...v1.26.0) (2026-11-27)
 
 ### ✨ New Features
