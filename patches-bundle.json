@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-27T17:44:16",
-  "description": "## [1.22.7](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.6...v1.22.7) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **speed:** preserve native drawer layout and enable full D-pad list navigation ([98f9985](https://github.com/BIRDY141/Birdy-Patches/commit/98f998537fac1bd823e8d15c95ecc301c44b135a))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.7/patches-1.22.7.mpp",
+  "created_at": "2026-11-27T17:54:45",
+  "description": "## [1.22.8](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.7...v1.22.8) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **speed:** expand container height and accurately toggle checkmark icons ([70c01f8](https://github.com/BIRDY141/Birdy-Patches/commit/70c01f897ac05c2468a16c7023fb6fb36318d360))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.8/patches-1.22.8.mpp",
   "signature_download_url": "",
-  "version": "1.22.7"
+  "version": "1.22.8"
 }

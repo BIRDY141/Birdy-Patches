@@ -1,3 +1,9 @@
+## [1.22.8](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.7...v1.22.8) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **speed:** expand container height and accurately toggle checkmark icons ([70c01f8](https://github.com/BIRDY141/Birdy-Patches/commit/70c01f897ac05c2468a16c7023fb6fb36318d360))
+
 ## [1.22.7](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.6...v1.22.7) (2026-11-27)
 
 ### 🐛 Bug Fixes
