@@ -1,3 +1,9 @@
+## [1.22.5](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.4...v1.22.5) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **speed,branding:** instant 1-to-1 native speed menu and centered red launcher banner ([df28ab1](https://github.com/BIRDY141/Birdy-Patches/commit/df28ab1a7dd278956b4c18aceeaab6f245ffdfd3))
+
 ## [1.22.4](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.3...v1.22.4) (2026-11-27)
 
 ### 🐛 Bug Fixes
