@@ -1,3 +1,9 @@
+## [1.16.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.15.1...v1.16.0) (2026-11-27)
+
+### ✨ New Features
+
+* **quality:** add Video tab and force quality dropdowns for Videos and Shorts ([4663faa](https://github.com/BIRDY141/Birdy-Patches/commit/4663faadb9923b7cd6f4f4a3fb930ede0f9dee8c))
+
 ## [1.15.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.15.0...v1.15.1) (2026-11-26)
 
 ### 🐛 Bug Fixes

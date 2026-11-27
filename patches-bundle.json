@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-26T22:15:21",
-  "description": "## [1.15.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.15.0...v1.15.1) (2026-11-26)\n\n### 🐛 Bug Fixes\n\n* **dearrow:** proxy thumbnails through NetBridge as data URIs to satisfy Cobalt CSP ([0feced3](https://github.com/BIRDY141/Birdy-Patches/commit/0feced309ecc3b858f234b9e2ff76c73430dde6b))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.15.1/patches-1.15.1.mpp",
+  "created_at": "2026-11-27T11:37:44",
+  "description": "## [1.16.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.15.1...v1.16.0) (2026-11-27)\n\n### ✨ New Features\n\n* **quality:** add Video tab and force quality dropdowns for Videos and Shorts ([4663faa](https://github.com/BIRDY141/Birdy-Patches/commit/4663faadb9923b7cd6f4f4a3fb930ede0f9dee8c))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.16.0/patches-1.16.0.mpp",
   "signature_download_url": "",
-  "version": "1.15.1"
+  "version": "1.16.0"
 }
