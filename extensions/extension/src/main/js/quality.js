@@ -707,12 +707,21 @@
 
     var lastSpeedVid = null;
     var lastSpeedRate = 1;
+    var currentVideoOverrideRate = null;
+    var lastLoadedSpeedVid = null;
 
     function enforceSpeed(player, isShort, vid, forceNow) {
         unlockSpeedOnEnvironment(player);
-        var raw = getStringSetting(isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY, "1");
-        var rate = parseFloat(raw);
-        if (!isFinite(rate) || rate <= 0) rate = 1;
+        if (vid && vid !== lastLoadedSpeedVid) {
+            lastLoadedSpeedVid = vid;
+            currentVideoOverrideRate = null; // New video resets to user's default playback speed
+        }
+
+        var defaultRaw = getStringSetting(isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY, "1");
+        var defaultRate = parseFloat(defaultRaw);
+        if (!isFinite(defaultRate) || defaultRate <= 0) defaultRate = 1;
+
+        var rate = currentVideoOverrideRate !== null ? currentVideoOverrideRate : defaultRate;
 
         var video = typeof document !== "undefined" ? document.querySelector("video") : null;
         if (rate === 1 && !forceNow && lastSpeedRate === 1) return;
@@ -833,7 +842,7 @@
                 ".birdy-speed-item:focus, .birdy-speed-item.focused {\n" +
                 "  background: #ffffff !important;\n" +
                 "  color: #0f0f0f !important;\n" +
-                "  transform: scale(1.02) !important;\n" +
+                "  transform: none !important;\n" +
                 "  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;\n" +
                 "}\n" +
                 ".birdy-speed-item:focus *, .birdy-speed-item.focused * {\n" +
@@ -924,17 +933,29 @@
 
     function updateSettingsMenuSubtitle(rate) {
         if (typeof document === "undefined") return;
-        var label = (rate === 1 ? "Normal" : (rate + "x"));
-        var items = document.querySelectorAll("ytlr-menu-item-renderer, [role='menuitem'], [role='button']");
+        var r = (rate !== undefined && rate !== null) ? rate : (currentVideoOverrideRate !== null ? currentVideoOverrideRate : (parseFloat(getStringSetting(VIDEO_SPEED_KEY, "1")) || 1));
+        var label = (Math.abs(r - 1) < 0.01 ? "Normal" : (r + "x"));
+        var items = document.querySelectorAll("ytlr-menu-item-renderer, [role='menuitem'], [role='button'], .ytlr-menu-item-renderer");
         for (var i = 0; i < items.length; i++) {
             var it = items[i];
+            if (it.closest && it.closest("#birdy-custom-speed-drawer, .birdy-speed-drawer, #birdytv-settings-hub")) continue;
             var text = (it.textContent || "").trim();
-            if (/Speed|سرعة التشغيل|Velocidad/i.test(text) && !/Video speed/i.test(text)) {
-                var subs = it.querySelectorAll("ytlr-formatted-string, span, div");
+            if (/Speed|سرعة|Velocidad/i.test(text) && !/Video speed/i.test(text)) {
+                var subs = it.querySelectorAll("ytlr-formatted-string, span, div, p");
+                var subFound = false;
                 for (var s = 0; s < subs.length; s++) {
-                    var st = (subs[s].textContent || "").trim();
-                    if (/^(Normal|\d+(\.\d+)?x)$/i.test(st)) {
-                        subs[s].textContent = label;
+                    var el = subs[s];
+                    if (el.children && el.children.length > 0) continue;
+                    var st = (el.textContent || "").trim();
+                    if (/^(Normal|عادي|\d+(\.\d+)?x)$/i.test(st) || /^[\•\·\s]*(Normal|عادي|\d+(\.\d+)?x)$/i.test(st)) {
+                        el.textContent = label;
+                        subFound = true;
+                    }
+                }
+                if (!subFound && it.lastElementChild && it.lastElementChild !== it.firstElementChild) {
+                    var lastTxt = (it.lastElementChild.textContent || "").trim();
+                    if (!/Speed|سرعة|Velocidad/i.test(lastTxt)) {
+                        it.lastElementChild.textContent = label;
                     }
                 }
             }
@@ -960,7 +981,8 @@
         ensureSpeedStyles();
 
         var speedKey = isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY;
-        var currentRate = parseFloat(getStringSetting(speedKey, "1")) || 1;
+        var defaultRate = parseFloat(getStringSetting(speedKey, "1")) || 1;
+        var currentRate = currentVideoOverrideRate !== null ? currentVideoOverrideRate : defaultRate;
 
         var existing = document.getElementById("birdy-custom-speed-drawer");
         if (existing) {
@@ -1049,13 +1071,16 @@
         drawer.appendChild(list);
 
         function onSelectRate(rate) {
-            try {
-                localStorage.setItem(STORAGE_PREFIX + speedKey, JSON.stringify(String(rate)));
-            } catch (e) {}
+            currentVideoOverrideRate = rate;
             lastSpeedRate = rate;
-            applyAllTweaks(true);
+            if (player && typeof player.setPlaybackRate === "function") player.setPlaybackRate(rate);
+            var vidEl = typeof document !== "undefined" ? document.querySelector("video") : null;
+            if (vidEl) {
+                vidEl.defaultPlaybackRate = rate;
+                vidEl.playbackRate = rate;
+            }
             updateSettingsMenuSubtitle(rate);
-            youtv.report("speed: applied " + rate + "x from custom drawer");
+            youtv.report("speed: applied " + rate + "x for current video");
 
             closeCustomSpeedDrawer();
 
@@ -1096,9 +1121,7 @@
 
                 item.onfocus = function () {
                     item.classList.add("focused");
-                    if (typeof item.scrollIntoView === "function") {
-                        item.scrollIntoView({ block: "nearest", behavior: "smooth" });
-                    }
+                    try { item.scrollIntoView({ block: "nearest" }); } catch (e) {}
                 };
                 item.onblur = function () {
                     item.classList.remove("focused");
@@ -1125,13 +1148,31 @@
                         if (idx < itemsList.length - 1) {
                             if (ev && ev.preventDefault) ev.preventDefault();
                             if (ev && ev.stopPropagation) ev.stopPropagation();
-                            itemsList[idx + 1].focus();
+                            var nextItem = itemsList[idx + 1];
+                            nextItem.focus();
+                            try {
+                                var top = nextItem.offsetTop;
+                                var h = nextItem.offsetHeight;
+                                var listH = list.clientHeight;
+                                if (top + h > list.scrollTop + listH) {
+                                    list.scrollTop = top + h - listH + 28;
+                                }
+                            } catch (e) {}
+                            try { nextItem.scrollIntoView({ block: "nearest" }); } catch (e2) {}
                         }
                     } else if (code === 38 || code === 19) { // Up
                         if (idx > 0) {
                             if (ev && ev.preventDefault) ev.preventDefault();
                             if (ev && ev.stopPropagation) ev.stopPropagation();
-                            itemsList[idx - 1].focus();
+                            var prevItem = itemsList[idx - 1];
+                            prevItem.focus();
+                            try {
+                                var top2 = prevItem.offsetTop;
+                                if (top2 < list.scrollTop) {
+                                    list.scrollTop = Math.max(0, top2 - 28);
+                                }
+                            } catch (e) {}
+                            try { prevItem.scrollIntoView({ block: "nearest" }); } catch (e2) {}
                         }
                     } else if (code === 13 || code === 23 || code === 66) { // Enter / OK
                         if (ev && ev.preventDefault) ev.preventDefault();
@@ -1173,6 +1214,8 @@
             closeCustomSpeedDrawer();
             return;
         }
+
+        updateSettingsMenuSubtitle();
 
         var player = findPlayer();
         var isShort = isCurrentShort(player);
