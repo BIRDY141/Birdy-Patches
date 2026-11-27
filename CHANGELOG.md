@@ -1,3 +1,9 @@
+## [1.20.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.19.1...v1.20.0) (2026-11-27)
+
+### ✨ New Features
+
+* **pip,speed:** trigger PiP via player button only and unlock speed menu ([387bf81](https://github.com/BIRDY141/Birdy-Patches/commit/387bf81029300f078996fb7dd4db386827b3e15a))
+
 ## [1.19.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.19.0...v1.19.1) (2026-11-27)
 
 ### 🐛 Bug Fixes
