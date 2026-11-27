@@ -128,6 +128,15 @@
         ];
     }
 
+    function languageOptionsList() {
+        return [
+            { id: "auto", text: t("about.language.auto") },
+            { id: "en", text: "English" },
+            { id: "ar", text: "العربية (Arabic)" },
+            { id: "es", text: "Español (Spanish)" }
+        ];
+    }
+
     // ---- Storage helpers ----------------------------------------------------------------------
     function getBool(key, def) {
         try {
@@ -307,7 +316,9 @@
             ".birdy-yt-cat-icon svg { width: 20px; height: 20px; }" +
             ".birdy-yt-cat.active { background: rgba(255, 255, 255, 0.12); color: #ffffff; font-weight: 600; }" +
             ".birdy-yt-cat.birdy-focus { background: #ffffff !important; color: #0f0f0f !important; font-weight: 700 !important; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45); transform: none !important; }" +
-            ".birdy-yt-cat.birdy-focus svg { stroke: #0f0f0f !important; fill: #0f0f0f !important; }" +
+            ".birdy-yt-cat.birdy-focus svg { stroke: #0f0f0f !important; fill: none !important; }" +
+            ".birdy-yt-cat.birdy-focus svg [fill='currentColor'] { fill: #0f0f0f !important; }" +
+            ".birdy-yt-cat.birdy-focus svg polygon { fill: #0f0f0f !important; }" +
             ".birdy-yt-content {" +
             " position: relative; flex: 1; height: 100%; box-sizing: border-box;" +
             " overflow: hidden; padding: 0.25rem 0.5rem 2rem 0; }" +
@@ -336,18 +347,20 @@
             ".birdy-yt-row[data-type='3way'].birdy-focus .birdy-yt-row-summary { color: #bbbbbb !important; }" +
             ".birdy-yt-switch-wrap { display: flex; align-items: center; gap: 0.85rem; flex-shrink: 0; }" +
             ".birdy-yt-switch-state { font-size: 0.94rem; font-weight: 500; color: rgba(255, 255, 255, 0.55); min-width: 64px; text-align: right; }" +
-            ".birdy-yt-switch-state.on { color: #3ea6ff; font-weight: 600; }" +
+            ".birdy-yt-switch-state.on { color: #ffffff; font-weight: 600; }" +
             ".birdy-yt-row.birdy-focus .birdy-yt-switch-state { color: #0f0f0f !important; font-weight: 700; }" +
             ".birdy-yt-switch {" +
             " position: relative; width: 48px; height: 28px; border-radius: 9999px; flex-shrink: 0;" +
-            " background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.22); padding: 0; cursor: pointer; outline: none; }" +
-            ".birdy-yt-switch.on { background: #3ea6ff; border-color: #3ea6ff; }" +
-            ".birdy-yt-row.birdy-focus .birdy-yt-switch { background: #9a9a9a; border-color: #9a9a9a; }" +
-            ".birdy-yt-row.birdy-focus .birdy-yt-switch.on { background: #0f0f0f; border-color: #0f0f0f; }" +
+            " background: rgba(255, 255, 255, 0.16); border: 2px solid rgba(255, 255, 255, 0.35); padding: 0; cursor: pointer; outline: none; transition: background 0.12s, border-color 0.12s; }" +
+            ".birdy-yt-switch.on { background: #ffffff !important; border-color: #ffffff !important; }" +
             ".birdy-yt-switch::after {" +
-            " content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px;" +
-            " border-radius: 50%; background: #f1f1f1; }" +
-            ".birdy-yt-switch.on::after { transform: translateX(20px); background: #ffffff; }" +
+            " content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;" +
+            " border-radius: 50%; background: #ffffff; transition: transform 0.14s ease-out, background 0.14s; }" +
+            ".birdy-yt-switch.on::after { transform: translateX(20px); background: #0f0f0f !important; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-switch { background: rgba(0, 0, 0, 0.12) !important; border-color: rgba(0, 0, 0, 0.35) !important; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-switch::after { background: #0f0f0f !important; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-switch.on { background: #ffffff !important; border: 2px solid #0f0f0f !important; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-switch.on::after { background: #0f0f0f !important; }" +
             ".birdy-yt-pills { display: flex; align-items: center; gap: 0.55rem; flex-shrink: 0; }" +
             ".birdy-yt-pill {" +
             " padding: 0.55rem 1.25rem; border-radius: 9999px; font-size: 0.94rem; font-weight: 600;" +
@@ -848,6 +861,23 @@
                 true
             ));
         } else if (activeTabKey === "about") {
+            appendRow(frag, createDropdownRow(
+                t("about.language.title"),
+                t("about.language.summary"),
+                languageOptionsList(),
+                getString("YOUTV_LANGUAGE", "auto"),
+                function (newLang) {
+                    setString("YOUTV_LANGUAGE", newLang);
+                    if (window.farotvI18n && typeof window.farotvI18n.setLanguage === "function") {
+                        window.farotvI18n.setLanguage(newLang);
+                    }
+                    pendingRestart = true;
+                    addRestartBannerIfNeeded();
+                    renderContent();
+                    updateFocusUI();
+                }
+            ));
+
             var repoRow = document.createElement("div");
             repoRow.className = "birdy-yt-row";
             var ver = window.__farotvVersion ? "v" + window.__farotvVersion : "";
@@ -1413,52 +1443,82 @@
         var tabKey = getString("YOUTV_STARTUP_TAB", "default");
         if (!tabKey || tabKey === "default" || tabKey === "home") return;
 
+        var targetBrowseId = null;
+        var primaryBrowseId = null;
+        var targetTextRegex = null;
+        if (tabKey === "subscriptions") {
+            primaryBrowseId = "FEsubscriptions";
+            targetBrowseId = "FEsubscriptions";
+            targetTextRegex = /Subscriptions|الاشتراكات|Suscripciones/i;
+        } else if (tabKey === "library") {
+            primaryBrowseId = "FEmy_youtube";
+            targetBrowseId = /FEmy_youtube|FElibrary/;
+            targetTextRegex = /Library|المكتبة|Biblioteca/i;
+        } else if (tabKey === "gaming") {
+            primaryBrowseId = "FEtopics_gaming";
+            targetBrowseId = "FEtopics_gaming";
+            targetTextRegex = /Gaming|ألعاب|Videojuegos/i;
+        } else if (tabKey === "music") {
+            primaryBrowseId = "FEtopics_music";
+            targetBrowseId = "FEtopics_music";
+            targetTextRegex = /Music|الموسيقى|Música/i;
+        } else if (tabKey === "news") {
+            primaryBrowseId = "FEtopics_news";
+            targetBrowseId = "FEtopics_news";
+            targetTextRegex = /News|الأخبار|Noticias/i;
+        } else if (tabKey === "sports") {
+            primaryBrowseId = "FEtopics_sports";
+            targetBrowseId = "FEtopics_sports";
+            targetTextRegex = /Sports|الرياضة|Deportes/i;
+        } else if (tabKey === "podcasts") {
+            primaryBrowseId = "FEtopics_podcasts";
+            targetBrowseId = "FEtopics_podcasts";
+            targetTextRegex = /Podcasts|البودكاست/i;
+        } else if (tabKey === "movies") {
+            primaryBrowseId = "FEtopics_movies";
+            targetBrowseId = "FEtopics_movies";
+            targetTextRegex = /Movies|الأفلام|Películas/i;
+        } else if (tabKey === "shorts") {
+            primaryBrowseId = "FEshorts";
+            targetBrowseId = "FEshorts";
+            targetTextRegex = /Shorts/i;
+        }
+        if (!primaryBrowseId) return;
+
+        var applied = false;
         var attempts = 0;
-        var maxAttempts = 35; // poll over ~10 seconds on startup
+        var maxAttempts = 35; // poll over ~12 seconds on startup
         var timer = setInterval(function () {
             attempts++;
-            if (attempts > maxAttempts) {
+            if (attempts > maxAttempts || applied) {
                 clearInterval(timer);
                 return;
             }
 
-            var targetBrowseId = null;
-            var targetTextRegex = null;
-            if (tabKey === "subscriptions") {
-                targetBrowseId = "FEsubscriptions";
-                targetTextRegex = /Subscriptions|الاشتراكات|Suscripciones/i;
-            } else if (tabKey === "library") {
-                targetBrowseId = /FEmy_youtube|FElibrary/;
-                targetTextRegex = /Library|المكتبة|Biblioteca/i;
-            } else if (tabKey === "gaming") {
-                targetBrowseId = "FEtopics_gaming";
-                targetTextRegex = /Gaming|ألعاب|Videojuegos/i;
-            } else if (tabKey === "music") {
-                targetBrowseId = "FEtopics_music";
-                targetTextRegex = /Music|الموسيقى|Música/i;
-            } else if (tabKey === "news") {
-                targetBrowseId = "FEtopics_news";
-                targetTextRegex = /News|الأخبار|Noticias/i;
-            } else if (tabKey === "sports") {
-                targetBrowseId = "FEtopics_sports";
-                targetTextRegex = /Sports|الرياضة|Deportes/i;
-            } else if (tabKey === "podcasts") {
-                targetBrowseId = "FEtopics_podcasts";
-                targetTextRegex = /Podcasts|البودكاست/i;
-            } else if (tabKey === "movies") {
-                targetBrowseId = "FEtopics_movies";
-                targetTextRegex = /Movies|الأفلام|Películas/i;
-            } else if (tabKey === "shorts") {
-                targetBrowseId = "FEshorts";
-                targetTextRegex = /Shorts/i;
+            var curHash = window.location.hash || "";
+            var targetHash = (tabKey === "shorts") ? "#/shorts" : ("#/browse?browseId=" + primaryBrowseId);
+
+            // 1. Try URL hash navigation once initial boot starts
+            if (attempts >= 2 && (!curHash || curHash === "#/" || curHash === "#/browse" || curHash.indexOf("FEwhat_to_watch") !== -1)) {
+                try {
+                    window.location.hash = targetHash;
+                    window.dispatchEvent(new Event("hashchange"));
+                } catch (e) {}
             }
 
-            var entries = document.querySelectorAll("ytlr-guide-entry-renderer, [role='menuitem'], [role='tab'], .ytlr-guide-entry-renderer");
+            // 2. Query any matching DOM entry in the guide or sidebar
+            var entries = document.querySelectorAll("ytlr-guide-entry-renderer, ytlr-compact-guide-entry-renderer, yt-guide-entry-renderer, [role='menuitem'], [role='tab'], a[href*='browseId'], [data-browse-id]");
             for (var i = 0; i < entries.length; i++) {
                 var entry = entries[i];
                 var txt = (entry.textContent || "").trim();
+                var href = entry.getAttribute ? (entry.getAttribute("href") || entry.getAttribute("data-browse-id") || "") : "";
                 var matched = false;
-                if (targetTextRegex && targetTextRegex.test(txt)) matched = true;
+                if (href && (href.indexOf(primaryBrowseId) !== -1 || (tabKey === "shorts" && href.indexOf("shorts") !== -1))) {
+                    matched = true;
+                }
+                if (!matched && targetTextRegex && targetTextRegex.test(txt)) {
+                    matched = true;
+                }
                 if (!matched && entry.__data && entry.__data.navigationEndpoint) {
                     var bId = entry.__data.navigationEndpoint.browseEndpoint && entry.__data.navigationEndpoint.browseEndpoint.browseId;
                     if (bId) {
@@ -1467,8 +1527,9 @@
                     }
                 }
                 if (matched) {
+                    applied = true;
                     clearInterval(timer);
-                    youtv.report("startup: navigated to " + tabKey);
+                    youtv.report("startup: navigated via DOM entry to " + tabKey);
                     try {
                         entry.click();
                     } catch (e) {
@@ -1481,6 +1542,13 @@
                     return;
                 }
             }
-        }, 300);
+
+            // 3. Verify if hash navigation successfully locked onto target
+            if (window.location.hash && window.location.hash.indexOf(primaryBrowseId) !== -1) {
+                applied = true;
+                clearInterval(timer);
+                youtv.report("startup: verified hash route for " + tabKey);
+            }
+        }, 350);
     })();
 })();

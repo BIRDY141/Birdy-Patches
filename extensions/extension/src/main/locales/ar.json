@@ -201,5 +201,8 @@
   "ui_tweaks.startup_tab.sports": "الرياضة",
   "ui_tweaks.startup_tab.podcasts": "البودكاست",
   "ui_tweaks.startup_tab.movies": "الأفلام والعروض",
-  "ui_tweaks.startup_tab.shorts": "مقاطع Shorts"
+  "ui_tweaks.startup_tab.shorts": "مقاطع Shorts",
+  "about.language.title": "اللغة",
+  "about.language.summary": "اختر لغة واجهة التطبيق",
+  "about.language.auto": "تلقائي (لغة النظام)"
 }

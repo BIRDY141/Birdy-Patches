@@ -201,5 +201,8 @@
   "ui_tweaks.startup_tab.sports": "Sports",
   "ui_tweaks.startup_tab.podcasts": "Podcasts",
   "ui_tweaks.startup_tab.movies": "Movies & TV",
-  "ui_tweaks.startup_tab.shorts": "Shorts"
+  "ui_tweaks.startup_tab.shorts": "Shorts",
+  "about.language.title": "Language",
+  "about.language.summary": "Choose the interface display language",
+  "about.language.auto": "Default (System)"
 }
