@@ -96,6 +96,22 @@
         ].concat(CAPTION_LANGS);
     }
 
+    var SPEED_OPTIONS = [
+        { id: "1", text: "1x (Normal)" },
+        { id: "0.25", text: "0.25x" },
+        { id: "0.5", text: "0.5x" },
+        { id: "0.75", text: "0.75x" },
+        { id: "1.25", text: "1.25x" },
+        { id: "1.5", text: "1.5x" },
+        { id: "1.75", text: "1.75x" },
+        { id: "2", text: "2x" },
+        { id: "2.25", text: "2.25x" },
+        { id: "2.5", text: "2.5x" },
+        { id: "3", text: "3x" },
+        { id: "3.5", text: "3.5x" },
+        { id: "4", text: "4x" }
+    ];
+
     // ---- Storage helpers ----------------------------------------------------------------------
     function getBool(key, def) {
         try {
@@ -617,6 +633,27 @@
                 }
             ));
             appendRow(frag, createDropdownRow(
+                t("video.speed.title"),
+                t("video.speed.summary"),
+                SPEED_OPTIONS,
+                getString("YOUTV_VIDEO_SPEED", "1"),
+                function (id) {
+                    setString("YOUTV_VIDEO_SPEED", id);
+                    if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
+                }
+            ));
+            appendRow(frag, createToggleRow(
+                t("video.pip.title"),
+                t("video.pip.summary"),
+                "YOUTV_VIDEO_PIP",
+                true,
+                false,
+                null,
+                function () {
+                    if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
+                }
+            ));
+            appendRow(frag, createDropdownRow(
                 t("captions.default.title"),
                 t("captions.default.summary"),
                 captionOptionsList(),
@@ -664,6 +701,16 @@
                 getString("YOUTV_QUALITY_SHORTS", "auto"),
                 function (id) {
                     setString("YOUTV_QUALITY_SHORTS", id);
+                    if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
+                }
+            ));
+            appendRow(frag, createDropdownRow(
+                t("video.speed.title"),
+                t("video.speed.summary"),
+                SPEED_OPTIONS,
+                getString("YOUTV_SHORTS_SPEED", "1"),
+                function (id) {
+                    setString("YOUTV_SHORTS_SPEED", id);
                     if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
                 }
             ));

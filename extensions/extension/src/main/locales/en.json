@@ -181,5 +181,9 @@
   "shorts.original_title.title": "Force original Shorts titles",
   "shorts.original_title.summary": "Prevent YouTube from auto-translating Shorts titles",
   "video.original_audio.title": "Force original audio",
-  "video.original_audio.summary": "Keep the creator's original audio track and prevent auto-dubbing"
+  "video.original_audio.summary": "Keep the creator's original audio track and prevent auto-dubbing",
+  "video.speed.title": "Playback speed",
+  "video.speed.summary": "Force playback speed (0.25x to 4x)",
+  "video.pip.title": "Picture-in-Picture (PiP)",
+  "video.pip.summary": "Enter Picture-in-Picture when pressing Home during playback"
 }

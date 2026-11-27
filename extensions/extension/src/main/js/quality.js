@@ -15,6 +15,11 @@
     var SHORTS_ORIG_TITLE_KEY = "YOUTV_SHORTS_ORIGINAL_TITLE";
     var VIDEO_ORIG_AUDIO_KEY = "YOUTV_VIDEO_ORIGINAL_AUDIO";
     var SHORTS_ORIG_AUDIO_KEY = "YOUTV_SHORTS_ORIGINAL_AUDIO";
+    var VIDEO_SPEED_KEY = "YOUTV_VIDEO_SPEED";
+    var SHORTS_SPEED_KEY = "YOUTV_SHORTS_SPEED";
+    var VIDEO_PIP_KEY = "YOUTV_VIDEO_PIP";
+
+    var SPEED_RATES = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 3, 3.5, 4];
 
     var QUALITY_ORDER = ["highres", "hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny"];
 
@@ -377,6 +382,15 @@
                 applyOriginalAudioToResponse(response);
             }
 
+            // 1b. Unlock playback speed in playerConfig if restricted
+            if (response.playerConfig) {
+                if (!response.playerConfig.playbackSpeedConfig) {
+                    response.playerConfig.playbackSpeedConfig = {};
+                }
+                response.playerConfig.playbackSpeedConfig.enabled = true;
+                response.playerConfig.playbackSpeedConfig.availableRates = SPEED_RATES.slice();
+            }
+
             // 2. Captions & More Auto-Translate in /player
             var captionLang = getStringSetting(isShortResp ? SHORTS_CAPTION_KEY : VIDEO_CAPTION_KEY, "auto");
             var moreTrans = getBoolSetting(isShortResp ? SHORTS_MORE_TRANS_KEY : VIDEO_MORE_TRANS_KEY, false);
@@ -640,13 +654,88 @@
         } catch (e) {}
     }
 
+    function unlockSpeedOnEnvironment(player) {
+        try {
+            if (window.ytcfg && typeof window.ytcfg.get === "function") {
+                var flags = window.ytcfg.get("EXPERIMENT_FLAGS");
+                if (flags && typeof flags === "object") {
+                    flags.html5_disable_playback_rate_on_tv = false;
+                    flags.web_player_disable_playback_speed = false;
+                    flags.tv_enable_playback_rate = true;
+                    flags.enable_playback_rate_on_tv = true;
+                }
+            }
+        } catch (e) {}
+        if (player && !player._birdySpeedPatched && typeof player.getAvailablePlaybackRates === "function") {
+            player._birdySpeedPatched = true;
+            try {
+                var origGetRates = player.getAvailablePlaybackRates;
+                player.getAvailablePlaybackRates = function () {
+                    var res = origGetRates.apply(this, arguments);
+                    if (!Array.isArray(res) || res.length <= 1) return SPEED_RATES.slice();
+                    return SPEED_RATES.slice();
+                };
+            } catch (e) {}
+        }
+    }
+
+    var lastSpeedVid = null;
+    var lastSpeedRate = 1;
+
+    function enforceSpeed(player, isShort, vid, forceNow) {
+        unlockSpeedOnEnvironment(player);
+        var raw = getStringSetting(isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY, "1");
+        var rate = parseFloat(raw);
+        if (!isFinite(rate) || rate <= 0) rate = 1;
+
+        var video = typeof document !== "undefined" ? document.querySelector("video") : null;
+        if (rate === 1 && !forceNow && lastSpeedRate === 1) return;
+
+        try {
+            if (player && typeof player.setPlaybackRate === "function") {
+                var curPlayerRate = typeof player.getPlaybackRate === "function" ? player.getPlaybackRate() : 1;
+                if (forceNow || Math.abs(curPlayerRate - rate) > 0.01) {
+                    player.setPlaybackRate(rate);
+                }
+            }
+            if (video && (forceNow || Math.abs(video.playbackRate - rate) > 0.01)) {
+                video.defaultPlaybackRate = rate;
+                video.playbackRate = rate;
+            }
+            if (lastSpeedVid !== vid || Math.abs(lastSpeedRate - rate) > 0.01) {
+                if (rate !== 1) youtv.report("speed: set " + (isShort ? "shorts" : "video") + " to " + rate + "x");
+                lastSpeedVid = vid;
+                lastSpeedRate = rate;
+            }
+        } catch (e) {}
+    }
+
+    var lastPipEnabled = null;
+    var lastPlayingState = null;
+
+    function syncPipState() {
+        var pipOn = getBoolSetting(VIDEO_PIP_KEY, true);
+        if (pipOn !== lastPipEnabled) {
+            lastPipEnabled = pipOn;
+            youtv.report("@pip " + (pipOn ? "1" : "0"));
+        }
+        var video = typeof document !== "undefined" ? document.querySelector("video") : null;
+        var playing = !!(video && !video.paused && !video.ended && video.readyState >= 2);
+        if (playing !== lastPlayingState) {
+            lastPlayingState = playing;
+            youtv.report("@playing " + (playing ? "1" : "0"));
+        }
+    }
+
     function applyAllTweaks(forceNow) {
         if (typeof document === "undefined") return;
+        syncPipState();
         var player = findPlayer();
         if (!player) return;
         var isShort = isCurrentShort(player);
         var vid = getVideoId(player);
         enforceQuality(player, isShort, vid, forceNow);
+        enforceSpeed(player, isShort, vid, forceNow);
         enforceCaptions(player, isShort, vid, forceNow);
         enforceOriginalAudio(player, isShort, vid, forceNow);
     }
@@ -660,6 +749,10 @@
             video.addEventListener("loadedmetadata", onEvt);
             video.addEventListener("playing", onEvt);
             video.addEventListener("durationchange", onEvt);
+            video.addEventListener("ratechange", onEvt);
+            video.addEventListener("play", syncPipState);
+            video.addEventListener("pause", syncPipState);
+            video.addEventListener("ended", syncPipState);
         }
         var player = findPlayer();
         if (player && !player._birdyQualityBound && typeof player.addEventListener === "function") {
