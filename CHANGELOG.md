@@ -1,3 +1,9 @@
+## [1.21.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.20.1...v1.21.0) (2026-11-27)
+
+### ✨ New Features
+
+* **speed,branding:** populate custom speeds in YouTube speed menu and fix obfuscated icon/banner branding ([faf27cd](https://github.com/BIRDY141/Birdy-Patches/commit/faf27cd56368e875a7fa870440da0261442b318b))
+
 ## [1.20.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.20.0...v1.20.1) (2026-11-27)
 
 ### 🐛 Bug Fixes
