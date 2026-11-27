@@ -222,11 +222,17 @@
 
         if (chosenIdx >= 0 && Array.isArray(cap.audioTracks)) {
             for (var a = 0; a < cap.audioTracks.length; a++) {
-                if (cap.audioTracks[a]) {
-                    cap.audioTracks[a].defaultCaptionTrackIndex = chosenIdx;
-                    cap.audioTracks[a].captionsInitialState = "CAPTIONS_INITIAL_STATE_ON_RECOMMENDED";
+                var at = cap.audioTracks[a];
+                if (at) {
+                    if (Array.isArray(at.captionTrackIndices) && at.captionTrackIndices.indexOf(chosenIdx) === -1) {
+                        at.captionTrackIndices.push(chosenIdx);
+                    }
+                    at.defaultCaptionTrackIndex = chosenIdx;
+                    at.captionsInitialState = "CAPTIONS_INITIAL_STATE_ON_REQUIRED";
+                    at.visibility = "ON";
                 }
             }
+            youtv.report("captions: response forced lang=" + captionLang + " idx=" + chosenIdx);
         }
     }
 
@@ -547,8 +553,12 @@
 
         try {
             if (typeof player.loadModule === "function") player.loadModule("captions");
-            if (typeof player.getOption !== "function" || typeof player.setOption !== "function") return;
-            var tracklist = player.getOption("captions", "tracklist");
+            var tracklist = (typeof player.getOption === "function") ? player.getOption("captions", "tracklist") : null;
+            if (!Array.isArray(tracklist) || !tracklist.length) {
+                var pr = (typeof player.getPlayerResponse === "function") ? player.getPlayerResponse() : null;
+                var cap = pr && pr.captions && pr.captions.playerCaptionsTracklistRenderer;
+                if (cap && Array.isArray(cap.captionTracks)) tracklist = cap.captionTracks;
+            }
             if (!Array.isArray(tracklist) || !tracklist.length) return;
 
             var chosen = null;
@@ -582,7 +592,16 @@
             }
 
             if (chosen) {
-                player.setOption("captions", "track", chosen);
+                if (typeof player.toggleSubtitlesOn === "function") {
+                    try { player.toggleSubtitlesOn(); } catch (e) {}
+                }
+                if (typeof player.setOption === "function") {
+                    player.setOption("captions", "track", {
+                        languageCode: chosen.languageCode,
+                        vssId: chosen.vssId,
+                        translationLanguage: chosen.translationLanguage
+                    });
+                }
                 lastCaptionVid = vid;
                 lastCaptionLang = desiredLang;
                 youtv.report("captions: set " + (isShort ? "shorts" : "video") + " to " + desiredLang);
