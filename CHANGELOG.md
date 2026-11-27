@@ -1,3 +1,9 @@
+## [1.25.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.24.0...v1.25.0) (2026-11-27)
+
+### ✨ New Features
+
+* **branding,settings:** fix red launcher banner, white toggles, language dropdown in about, sidebar icon fill, and startup tab ([64873bc](https://github.com/BIRDY141/Birdy-Patches/commit/64873bc2ed6234b676ae6f44dcb66253169899f1))
+
 ## [1.24.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.23.2...v1.24.0) (2026-11-27)
 
 ### ✨ New Features
