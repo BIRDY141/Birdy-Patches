@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-27T17:27:17",
-  "description": "## [1.22.5](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.4...v1.22.5) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **speed,branding:** instant 1-to-1 native speed menu and centered red launcher banner ([df28ab1](https://github.com/BIRDY141/Birdy-Patches/commit/df28ab1a7dd278956b4c18aceeaab6f245ffdfd3))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.5/patches-1.22.5.mpp",
+  "created_at": "2026-11-27T17:37:16",
+  "description": "## [1.22.6](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.5...v1.22.6) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **speed:** avoid TrustedHTML violation when rebuilding speed menu container ([6ab2c26](https://github.com/BIRDY141/Birdy-Patches/commit/6ab2c26dc02ad1b04b6ed86f98c9cf16800e1371))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.6/patches-1.22.6.mpp",
   "signature_download_url": "",
-  "version": "1.22.5"
+  "version": "1.22.6"
 }

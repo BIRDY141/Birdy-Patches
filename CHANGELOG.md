@@ -1,3 +1,9 @@
+## [1.22.6](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.5...v1.22.6) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **speed:** avoid TrustedHTML violation when rebuilding speed menu container ([6ab2c26](https://github.com/BIRDY141/Birdy-Patches/commit/6ab2c26dc02ad1b04b6ed86f98c9cf16800e1371))
+
 ## [1.22.5](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.4...v1.22.5) (2026-11-27)
 
 ### 🐛 Bug Fixes
