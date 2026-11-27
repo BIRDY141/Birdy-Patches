@@ -1,3 +1,9 @@
+## [1.22.11](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.10...v1.22.11) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **speed:** complete 1-to-1 re-implementation from scratch for native speed menu ([9a51542](https://github.com/BIRDY141/Birdy-Patches/commit/9a515421d1058c6fbda8dabf80089d735df4750f))
+
 ## [1.22.10](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.9...v1.22.10) (2026-11-27)
 
 ### 🐛 Bug Fixes
