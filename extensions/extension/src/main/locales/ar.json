@@ -168,5 +168,17 @@
   "quality.large": "480p",
   "quality.medium": "360p",
   "quality.small": "240p",
-  "quality.tiny": "144p"
+  "quality.tiny": "144p",
+  "captions.lang.auto": "افتراضي YouTube",
+  "captions.lang.video": "لغة الفيديو (الأصلية)",
+  "captions.default.title": "لغة الترجمة الافتراضية",
+  "captions.default.summary": "تحديد لغة الترجمة تلقائياً أو فرض الترجمة التلقائية لهذه اللغة",
+  "captions.more_translate.title": "إظهار المزيد من لغات الترجمة التلقائية",
+  "captions.more_translate.summary": "عرض جميع لغات الترجمة التلقائية المدعومة في قائمة الترجمة",
+  "video.original_title.title": "فرض عناوين الفيديو الأصلية",
+  "video.original_title.summary": "منع YouTube من ترجمة عناوين الفيديوهات تلقائياً",
+  "shorts.original_title.title": "فرض عناوين Shorts الأصلية",
+  "shorts.original_title.summary": "منع YouTube من ترجمة عناوين Shorts تلقائياً",
+  "video.original_audio.title": "فرض الصوت الأصلي",
+  "video.original_audio.summary": "الاحتفاظ بالمسار الصوتي الأصلي ومنع الدبلجة التلقائية"
 }

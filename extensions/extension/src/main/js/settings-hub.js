@@ -60,6 +60,41 @@
         });
     }
 
+    var CAPTION_LANGS = [
+        { id: "en", text: "English" },
+        { id: "ar", text: "Arabic (العربية)" },
+        { id: "es", text: "Spanish (Español)" },
+        { id: "fr", text: "French (Français)" },
+        { id: "de", text: "German (Deutsch)" },
+        { id: "it", text: "Italian (Italiano)" },
+        { id: "pt", text: "Portuguese (Português)" },
+        { id: "ru", text: "Russian (Русский)" },
+        { id: "ja", text: "Japanese (日本語)" },
+        { id: "ko", text: "Korean (한국어)" },
+        { id: "zh-Hans", text: "Chinese Simplified (简体中文)" },
+        { id: "zh-Hant", text: "Chinese Traditional (繁體中文)" },
+        { id: "hi", text: "Hindi (हिन्दी)" },
+        { id: "tr", text: "Turkish (Türkçe)" },
+        { id: "nl", text: "Dutch (Nederlands)" },
+        { id: "pl", text: "Polish (Polski)" },
+        { id: "sv", text: "Swedish (Svenska)" },
+        { id: "id", text: "Indonesian (Bahasa Indonesia)" },
+        { id: "vi", text: "Vietnamese (Tiếng Việt)" },
+        { id: "th", text: "Thai (ไทย)" },
+        { id: "uk", text: "Ukrainian (Українська)" },
+        { id: "he", text: "Hebrew (עברית)" },
+        { id: "fa", text: "Persian (فارسی)" },
+        { id: "ur", text: "Urdu (اردو)" },
+        { id: "bn", text: "Bengali (বাংলা)" }
+    ];
+
+    function captionOptionsList() {
+        return [
+            { id: "auto", text: t("captions.lang.auto") },
+            { id: "video", text: t("captions.lang.video") }
+        ].concat(CAPTION_LANGS);
+    }
+
     // ---- Storage helpers ----------------------------------------------------------------------
     function getBool(key, def) {
         try {
@@ -580,6 +615,39 @@
                     if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
                 }
             ));
+            appendRow(frag, createDropdownRow(
+                t("captions.default.title"),
+                t("captions.default.summary"),
+                captionOptionsList(),
+                getString("YOUTV_VIDEO_CAPTION_LANG", "auto"),
+                function (id) {
+                    setString("YOUTV_VIDEO_CAPTION_LANG", id);
+                    if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
+                }
+            ));
+            appendRow(frag, createToggleRow(
+                t("captions.more_translate.title"),
+                t("captions.more_translate.summary"),
+                "YOUTV_VIDEO_MORE_AUTO_TRANSLATE",
+                false
+            ));
+            appendRow(frag, createToggleRow(
+                t("video.original_title.title"),
+                t("video.original_title.summary"),
+                "YOUTV_VIDEO_ORIGINAL_TITLE",
+                false
+            ));
+            appendRow(frag, createToggleRow(
+                t("video.original_audio.title"),
+                t("video.original_audio.summary"),
+                "YOUTV_VIDEO_ORIGINAL_AUDIO",
+                false,
+                false,
+                null,
+                function () {
+                    if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
+                }
+            ));
         } else if (activeTabKey === "shorts") {
             appendRow(frag, createToggleRow(
                 t("feature.shorts.name"),
@@ -595,6 +663,39 @@
                 getString("YOUTV_QUALITY_SHORTS", "auto"),
                 function (id) {
                     setString("YOUTV_QUALITY_SHORTS", id);
+                    if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
+                }
+            ));
+            appendRow(frag, createDropdownRow(
+                t("captions.default.title"),
+                t("captions.default.summary"),
+                captionOptionsList(),
+                getString("YOUTV_SHORTS_CAPTION_LANG", "auto"),
+                function (id) {
+                    setString("YOUTV_SHORTS_CAPTION_LANG", id);
+                    if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
+                }
+            ));
+            appendRow(frag, createToggleRow(
+                t("captions.more_translate.title"),
+                t("captions.more_translate.summary"),
+                "YOUTV_SHORTS_MORE_AUTO_TRANSLATE",
+                false
+            ));
+            appendRow(frag, createToggleRow(
+                t("shorts.original_title.title"),
+                t("shorts.original_title.summary"),
+                "YOUTV_SHORTS_ORIGINAL_TITLE",
+                false
+            ));
+            appendRow(frag, createToggleRow(
+                t("video.original_audio.title"),
+                t("video.original_audio.summary"),
+                "YOUTV_SHORTS_ORIGINAL_AUDIO",
+                false,
+                false,
+                null,
+                function () {
                     if (typeof window.birdyApplyQuality === "function") window.birdyApplyQuality();
                 }
             ));
@@ -766,7 +867,7 @@
         );
     }
 
-    function createToggleRow(titleText, summaryText, storageKey, defaultVal, needsRestart, dotColor) {
+    function createToggleRow(titleText, summaryText, storageKey, defaultVal, needsRestart, dotColor, onChange) {
         var isEnabled = getBool(storageKey, defaultVal);
         var row = document.createElement("div");
         row.className = "birdy-yt-row";
@@ -819,6 +920,7 @@
                 pendingRestart = true;
                 addRestartBannerIfNeeded();
             }
+            if (typeof onChange === "function") onChange(isEnabled);
         }
 
         row.onclick = function () {

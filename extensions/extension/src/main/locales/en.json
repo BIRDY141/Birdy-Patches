@@ -168,5 +168,17 @@
   "quality.large": "480p",
   "quality.medium": "360p",
   "quality.small": "240p",
-  "quality.tiny": "144p"
+  "quality.tiny": "144p",
+  "captions.lang.auto": "YouTube Default",
+  "captions.lang.video": "Video language (Original)",
+  "captions.default.title": "Default caption language",
+  "captions.default.summary": "Automatically select or force auto-translate captions to this language",
+  "captions.more_translate.title": "Force more auto-translate languages",
+  "captions.more_translate.summary": "Expose all supported auto-translate languages in the caption menu",
+  "video.original_title.title": "Force original video titles",
+  "video.original_title.summary": "Prevent YouTube from auto-translating video titles",
+  "shorts.original_title.title": "Force original Shorts titles",
+  "shorts.original_title.summary": "Prevent YouTube from auto-translating Shorts titles",
+  "video.original_audio.title": "Force original audio",
+  "video.original_audio.summary": "Keep the creator's original audio track and prevent auto-dubbing"
 }
