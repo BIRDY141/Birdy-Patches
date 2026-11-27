@@ -785,7 +785,8 @@
             var st = document.createElement("style");
             st.id = "birdy-speed-styles";
             st.appendChild(document.createTextNode(
-                ".birdy-speed-row { outline: none !important; cursor: pointer; }\n" +
+                ".birdy-speed-container { height: auto !important; max-height: 72vh !important; overflow-y: auto !important; overflow-x: hidden !important; display: flex !important; flex-direction: column !important; }\n" +
+                ".birdy-speed-row { outline: none !important; cursor: pointer; flex-shrink: 0 !important; min-height: 48px !important; display: flex !important; align-items: center !important; }\n" +
                 ".birdy-speed-row:focus, .birdy-speed-row[focused], .birdy-speed-row.focused { background: #ffffff !important; color: #0f0f0f !important; }\n" +
                 ".birdy-speed-row:focus *, .birdy-speed-row[focused] *, .birdy-speed-row.focused * { color: #0f0f0f !important; fill: #0f0f0f !important; }\n"
             ));
@@ -898,12 +899,17 @@
 
         // Enable smooth scrolling on container and its parent
         try {
-            container.style.maxHeight = "72vh";
-            container.style.overflowY = "auto";
-            container.style.overflowX = "hidden";
+            container.classList.add("birdy-speed-container");
+            container.style.setProperty("height", "auto", "important");
+            container.style.setProperty("max-height", "72vh", "important");
+            container.style.setProperty("overflow-y", "auto", "important");
+            container.style.setProperty("overflow-x", "hidden", "important");
+            container.style.setProperty("display", "flex", "important");
+            container.style.setProperty("flex-direction", "column", "important");
             if (container.parentElement) {
-                container.parentElement.style.maxHeight = "85vh";
-                container.parentElement.style.overflowY = "auto";
+                container.parentElement.style.setProperty("height", "auto", "important");
+                container.parentElement.style.setProperty("max-height", "85vh", "important");
+                container.parentElement.style.setProperty("overflow", "visible", "important");
             }
         } catch (e) {}
 
@@ -929,11 +935,11 @@
         }
         if (normalLabelEl) normalLabelEl.textContent = "Normal (1x)";
 
-        var normalCheck = row.querySelector("svg, ytlr-icon, [class*='check'], [class*='icon']");
+        var normalCheck = row.querySelectorAll("svg, yt-icon, ytlr-icon, c-icon, [class*='check'], [class*='icon'], [role='img']");
         var isNormalSel = Math.abs(currentRate - 1) < 0.01;
-        if (normalCheck) {
-            normalCheck.style.visibility = isNormalSel ? "visible" : "hidden";
-            normalCheck.style.display = isNormalSel ? "" : "none";
+        for (var nci = 0; nci < normalCheck.length; nci++) {
+            normalCheck[nci].style.setProperty("visibility", isNormalSel ? "visible" : "hidden", "important");
+            normalCheck[nci].style.setProperty("display", isNormalSel ? "" : "none", "important");
         }
 
         // Clean template row for cloning
@@ -957,10 +963,10 @@
             for (var k = 0; k < allRows.length; k++) {
                 var rVal = parseFloat(allRows[k].getAttribute("data-birdy-rate"));
                 var isSel = Math.abs(rVal - rateVal) < 0.01;
-                var chks = allRows[k].querySelectorAll("svg, ytlr-icon, [class*='check'], [class*='icon']");
+                var chks = allRows[k].querySelectorAll("svg, yt-icon, ytlr-icon, c-icon, [class*='check'], [class*='icon'], [role='img']");
                 for (var ci = 0; ci < chks.length; ci++) {
-                    chks[ci].style.visibility = isSel ? "visible" : "hidden";
-                    chks[ci].style.display = isSel ? "" : "none";
+                    chks[ci].style.setProperty("visibility", isSel ? "visible" : "hidden", "important");
+                    chks[ci].style.setProperty("display", isSel ? "" : "none", "important");
                 }
             }
 
@@ -1008,10 +1014,10 @@
             if (!textUpdated) item.textContent = label;
 
             var isSelected = Math.abs(rateVal - currentRate) < 0.01;
-            var chkCandidates = item.querySelectorAll("svg, ytlr-icon, [class*='check'], [class*='icon']");
+            var chkCandidates = item.querySelectorAll("svg, yt-icon, ytlr-icon, c-icon, [class*='check'], [class*='icon'], [role='img']");
             for (var ci = 0; ci < chkCandidates.length; ci++) {
-                chkCandidates[ci].style.visibility = isSelected ? "visible" : "hidden";
-                chkCandidates[ci].style.display = isSelected ? "" : "none";
+                chkCandidates[ci].style.setProperty("visibility", isSelected ? "visible" : "hidden", "important");
+                chkCandidates[ci].style.setProperty("display", isSelected ? "" : "none", "important");
             }
 
             item.onclick = function (ev) {
