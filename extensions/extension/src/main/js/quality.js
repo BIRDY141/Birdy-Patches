@@ -886,26 +886,57 @@
 
         var container = ctx.container;
         var row = ctx.normalRow;
+        var normalEl = ctx.normalEl;
 
         // Already populated
-        if (container.getAttribute("data-birdy-speed-injected") === "1" && container.children.length >= SPEED_RATES.length) {
+        if (container.getAttribute("data-birdy-speed-injected") === "1" && container.querySelectorAll(".birdy-speed-row").length >= SPEED_RATES.length - 1) {
             return;
         }
         container.setAttribute("data-birdy-speed-injected", "1");
 
         ensureSpeedStyles();
 
-        // Enable smooth TV scrolling for all speed options
+        // Enable smooth scrolling on container and its parent
         try {
-            container.style.maxHeight = "75vh";
+            container.style.maxHeight = "72vh";
             container.style.overflowY = "auto";
             container.style.overflowX = "hidden";
+            if (container.parentElement) {
+                container.parentElement.style.maxHeight = "85vh";
+                container.parentElement.style.overflowY = "auto";
+            }
         } catch (e) {}
 
         var speedKey = isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY;
         var currentRate = parseFloat(getStringSetting(speedKey, "1")) || 1;
 
-        // Clean template row
+        // Format the native Normal row as the 1x anchor
+        row.setAttribute("data-birdy-rate", "1");
+        row.setAttribute("tabindex", "0");
+        row.tabIndex = 0;
+        row.classList.add("birdy-speed-row");
+
+        var normalLabelEl = null;
+        var rowSub = row.getElementsByTagName("*");
+        for (var nsi = 0; nsi < rowSub.length; nsi++) {
+            var nse = rowSub[nsi];
+            var ntag = (nse.tagName || "").toLowerCase();
+            if (ntag === "svg" || ntag === "path" || ntag === "g" || ntag === "use") continue;
+            if (nse.children.length === 0 && (nse.textContent || "").trim().length > 0) {
+                normalLabelEl = nse;
+                break;
+            }
+        }
+        if (normalLabelEl) normalLabelEl.textContent = "Normal (1x)";
+
+        var normalCheck = row.querySelector("svg, ytlr-icon, [class*='check'], [class*='icon']");
+        var isNormalSel = Math.abs(currentRate - 1) < 0.01;
+        if (normalCheck) {
+            normalCheck.style.visibility = isNormalSel ? "visible" : "hidden";
+            normalCheck.style.display = isNormalSel ? "" : "none";
+        }
+
+        // Clean template row for cloning
         var template = row.cloneNode(true);
         template.removeAttribute("focused");
         template.removeAttribute("aria-checked");
@@ -922,87 +953,146 @@
             applyAllTweaks(true);
             youtv.report("speed: applied " + rateVal + "x from native menu");
 
-            // Update checkmarks in container
-            var rows = container.querySelectorAll(".birdy-speed-row");
-            for (var k = 0; k < rows.length; k++) {
-                var rVal = parseFloat(rows[k].getAttribute("data-birdy-rate"));
+            var allRows = container.querySelectorAll(".birdy-speed-row");
+            for (var k = 0; k < allRows.length; k++) {
+                var rVal = parseFloat(allRows[k].getAttribute("data-birdy-rate"));
                 var isSel = Math.abs(rVal - rateVal) < 0.01;
-                var chks = rows[k].querySelectorAll("svg, ytlr-icon, [class*='check'], [class*='icon']");
+                var chks = allRows[k].querySelectorAll("svg, ytlr-icon, [class*='check'], [class*='icon']");
                 for (var ci = 0; ci < chks.length; ci++) {
                     chks[ci].style.visibility = isSel ? "visible" : "hidden";
                     chks[ci].style.display = isSel ? "" : "none";
                 }
             }
 
-            // Dismiss menu smoothly
             setTimeout(function () {
                 var escEvt = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, keyCode: 27, which: 27, key: "Escape" });
                 document.dispatchEvent(escEvt);
             }, 80);
         }
 
-        // Remove old children in container and rebuild in exact numerical order
-        while (container.firstChild) {
-            container.removeChild(container.firstChild);
+        // Attach click/key to normal row
+        row.onclick = function (ev) {
+            if (ev && ev.stopPropagation) ev.stopPropagation();
+            applyRate(1);
+        };
+
+        // Remove any old clones before re-inserting
+        var oldClones = container.querySelectorAll(".birdy-speed-clone");
+        for (var oc = 0; oc < oldClones.length; oc++) {
+            if (oldClones[oc].parentNode) oldClones[oc].parentNode.removeChild(oldClones[oc]);
         }
-        var activeFocusRow = null;
 
-        for (var r = 0; r < SPEED_RATES.length; r++) {
-            (function (rateVal) {
-                var item = template.cloneNode(true);
-                item.className = (template.className || "") + " birdy-speed-row";
-                item.setAttribute("data-birdy-rate", String(rateVal));
-                item.tabIndex = 0;
+        // Build list of all items (clones before Normal, Normal, clones after Normal)
+        var allItems = [];
 
-                var label = rateVal === 1 ? "Normal (1x)" : (rateVal + "x");
-                var subEls = item.getElementsByTagName("*");
-                var textUpdated = false;
-                for (var si = 0; si < subEls.length; si++) {
-                    var se = subEls[si];
-                    var tag = (se.tagName || "").toLowerCase();
-                    if (tag === "svg" || tag === "path" || tag === "g" || tag === "use") continue;
-                    if (se.children.length === 0 && (se.textContent || "").trim().length > 0) {
-                        se.textContent = label;
-                        textUpdated = true;
-                        break;
-                    }
+        function createItem(rateVal) {
+            var item = template.cloneNode(true);
+            item.className = (template.className || "") + " birdy-speed-row birdy-speed-clone";
+            item.setAttribute("data-birdy-rate", String(rateVal));
+            item.setAttribute("tabindex", "0");
+            item.tabIndex = 0;
+
+            var label = rateVal + "x";
+            var subEls = item.getElementsByTagName("*");
+            var textUpdated = false;
+            for (var si = 0; si < subEls.length; si++) {
+                var se = subEls[si];
+                var tag = (se.tagName || "").toLowerCase();
+                if (tag === "svg" || tag === "path" || tag === "g" || tag === "use") continue;
+                if (se.children.length === 0 && (se.textContent || "").trim().length > 0) {
+                    se.textContent = label;
+                    textUpdated = true;
+                    break;
                 }
-                if (!textUpdated) item.textContent = label;
+            }
+            if (!textUpdated) item.textContent = label;
 
-                var isSelected = Math.abs(rateVal - currentRate) < 0.01;
-                var chkCandidates = item.querySelectorAll("svg, ytlr-icon, [class*='check'], [class*='icon']");
-                for (var ci = 0; ci < chkCandidates.length; ci++) {
-                    chkCandidates[ci].style.visibility = isSelected ? "visible" : "hidden";
-                    chkCandidates[ci].style.display = isSelected ? "" : "none";
-                }
+            var isSelected = Math.abs(rateVal - currentRate) < 0.01;
+            var chkCandidates = item.querySelectorAll("svg, ytlr-icon, [class*='check'], [class*='icon']");
+            for (var ci = 0; ci < chkCandidates.length; ci++) {
+                chkCandidates[ci].style.visibility = isSelected ? "visible" : "hidden";
+                chkCandidates[ci].style.display = isSelected ? "" : "none";
+            }
 
-                item.onclick = function (ev) {
-                    if (ev && ev.stopPropagation) ev.stopPropagation();
-                    applyRate(rateVal);
-                };
-                item.onkeydown = function (ev) {
+            item.onclick = function (ev) {
+                if (ev && ev.stopPropagation) ev.stopPropagation();
+                applyRate(rateVal);
+            };
+
+            return item;
+        }
+
+        // Insert lower rates (0.25, 0.5, 0.75) BEFORE the Normal row
+        for (var lo = 0; lo < SPEED_RATES.length; lo++) {
+            var rLo = SPEED_RATES[lo];
+            if (rLo >= 1) break;
+            var cloneLo = createItem(rLo);
+            row.parentNode.insertBefore(cloneLo, row);
+            allItems.push(cloneLo);
+        }
+
+        allItems.push(row);
+
+        // Insert higher rates (1.25, 1.5, ... 4) AFTER the Normal row
+        var insertAnchor = row;
+        for (var hi = 0; hi < SPEED_RATES.length; hi++) {
+            var rHi = SPEED_RATES[hi];
+            if (rHi <= 1) continue;
+            var cloneHi = createItem(rHi);
+            row.parentNode.insertBefore(cloneHi, insertAnchor.nextSibling);
+            insertAnchor = cloneHi;
+            allItems.push(cloneHi);
+        }
+
+        // Wire up keyboard D-pad navigation for smooth 1-to-1 TV list navigation
+        for (var b = 0; b < allItems.length; b++) {
+            (function (idx) {
+                var currentEl = allItems[idx];
+                currentEl.onkeydown = function (ev) {
                     var code = ev.keyCode || ev.which;
-                    if (code === 13 || code === 23) {
+                    if (code === 13 || code === 23) { // Enter / OK
                         if (ev && ev.stopPropagation) ev.stopPropagation();
-                        applyRate(rateVal);
+                        var rV = parseFloat(currentEl.getAttribute("data-birdy-rate"));
+                        applyRate(rV);
+                    } else if (code === 40 || code === 20) { // Down
+                        if (idx < allItems.length - 1) {
+                            if (ev && ev.preventDefault) ev.preventDefault();
+                            if (ev && ev.stopPropagation) ev.stopPropagation();
+                            allItems[idx + 1].focus();
+                            if (typeof allItems[idx + 1].scrollIntoView === "function") {
+                                allItems[idx + 1].scrollIntoView({ block: "nearest", behavior: "smooth" });
+                            }
+                        }
+                    } else if (code === 38 || code === 19) { // Up
+                        if (idx > 0) {
+                            if (ev && ev.preventDefault) ev.preventDefault();
+                            if (ev && ev.stopPropagation) ev.stopPropagation();
+                            allItems[idx - 1].focus();
+                            if (typeof allItems[idx - 1].scrollIntoView === "function") {
+                                allItems[idx - 1].scrollIntoView({ block: "nearest", behavior: "smooth" });
+                            }
+                        }
                     }
                 };
-                item.onfocus = function () {
-                    if (typeof item.scrollIntoView === "function") {
-                        item.scrollIntoView({ block: "nearest", behavior: "smooth" });
+                currentEl.onfocus = function () {
+                    if (typeof currentEl.scrollIntoView === "function") {
+                        currentEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
                     }
                 };
-
-                if (isSelected) {
-                    activeFocusRow = item;
-                }
-
-                container.appendChild(item);
-            })(SPEED_RATES[r]);
+            })(b);
         }
 
-        if (activeFocusRow && typeof activeFocusRow.focus === "function") {
-            try { activeFocusRow.focus(); } catch (e) {}
+        // Focus current active rate item
+        var activeItem = null;
+        for (var a = 0; a < allItems.length; a++) {
+            var rateCheck = parseFloat(allItems[a].getAttribute("data-birdy-rate"));
+            if (Math.abs(rateCheck - currentRate) < 0.01) {
+                activeItem = allItems[a];
+                break;
+            }
+        }
+        if (activeItem && typeof activeItem.focus === "function") {
+            try { activeItem.focus(); } catch (e) {}
         }
 
         youtv.report("speed: native container populated with " + SPEED_RATES.length + " rates");
