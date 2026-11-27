@@ -50,7 +50,7 @@ val pipPatch = bytecodePatch(
     execute {
         CobaltActivityOnCreateFingerprint.method.addInstruction(
             0,
-            "invoke-static { p0 }, $PIP_HELPER->setActivity(Landroid/app/Activity;)V",
+            "invoke-static/range { p0 .. p0 }, $PIP_HELPER->setActivity(Landroid/app/Activity;)V",
         )
 
         val cobaltClass = CobaltActivityOnCreateFingerprint.classDef
@@ -61,7 +61,7 @@ val pipPatch = bytecodePatch(
         if (existingLeaveHint != null) {
             existingLeaveHint.addInstruction(
                 0,
-                "invoke-static { p0 }, $PIP_HELPER->onUserLeaveHint(Landroid/app/Activity;)V",
+                "invoke-static/range { p0 .. p0 }, $PIP_HELPER->onUserLeaveHint(Landroid/app/Activity;)V",
             )
         } else {
             val superType = cobaltClass.superclass ?: "Landroid/app/Activity;"
