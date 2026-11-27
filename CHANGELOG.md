@@ -1,3 +1,9 @@
+## [1.22.10](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.9...v1.22.10) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **speed,deploy:** stack speed items cleanly in flex column without breaking dialog layout and update in-place via adb install -r ([49c7294](https://github.com/BIRDY141/Birdy-Patches/commit/49c7294dfe0d3bbd1c0511b85553834dcd73ebf2))
+
 ## [1.22.9](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.8...v1.22.9) (2026-11-27)
 
 ### 🐛 Bug Fixes
