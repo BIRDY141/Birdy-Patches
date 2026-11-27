@@ -46,13 +46,8 @@ if (Test-Path "tv_ip.txt") {
 Write-Host "Connecting to TV: $tvIp"
 & $adbExe connect $tvIp
 
-Write-Host "Clean reinstalling to TV to refresh launcher banner and caches..."
-& $adbExe uninstall app.tvpatches.android.youtube.tv
-& $adbExe shell pm clear com.google.android.tvlauncher
-& $adbExe shell pm clear com.android.providers.tv
-
-Write-Host "Installing to TV..."
-$installOut = (& $adbExe install $outApk 2>&1)
+Write-Host "Updating BirdyTV on TV..."
+$installOut = (& $adbExe install -r $outApk 2>&1)
 Write-Host $installOut
 
 Write-Host "Launching BirdyTV on TV..."

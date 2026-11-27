@@ -785,18 +785,27 @@
             var st = document.createElement("style");
             st.id = "birdy-speed-styles";
             st.appendChild(document.createTextNode(
-                "[role='dialog'], [role='listbox'], [role='menu'], ytlr-dialog-renderer, ytlr-menu-renderer, .birdy-speed-container {\n" +
+                ".birdy-speed-container {\n" +
+                "  position: relative !important;\n" +
+                "  display: flex !important;\n" +
+                "  flex-direction: column !important;\n" +
+                "  gap: 6px !important;\n" +
                 "  height: auto !important;\n" +
-                "  max-height: 85vh !important;\n" +
+                "  max-height: 74vh !important;\n" +
                 "  overflow-y: auto !important;\n" +
                 "  overflow-x: hidden !important;\n" +
                 "}\n" +
                 ".birdy-speed-row {\n" +
+                "  position: relative !important;\n" +
+                "  top: auto !important;\n" +
+                "  left: auto !important;\n" +
+                "  right: auto !important;\n" +
+                "  bottom: auto !important;\n" +
+                "  transform: none !important;\n" +
                 "  outline: none !important;\n" +
                 "  cursor: pointer;\n" +
                 "  flex-shrink: 0 !important;\n" +
                 "  min-height: 48px !important;\n" +
-                "  height: 48px !important;\n" +
                 "  display: flex !important;\n" +
                 "  align-items: center !important;\n" +
                 "}\n" +
@@ -916,21 +925,16 @@
 
         ensureSpeedStyles();
 
-        // Unclip all ancestors from row up to document.body so the whole speed list is visible
+        // Style the list container itself (never break parent dialog/watch layout)
         try {
-            var anc = row.parentElement;
-            while (anc && anc !== document.body) {
-                anc.classList.add("birdy-speed-container");
-                anc.style.setProperty("height", "auto", "important");
-                anc.style.setProperty("max-height", "85vh", "important");
-                anc.style.setProperty("overflow-y", "auto", "important");
-                anc.style.setProperty("overflow-x", "hidden", "important");
-                anc = anc.parentElement;
-            }
+            container.classList.add("birdy-speed-container");
         } catch (e) {}
 
         var speedKey = isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY;
         var currentRate = parseFloat(getStringSetting(speedKey, "1")) || 1;
+
+        // Preserve native click handler on Normal row before attaching ours
+        var origRowClick = row.onclick;
 
         // Format the native Normal row as the 1x anchor
         row.setAttribute("data-birdy-rate", "1");
@@ -986,10 +990,16 @@
                 }
             }
 
-            setTimeout(function () {
-                var escEvt = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, keyCode: 27, which: 27, key: "Escape" });
-                document.dispatchEvent(escEvt);
-            }, 80);
+            // Close the drawer natively, then re-enforce chosen speed
+            try {
+                if (typeof origRowClick === "function") {
+                    origRowClick.call(row);
+                } else {
+                    row.click();
+                }
+            } catch (e) {}
+            setTimeout(function () { applyAllTweaks(true); }, 50);
+            setTimeout(function () { applyAllTweaks(true); }, 200);
         }
 
         // Attach click/key to normal row
