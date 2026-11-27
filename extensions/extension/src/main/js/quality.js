@@ -784,10 +784,11 @@
         try {
             var st = document.createElement("style");
             st.id = "birdy-speed-styles";
-            st.textContent =
+            st.appendChild(document.createTextNode(
                 ".birdy-speed-row { outline: none !important; cursor: pointer; }\n" +
                 ".birdy-speed-row:focus, .birdy-speed-row[focused], .birdy-speed-row.focused { background: #ffffff !important; color: #0f0f0f !important; }\n" +
-                ".birdy-speed-row:focus *, .birdy-speed-row[focused] *, .birdy-speed-row.focused * { color: #0f0f0f !important; fill: #0f0f0f !important; }\n";
+                ".birdy-speed-row:focus *, .birdy-speed-row[focused] *, .birdy-speed-row.focused * { color: #0f0f0f !important; fill: #0f0f0f !important; }\n"
+            ));
             (document.head || document.documentElement || document.body).appendChild(st);
         } catch (e) {}
     }
@@ -941,7 +942,9 @@
         }
 
         // Remove old children in container and rebuild in exact numerical order
-        container.innerHTML = "";
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
         var activeFocusRow = null;
 
         for (var r = 0; r < SPEED_RATES.length; r++) {
@@ -956,6 +959,8 @@
                 var textUpdated = false;
                 for (var si = 0; si < subEls.length; si++) {
                     var se = subEls[si];
+                    var tag = (se.tagName || "").toLowerCase();
+                    if (tag === "svg" || tag === "path" || tag === "g" || tag === "use") continue;
                     if (se.children.length === 0 && (se.textContent || "").trim().length > 0) {
                         se.textContent = label;
                         textUpdated = true;
