@@ -47,6 +47,7 @@
   "player.channel.title": "Hide Channel button",
   "player.description.title": "Hide Description button",
   "player.subscribe.title": "Hide Subscribe button",
+  "player.join.title": "Hide Join button",
   "player.like.title": "Hide Like / Dislike buttons",
   "player.comments.title": "Hide Comments button",
   "player.ask.title": "Hide Ask (AI) button",

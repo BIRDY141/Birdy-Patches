@@ -10,7 +10,8 @@
     var BUTTONS = [
         { key: "channel", titleKey: "player.channel.title", types: ["CHANNEL_BUTTON"] },
         { key: "description", titleKey: "player.description.title", types: ["ABOUT_BUTTON"] },
-        { key: "subscribe", titleKey: "player.subscribe.title", types: ["SUBSCRIBE"] },
+        { key: "subscribe", titleKey: "player.subscribe.title", types: ["SUBSCRIBE", "SUBSCRIBE_BUTTON"] },
+        { key: "join", titleKey: "player.join.title", types: ["SPONSORSHIPS", "JOIN", "MEMBERSHIP", "CHANNEL_MEMBERSHIP"], icons: ["LOYALTY", "MEMBERSHIP", "MONETIZATION_ON"] },
         { key: "like", titleKey: "player.like.title", types: ["LIKE_BUTTON"] },
         { key: "comments", titleKey: "player.comments.title", types: ["COMMENTS"], icons: ["COMMENT"] },
         { key: "ask", titleKey: "player.ask.title", icons: ["SPARK"] },
@@ -30,6 +31,9 @@
     function matches(spec, item) {
         var type = item.type || "";
         if (spec.types && spec.types.some(function (t) { return type === P + t; })) return true;
+        var button = item.button || {};
+        if (spec.key === "subscribe" && button.subscribeButtonRenderer) return true;
+        if (spec.key === "join" && (button.sponsorshipsOfferButtonRenderer || /sponsorship/i.test(JSON.stringify(button)))) return true;
         var icon = iconOf(item);
         return !!icon && !!spec.icons && spec.icons.indexOf(icon) !== -1;
     }

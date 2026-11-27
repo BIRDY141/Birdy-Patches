@@ -23,6 +23,7 @@
         { key: "channel", titleKey: "player.channel.title" },
         { key: "description", titleKey: "player.description.title" },
         { key: "subscribe", titleKey: "player.subscribe.title" },
+        { key: "join", titleKey: "player.join.title" },
         { key: "like", titleKey: "player.like.title" },
         { key: "comments", titleKey: "player.comments.title" },
         { key: "ask", titleKey: "player.ask.title" },
