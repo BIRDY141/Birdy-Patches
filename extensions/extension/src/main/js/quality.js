@@ -716,8 +716,10 @@
                 video.defaultPlaybackRate = rate;
                 video.playbackRate = rate;
             }
-            if (lastSpeedVid !== vid || Math.abs(lastSpeedRate - rate) > 0.01) {
-                if (rate !== 1) youtv.report("speed: set " + (isShort ? "shorts" : "video") + " to " + rate + "x");
+            if (lastSpeedVid !== vid || Math.abs(lastSpeedRate - rate) > 0.01 || forceNow) {
+                if (rate !== 1 || forceNow) {
+                    youtv.report("speed: set " + (isShort ? "shorts" : "video") + " to " + rate + "x (actual=" + (video ? video.playbackRate : "none") + ")");
+                }
                 lastSpeedVid = vid;
                 lastSpeedRate = rate;
             }
@@ -768,12 +770,15 @@
         if (typeof CSSStyleSheet !== "undefined" && document && document.adoptedStyleSheets) {
             var speedSheet = new CSSStyleSheet();
             speedSheet.replaceSync(
-                ".birdy-speed-list { display: flex; flex-direction: column; gap: 6px; padding: 8px 4px; max-height: 58vh; overflow-y: auto; }" +
+                ".birdy-speed-overlay { position: fixed; z-index: 2147483646; background: #0f0f0f;" +
+                " display: flex; flex-direction: column; gap: 6px; padding: 10px 16px; box-sizing: border-box;" +
+                " overflow: hidden; }" +
+                ".birdy-speed-list { display: flex; flex-direction: column; gap: 6px; transition: transform 120ms ease-out; }" +
                 ".birdy-speed-item { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 14px 20px;" +
-                " border-radius: 12px; font-size: 1.25rem; font-weight: 500; background: transparent; color: #f1f1f1;" +
-                " border: 1px solid transparent; cursor: pointer; text-align: left; box-sizing: border-box; }" +
-                ".birdy-speed-item.selected { color: #3ea6ff; font-weight: 600; }" +
-                ".birdy-speed-item.birdy-focus { background: #f1f1f1; color: #0f0f0f; font-weight: 700; }"
+                " border-radius: 12px; font-size: 1.2rem; font-weight: 500; background: #181818; color: #f1f1f1;" +
+                " border: 1px solid rgba(255,255,255,0.08); cursor: pointer; text-align: left; box-sizing: border-box; flex-shrink: 0; }" +
+                ".birdy-speed-item.selected { color: #3ea6ff; border-color: rgba(62,166,255,0.45); font-weight: 600; }" +
+                ".birdy-speed-item.birdy-focus { background: #f1f1f1; color: #0f0f0f; border-color: #f1f1f1; font-weight: 700; }"
             );
             document.adoptedStyleSheets = document.adoptedStyleSheets.concat([speedSheet]);
         }
@@ -781,26 +786,52 @@
 
     var activeSpeedMenu = null;
 
-    function closeNativeSpeedPopup(container) {
+    function destroySpeedOverlay() {
+        if (!activeSpeedMenu) return;
+        if (activeSpeedMenu.overlay && activeSpeedMenu.overlay.parentNode) {
+            activeSpeedMenu.overlay.parentNode.removeChild(activeSpeedMenu.overlay);
+        }
+        activeSpeedMenu = null;
+    }
+
+    function closeNativeSpeedPopup() {
+        var menu = activeSpeedMenu;
+        destroySpeedOverlay();
         try {
-            var esc = new KeyboardEvent("keydown", { key: "Escape", code: "Escape", keyCode: 27, which: 27, bubbles: true });
-            document.dispatchEvent(esc);
-            if (container && container.parentElement) {
-                var back = new KeyboardEvent("keydown", { key: "GoBack", keyCode: 4, which: 4, bubbles: true });
-                container.dispatchEvent(back);
+            if (menu && menu.normalBtn && typeof menu.normalBtn.click === "function") {
+                // Keep speed setting while letting YouTube close its own drawer cleanly
+                menu.normalBtn.click();
+                setTimeout(function () { applyAllTweaks(true); }, 30);
+            } else {
+                var target = window;
+                target.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", code: "Escape", keyCode: 27, which: 27, bubbles: true }));
+                target.dispatchEvent(new KeyboardEvent("keyup", { key: "Escape", code: "Escape", keyCode: 27, which: 27, bubbles: true }));
             }
         } catch (e) {}
-        activeSpeedMenu = null;
     }
 
     function updateNativeSpeedFocus() {
         if (!activeSpeedMenu) return;
         var items = activeSpeedMenu.items;
+        var listEl = activeSpeedMenu.listEl;
+        var vp = activeSpeedMenu.overlay;
+        var focused = null;
         for (var i = 0; i < items.length; i++) {
             var isFoc = i === activeSpeedMenu.focusIdx;
             items[i].classList.toggle("birdy-focus", isFoc);
-            if (isFoc && typeof items[i].scrollIntoView === "function") {
-                try { items[i].scrollIntoView({ block: "nearest" }); } catch (e) {}
+            if (isFoc) focused = items[i];
+        }
+        if (focused && vp && listEl) {
+            var viewH = vp.clientHeight;
+            var curY = listEl._scrollY || 0;
+            var top = focused.offsetTop;
+            var bottom = top + focused.offsetHeight;
+            var nextY = curY;
+            if (top - 12 < curY) nextY = Math.max(0, top - 12);
+            else if (bottom + 12 > curY + viewH) nextY = bottom + 12 - viewH;
+            if (nextY !== curY) {
+                listEl._scrollY = nextY;
+                listEl.style.transform = "translateY(-" + nextY + "px)";
             }
         }
     }
@@ -808,123 +839,177 @@
     function isElemVisible(el) {
         if (!el || typeof el.getBoundingClientRect !== "function") return false;
         var rect = el.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0;
+        return rect.width > 10 && rect.height > 10;
+    }
+
+    var SPEED_TITLES = /^(Video speed|Playback speed|Velocidad de reproducción|سرعة التشغيل)$/i;
+    var NORMAL_LABELS = /^(Normal|عادي)$/i;
+
+    function findSpeedHeadingIn(root) {
+        if (!root || !root.getElementsByTagName) return null;
+        var nodes = root.getElementsByTagName("*");
+        var headingEl = null;
+        for (var i = 0; i < nodes.length; i++) {
+            var el = nodes[i];
+            if (el.children && el.children.length > 1) continue;
+            var txt = (el.textContent || "").trim();
+            if (SPEED_TITLES.test(txt) && isElemVisible(el)) {
+                headingEl = el;
+            }
+        }
+        return headingEl;
+    }
+
+    function findSpeedPanel() {
+        var popupRoot = document.querySelector("ytlr-popup-container");
+        var headingEl = findSpeedHeadingIn(popupRoot) || findSpeedHeadingIn(document.body);
+        if (!headingEl) return null;
+
+        // Walk up from heading until the subtree contains "Normal" (without climbing into parent Settings menu)
+        var panel = headingEl.parentElement;
+        while (panel && panel !== document.body) {
+            var panelTxt = panel.textContent || "";
+            if (panelTxt.indexOf("Captions") !== -1 || panelTxt.indexOf("Stats for nerds") !== -1) {
+                panel = null;
+                break;
+            }
+            if (/Normal|عادي/i.test(panelTxt)) break;
+            panel = panel.parentElement;
+        }
+        if (!panel || panel === document.body || !isElemVisible(panel)) return null;
+
+        var normalBtn = null;
+        var pNodes = panel.getElementsByTagName("*");
+        for (var j = 0; j < pNodes.length; j++) {
+            var pn = pNodes[j];
+            if (pn.children && pn.children.length <= 2 && NORMAL_LABELS.test((pn.textContent || "").trim())) {
+                normalBtn = (pn.closest && pn.closest("[role='button'], button, ytlr-button-renderer")) || pn;
+                break;
+            }
+        }
+        if (!normalBtn) return null;
+
+        return { heading: headingEl, panel: panel, normalBtn: normalBtn };
     }
 
     function enhanceNativeSpeedContainer() {
-        if (typeof document === "undefined" || !document.querySelectorAll) return;
-        if (!document.querySelector("video")) return;
+        if (typeof document === "undefined" || !document.querySelector) return;
+        if (!document.querySelector("video")) {
+            destroySpeedOverlay();
+            return;
+        }
         var player = findPlayer();
         var isShort = isCurrentShort(player);
-        if (!getBoolSetting(isShort ? SHORTS_CUSTOM_SPEED_KEY : VIDEO_CUSTOM_SPEED_KEY, true)) return;
-
-        var popups = document.querySelectorAll("ytlr-popup-container, ytlr-menu-renderer, ytlr-multi-page-menu-renderer, ytlr-settings-panel, [role='dialog']");
-        for (var i = 0; i < popups.length; i++) {
-            var popup = popups[i];
-            if (!popup || !isElemVisible(popup)) continue;
-            if (popup.getAttribute("data-birdy-speed-menu") === "1") continue;
-
-            var text = (popup.textContent || "").trim();
-            if (!/(Video speed|Playback speed|Velocidad|سرعة التشغيل)/i.test(text)) continue;
-            if (text.indexOf("Normal") === -1 && text.indexOf("عادي") === -1) continue;
-            if (text.length > 260) continue;
-
-            var normalEl = null;
-            var candidates = popup.querySelectorAll("yt-formatted-string, span, div, button, [role='button']");
-            for (var j = 0; j < candidates.length; j++) {
-                var t = (candidates[j].textContent || "").trim();
-                if ((t === "Normal" || t === "عادي") && candidates[j].children.length <= 2) {
-                    normalEl = candidates[j];
-                    break;
-                }
-            }
-            if (!normalEl) continue;
-
-            var listHost = normalEl.parentElement;
-            while (listHost && listHost !== popup && listHost.tagName && !/LIST|MENU|ITEMS|CONTENT/i.test(listHost.tagName) && listHost.children.length <= 1) {
-                listHost = listHost.parentElement;
-            }
-            if (!listHost) listHost = normalEl.parentElement;
-            if (!listHost) continue;
-
-            popup.setAttribute("data-birdy-speed-menu", "1");
-            var speedKey = isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY;
-            var currentRate = parseFloat(getStringSetting(speedKey, "1")) || 1;
-
-            listHost.textContent = "";
-            var wrap = document.createElement("div");
-            wrap.className = "birdy-speed-list";
-
-            var itemEls = [];
-            var initIdx = 3;
-            for (var r = 0; r < SPEED_RATES.length; r++) {
-                (function (rate, idx) {
-                    var isSel = Math.abs(rate - currentRate) < 0.01;
-                    if (isSel) initIdx = idx;
-                    var btn = document.createElement("button");
-                    btn.className = "birdy-speed-item" + (isSel ? " selected" : "");
-                    var lbl = document.createElement("span");
-                    lbl.textContent = rate === 1 ? "Normal (1x)" : (rate + "x");
-                    var chk = document.createElement("span");
-                    chk.textContent = isSel ? "\u2713" : "";
-                    btn.appendChild(lbl);
-                    btn.appendChild(chk);
-                    btn.onclick = function (ev) {
-                        ev.stopPropagation();
-                        try {
-                            localStorage.setItem(STORAGE_PREFIX + speedKey, JSON.stringify(String(rate)));
-                        } catch (e) {}
-                        applyAllTweaks(true);
-                        closeNativeSpeedPopup(popup);
-                    };
-                    wrap.appendChild(btn);
-                    itemEls.push(btn);
-                })(SPEED_RATES[r], r);
-            }
-
-            listHost.appendChild(wrap);
-            activeSpeedMenu = { popup: popup, items: itemEls, focusIdx: initIdx };
-            updateNativeSpeedFocus();
-            break;
+        if (!getBoolSetting(isShort ? SHORTS_CUSTOM_SPEED_KEY : VIDEO_CUSTOM_SPEED_KEY, true)) {
+            destroySpeedOverlay();
+            return;
         }
 
-        if (activeSpeedMenu && (!document.body.contains(activeSpeedMenu.popup) || !isElemVisible(activeSpeedMenu.popup))) {
-            activeSpeedMenu = null;
+        if (activeSpeedMenu) {
+            if (!document.body.contains(activeSpeedMenu.panel) || !isElemVisible(activeSpeedMenu.panel)) {
+                destroySpeedOverlay();
+            }
+            return;
         }
+
+        var found = findSpeedPanel();
+        if (!found) return;
+
+        var panelRect = found.panel.getBoundingClientRect();
+        var headRect = found.heading.getBoundingClientRect();
+        var topPos = Math.max(panelRect.top, headRect.bottom + 8);
+        var height = Math.max(180, panelRect.bottom - topPos - 12);
+
+        var speedKey = isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY;
+        var currentRate = parseFloat(getStringSetting(speedKey, "1")) || 1;
+
+        var overlay = document.createElement("div");
+        overlay.className = "birdy-speed-overlay";
+        overlay.style.left = panelRect.left + "px";
+        overlay.style.top = topPos + "px";
+        overlay.style.width = panelRect.width + "px";
+        overlay.style.height = height + "px";
+
+        var listEl = document.createElement("div");
+        listEl.className = "birdy-speed-list";
+        listEl._scrollY = 0;
+
+        var itemEls = [];
+        var initIdx = 3;
+        for (var r = 0; r < SPEED_RATES.length; r++) {
+            (function (rate, idx) {
+                var isSel = Math.abs(rate - currentRate) < 0.01;
+                if (isSel) initIdx = idx;
+                var btn = document.createElement("button");
+                btn.className = "birdy-speed-item" + (isSel ? " selected" : "");
+                var lbl = document.createElement("span");
+                lbl.textContent = rate === 1 ? "Normal (1x)" : (rate + "x");
+                var chk = document.createElement("span");
+                chk.textContent = isSel ? "\u2713" : "";
+                btn.appendChild(lbl);
+                btn.appendChild(chk);
+                btn.onclick = function (ev) {
+                    if (ev && ev.stopPropagation) ev.stopPropagation();
+                    try {
+                        localStorage.setItem(STORAGE_PREFIX + speedKey, JSON.stringify(String(rate)));
+                    } catch (e) {}
+                    applyAllTweaks(true);
+                    closeNativeSpeedPopup();
+                };
+                listEl.appendChild(btn);
+                itemEls.push(btn);
+            })(SPEED_RATES[r], r);
+        }
+
+        overlay.appendChild(listEl);
+        document.body.appendChild(overlay);
+        activeSpeedMenu = {
+            panel: found.panel,
+            normalBtn: found.normalBtn,
+            overlay: overlay,
+            listEl: listEl,
+            items: itemEls,
+            focusIdx: initIdx
+        };
+        updateNativeSpeedFocus();
+        youtv.report("speed: custom picker opened inside Video speed menu");
     }
 
-    if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
-        document.addEventListener("keydown", function (e) {
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+        window.addEventListener("keydown", function (e) {
             var code = e.keyCode || e.which;
             if (!activeSpeedMenu) {
                 if (code === 13 || code === 23) {
-                    setTimeout(enhanceNativeSpeedContainer, 80);
-                    setTimeout(enhanceNativeSpeedContainer, 240);
+                    setTimeout(enhanceNativeSpeedContainer, 100);
+                    setTimeout(enhanceNativeSpeedContainer, 300);
                 }
                 return;
             }
-            if (!document.body.contains(activeSpeedMenu.popup) || !isElemVisible(activeSpeedMenu.popup)) {
-                activeSpeedMenu = null;
+            if (!document.body.contains(activeSpeedMenu.panel) || !isElemVisible(activeSpeedMenu.panel)) {
+                destroySpeedOverlay();
                 return;
             }
             if (code === 38) { // UP
                 e.preventDefault(); e.stopPropagation();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
                 if (activeSpeedMenu.focusIdx > 0) {
                     activeSpeedMenu.focusIdx--;
                     updateNativeSpeedFocus();
                 }
             } else if (code === 40) { // DOWN
                 e.preventDefault(); e.stopPropagation();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
                 if (activeSpeedMenu.focusIdx < activeSpeedMenu.items.length - 1) {
                     activeSpeedMenu.focusIdx++;
                     updateNativeSpeedFocus();
                 }
             } else if (code === 13 || code === 23) { // OK
                 e.preventDefault(); e.stopPropagation();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
                 var btn = activeSpeedMenu.items[activeSpeedMenu.focusIdx];
                 if (btn) btn.click();
             } else if (code === 27 || code === 4 || code === 10009 || code === 37) {
-                activeSpeedMenu = null;
+                destroySpeedOverlay();
             }
         }, true);
     }
