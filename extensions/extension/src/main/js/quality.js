@@ -777,364 +777,321 @@
         applyAllTweaks(true);
     };
 
-    // ---- Custom Speed Picker inside YouTube's native "Video speed" container ------------------
+    // ---- 1-to-1 Native-Look Speed Menu -----------------------------------------------------
+    var speedSheet = null;
     function ensureSpeedStyles() {
-        if (typeof document === "undefined") return;
-        if (document.getElementById("birdy-speed-styles")) return;
+        if (speedSheet || typeof document === "undefined") return;
         try {
-            var st = document.createElement("style");
-            st.id = "birdy-speed-styles";
-            st.appendChild(document.createTextNode(
-                ".birdy-speed-container {\n" +
-                "  position: relative !important;\n" +
-                "  display: flex !important;\n" +
-                "  flex-direction: column !important;\n" +
-                "  gap: 6px !important;\n" +
-                "  height: auto !important;\n" +
-                "  max-height: 74vh !important;\n" +
-                "  overflow-y: auto !important;\n" +
-                "  overflow-x: hidden !important;\n" +
-                "}\n" +
-                ".birdy-speed-row {\n" +
-                "  position: relative !important;\n" +
-                "  top: auto !important;\n" +
-                "  left: auto !important;\n" +
-                "  right: auto !important;\n" +
-                "  bottom: auto !important;\n" +
-                "  transform: none !important;\n" +
-                "  outline: none !important;\n" +
-                "  cursor: pointer;\n" +
-                "  flex-shrink: 0 !important;\n" +
-                "  min-height: 48px !important;\n" +
+            speedSheet = new CSSStyleSheet();
+            speedSheet.replaceSync(
+                ".birdy-speed-item {\n" +
                 "  display: flex !important;\n" +
                 "  align-items: center !important;\n" +
+                "  justify-content: space-between !important;\n" +
+                "  min-height: 76px !important;\n" +
+                "  height: 76px !important;\n" +
+                "  border-radius: 16px !important;\n" +
+                "  padding: 0 28px !important;\n" +
+                "  font-size: 24px !important;\n" +
+                "  font-weight: 500 !important;\n" +
+                "  font-family: Roboto, 'YouTube Sans', sans-serif !important;\n" +
+                "  background: rgba(255, 255, 255, 0.08) !important;\n" +
+                "  color: #f1f1f1 !important;\n" +
+                "  cursor: pointer !important;\n" +
+                "  outline: none !important;\n" +
+                "  box-sizing: border-box !important;\n" +
+                "  transition: background 0.12s, color 0.12s, transform 0.12s !important;\n" +
                 "}\n" +
-                ".birdy-speed-row:focus, .birdy-speed-row[focused], .birdy-speed-row.focused {\n" +
+                ".birdy-speed-item:focus, .birdy-speed-item.focused {\n" +
                 "  background: #ffffff !important;\n" +
                 "  color: #0f0f0f !important;\n" +
+                "  transform: scale(1.02) !important;\n" +
+                "  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;\n" +
                 "}\n" +
-                ".birdy-speed-row:focus *, .birdy-speed-row[focused] *, .birdy-speed-row.focused * {\n" +
+                ".birdy-speed-item:focus *, .birdy-speed-item.focused * {\n" +
                 "  color: #0f0f0f !important;\n" +
                 "  fill: #0f0f0f !important;\n" +
-                "}\n"
-            ));
-            (document.head || document.documentElement || document.body).appendChild(st);
+                "}\n" +
+                "#birdy-speed-container::-webkit-scrollbar { display: none !important; width: 0 !important; }\n"
+            );
+            document.adoptedStyleSheets = document.adoptedStyleSheets.concat([speedSheet]);
         } catch (e) {}
     }
 
-    function findSpeedMenuContext() {
+    function findSpeedHeading() {
         if (typeof document === "undefined") return null;
-
-        var normalEl = null;
-        var isSpeedMenu = false;
-
-        // Method 1: Find heading "Video speed" or localized equivalents
         var headers = document.querySelectorAll("h1, h2, h3, h4, div, span, ytlr-dialog-title");
-        var speedHeader = null;
         for (var h = 0; h < headers.length; h++) {
             var head = headers[h];
             if (head.children && head.children.length > 2) continue;
             var ht = (head.textContent || "").trim();
             if (/^(Video speed|Playback speed|سرعة التشغيل|Velocidad de reproducción|Velocidad)$/i.test(ht)) {
-                speedHeader = head;
-                break;
+                var r = head.getBoundingClientRect();
+                if (r && r.height > 0) return head;
             }
         }
-
-        if (speedHeader) {
-            var parent = speedHeader.parentElement;
-            for (var depth = 0; depth < 6 && parent && parent !== document.body; depth++) {
-                var candidates = parent.querySelectorAll("*");
-                for (var ci = 0; ci < candidates.length; ci++) {
-                    var ce = candidates[ci];
-                    if (ce.children && ce.children.length > 3) continue;
-                    var ct = (ce.textContent || "").trim();
-                    if (/^(Normal(\s*\(1x\))?|عادي|Estándar)$/i.test(ct)) {
-                        normalEl = ce;
-                        isSpeedMenu = true;
-                        break;
-                    }
-                }
-                if (normalEl) break;
-                parent = parent.parentElement;
-            }
-        }
-
-        // Method 2: Global scan for "Normal" leaf row inside speed menu container
-        if (!normalEl) {
-            var all = document.querySelectorAll("*");
-            for (var i = 0; i < all.length; i++) {
-                var el = all[i];
-                if (el.children && el.children.length > 3) continue;
-                var t = (el.textContent || "").trim();
-                if (/^(Normal(\s*\(1x\))?|عادي|Estándar)$/i.test(t)) {
-                    var anc = el;
-                    for (var d = 0; d < 8 && anc && anc !== document.body; d++) {
-                        var at = anc.textContent || "";
-                        if (/Video speed|Playback speed|Velocidad|سرعة التشغيل/i.test(at)) {
-                            isSpeedMenu = true;
-                            normalEl = el;
-                            break;
-                        }
-                        anc = anc.parentElement;
-                    }
-                    if (isSpeedMenu) break;
-                }
-            }
-        }
-
-        if (!isSpeedMenu || !normalEl) return null;
-
-        // Find the clickable item row container
-        var row = normalEl;
-        while (row && row.parentElement && row.parentElement !== document.body) {
-            var role = row.getAttribute ? (row.getAttribute("role") || "") : "";
-            var tag = (row.tagName || "").toUpperCase();
-            if (/BUTTON|MENUITEM|RADIO|OPTION/i.test(role) || /BUTTON|YTLR-/i.test(tag) || row.tabIndex >= 0) {
-                break;
-            }
-            if (row.parentElement && row.parentElement.getAttribute && /listbox|menu/i.test(row.parentElement.getAttribute("role") || "")) {
-                break;
-            }
-            row = row.parentElement;
-        }
-        if (!row || !row.parentElement) return null;
-
-        return { normalEl: normalEl, normalRow: row, container: row.parentElement };
+        return null;
     }
 
-    function enhanceNativeSpeedContainer() {
+    function createCheckSvg(visible) {
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.style.width = "28px";
+        svg.style.height = "28px";
+        svg.style.fill = "currentColor";
+        svg.style.flexShrink = "0";
+        svg.style.visibility = visible ? "visible" : "hidden";
+        var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", "M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z");
+        svg.appendChild(path);
+        return svg;
+    }
+
+    function closeSpeedMenu() {
+        var c = document.getElementById("birdy-speed-container");
+        if (c && c.parentNode) c.parentNode.removeChild(c);
+
+        var backBtn = document.querySelector("ytlr-dialog-header-renderer button, [aria-label*='Back'], [aria-label*='close']");
+        if (backBtn && typeof backBtn.click === "function") {
+            try { backBtn.click(); return; } catch (e) {}
+        }
+
+        [27, 4].forEach(function (code) {
+            try {
+                var evt = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, keyCode: code, which: code });
+                (document.activeElement || document.body || window).dispatchEvent(evt);
+            } catch (e) {}
+        });
+    }
+
+    function updateSettingsMenuSubtitle(rate) {
         if (typeof document === "undefined") return;
-        if (!document.querySelector("video")) return;
+        var label = (rate === 1 ? "Normal" : (rate + "x"));
+        var items = document.querySelectorAll("ytlr-menu-item-renderer, [role='menuitem'], [role='button']");
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            var text = (it.textContent || "").trim();
+            if (/Speed|سرعة التشغيل|Velocidad/i.test(text) && !/Video speed|Playback speed/i.test(text)) {
+                var subs = it.querySelectorAll("ytlr-formatted-string, span, div");
+                for (var s = 0; s < subs.length; s++) {
+                    var st = (subs[s].textContent || "").trim();
+                    if (/^(Normal|\d+(\.\d+)?x)$/i.test(st)) {
+                        subs[s].textContent = label;
+                    }
+                }
+            }
+        }
+    }
+
+    function renderSpeedMenu() {
+        if (typeof document === "undefined") return;
+        if (!document.querySelector("video")) {
+            var orphaned = document.getElementById("birdy-speed-container");
+            if (orphaned && orphaned.parentNode) orphaned.parentNode.removeChild(orphaned);
+            return;
+        }
+
         var player = findPlayer();
         var isShort = isCurrentShort(player);
         if (!getBoolSetting(isShort ? SHORTS_CUSTOM_SPEED_KEY : VIDEO_CUSTOM_SPEED_KEY, true)) return;
 
-        var ctx = findSpeedMenuContext();
-        if (!ctx) return;
+        var head = findSpeedHeading();
+        var container = document.getElementById("birdy-speed-container");
 
-        var container = ctx.container;
-        var row = ctx.normalRow;
-        var normalEl = ctx.normalEl;
-
-        // Already populated
-        if (container.getAttribute("data-birdy-speed-injected") === "1" && container.querySelectorAll(".birdy-speed-row").length >= SPEED_RATES.length - 1) {
+        // If drawer is closed, remove our custom menu
+        if (!head) {
+            if (container && container.parentNode) {
+                container.parentNode.removeChild(container);
+            }
             return;
         }
-        container.setAttribute("data-birdy-speed-injected", "1");
 
-        ensureSpeedStyles();
-
-        // Style the list container itself (never break parent dialog/watch layout)
-        try {
-            container.classList.add("birdy-speed-container");
-        } catch (e) {}
-
-        var speedKey = isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY;
-        var currentRate = parseFloat(getStringSetting(speedKey, "1")) || 1;
-
-        // Preserve native click handler on Normal row before attaching ours
-        var origRowClick = row.onclick;
-
-        // Format the native Normal row as the 1x anchor
-        row.setAttribute("data-birdy-rate", "1");
-        row.setAttribute("tabindex", "0");
-        row.tabIndex = 0;
-        row.classList.add("birdy-speed-row");
-
-        var normalLabelEl = null;
-        var rowSub = row.getElementsByTagName("*");
-        for (var nsi = 0; nsi < rowSub.length; nsi++) {
-            var nse = rowSub[nsi];
-            var ntag = (nse.tagName || "").toLowerCase();
-            if (ntag === "svg" || ntag === "path" || ntag === "g" || ntag === "use") continue;
-            if (nse.children.length === 0 && (nse.textContent || "").trim().length > 0) {
-                normalLabelEl = nse;
-                break;
-            }
-        }
-        if (normalLabelEl) normalLabelEl.textContent = "Normal (1x)";
-
-        var normalCheck = row.querySelectorAll("svg, yt-icon, ytlr-icon, c-icon, [class*='check'], [class*='icon'], [role='img']");
-        var isNormalSel = Math.abs(currentRate - 1) < 0.01;
-        for (var nci = 0; nci < normalCheck.length; nci++) {
-            normalCheck[nci].style.setProperty("visibility", isNormalSel ? "visible" : "hidden", "important");
-            normalCheck[nci].style.setProperty("display", isNormalSel ? "" : "none", "important");
-        }
-
-        // Clean template row for cloning
-        var template = row.cloneNode(true);
-        template.removeAttribute("focused");
-        template.removeAttribute("aria-checked");
-        template.classList.remove("focused");
-        if (template.style) {
-            template.style.background = "";
-            template.style.color = "";
-        }
-
-        function applyRate(rateVal) {
-            try {
-                localStorage.setItem(STORAGE_PREFIX + speedKey, JSON.stringify(String(rateVal)));
-            } catch (e) {}
-            applyAllTweaks(true);
-            youtv.report("speed: applied " + rateVal + "x from native menu");
-
-            var allRows = container.querySelectorAll(".birdy-speed-row");
-            for (var k = 0; k < allRows.length; k++) {
-                var rVal = parseFloat(allRows[k].getAttribute("data-birdy-rate"));
-                var isSel = Math.abs(rVal - rateVal) < 0.01;
-                var chks = allRows[k].querySelectorAll("svg, yt-icon, ytlr-icon, c-icon, [class*='check'], [class*='icon'], [role='img']");
-                for (var ci = 0; ci < chks.length; ci++) {
-                    chks[ci].style.setProperty("visibility", isSel ? "visible" : "hidden", "important");
-                    chks[ci].style.setProperty("display", isSel ? "" : "none", "important");
+        // Drawer is open! Hide native items so only our clean 1-to-1 list appears
+        var anc = head.parentElement;
+        for (var d = 0; d < 8 && anc && anc !== document.body; d++) {
+            var natives = anc.querySelectorAll("ytlr-menu-item-renderer, ytlr-menu-section-renderer, iron-list, [role='menuitem'], [role='option'], [role='radio']");
+            for (var n = 0; n < natives.length; n++) {
+                if (!natives[n].classList.contains("birdy-speed-item")) {
+                    natives[n].style.setProperty("display", "none", "important");
                 }
             }
-
-            // Close the drawer natively, then re-enforce chosen speed
-            try {
-                if (typeof origRowClick === "function") {
-                    origRowClick.call(row);
-                } else {
-                    row.click();
-                }
-            } catch (e) {}
-            setTimeout(function () { applyAllTweaks(true); }, 50);
-            setTimeout(function () { applyAllTweaks(true); }, 200);
+            anc = anc.parentElement;
         }
 
-        // Attach click/key to normal row
-        row.onclick = function (ev) {
-            if (ev && ev.stopPropagation) ev.stopPropagation();
-            applyRate(1);
-        };
-
-        // Remove any old clones before re-inserting
-        var oldClones = container.querySelectorAll(".birdy-speed-clone");
+        // Clean up old legacy clone elements if any
+        var oldClones = document.querySelectorAll(".birdy-speed-clone, .birdy-speed-row");
         for (var oc = 0; oc < oldClones.length; oc++) {
             if (oldClones[oc].parentNode) oldClones[oc].parentNode.removeChild(oldClones[oc]);
         }
 
-        // Build list of all items (clones before Normal, Normal, clones after Normal)
-        var allItems = [];
+        ensureSpeedStyles();
 
-        function createItem(rateVal) {
-            var item = template.cloneNode(true);
-            item.className = (template.className || "") + " birdy-speed-row birdy-speed-clone";
-            item.setAttribute("data-birdy-rate", String(rateVal));
-            item.setAttribute("tabindex", "0");
-            item.tabIndex = 0;
+        var speedKey = isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY;
+        var currentRate = parseFloat(getStringSetting(speedKey, "1")) || 1;
 
-            var label = rateVal + "x";
-            var subEls = item.getElementsByTagName("*");
-            var textUpdated = false;
-            for (var si = 0; si < subEls.length; si++) {
-                var se = subEls[si];
-                var tag = (se.tagName || "").toLowerCase();
-                if (tag === "svg" || tag === "path" || tag === "g" || tag === "use") continue;
-                if (se.children.length === 0 && (se.textContent || "").trim().length > 0) {
-                    se.textContent = label;
-                    textUpdated = true;
-                    break;
+        // Position accurately under the heading
+        var rect = head.getBoundingClientRect();
+        var topPos = Math.round(rect.bottom + 16);
+        var leftPos = Math.round(rect.left);
+        var widthPos = Math.round(window.innerWidth - leftPos - 48);
+        if (widthPos < 350 || widthPos > 700) widthPos = 610;
+        var maxHeightPos = Math.round(window.innerHeight - topPos - 32);
+
+        // If container already exists and has correct count, update checks and positions
+        if (container) {
+            container.style.top = topPos + "px";
+            container.style.left = leftPos + "px";
+            container.style.width = widthPos + "px";
+            container.style.maxHeight = maxHeightPos + "px";
+            var existingItems = container.querySelectorAll(".birdy-speed-item");
+            if (existingItems.length === SPEED_RATES.length) {
+                for (var ei = 0; ei < existingItems.length; ei++) {
+                    var eRate = parseFloat(existingItems[ei].getAttribute("data-rate"));
+                    var eSel = Math.abs(eRate - currentRate) < 0.01;
+                    var eSvg = existingItems[ei].querySelector("svg");
+                    if (eSvg) eSvg.style.visibility = eSel ? "visible" : "hidden";
+                    existingItems[ei].setAttribute("aria-checked", eSel ? "true" : "false");
                 }
+                return;
             }
-            if (!textUpdated) item.textContent = label;
-
-            var isSelected = Math.abs(rateVal - currentRate) < 0.01;
-            var chkCandidates = item.querySelectorAll("svg, yt-icon, ytlr-icon, c-icon, [class*='check'], [class*='icon'], [role='img']");
-            for (var ci = 0; ci < chkCandidates.length; ci++) {
-                chkCandidates[ci].style.setProperty("visibility", isSelected ? "visible" : "hidden", "important");
-                chkCandidates[ci].style.setProperty("display", isSelected ? "" : "none", "important");
-            }
-
-            item.onclick = function (ev) {
-                if (ev && ev.stopPropagation) ev.stopPropagation();
-                applyRate(rateVal);
-            };
-
-            return item;
+            while (container.firstChild) container.removeChild(container.firstChild);
+        } else {
+            container = document.createElement("div");
+            container.id = "birdy-speed-container";
+            container.setAttribute("role", "menu");
+            container.setAttribute("tabindex", "-1");
+            (document.body || document.documentElement).appendChild(container);
         }
 
-        // Insert lower rates (0.25, 0.5, 0.75) BEFORE the Normal row
-        for (var lo = 0; lo < SPEED_RATES.length; lo++) {
-            var rLo = SPEED_RATES[lo];
-            if (rLo >= 1) break;
-            var cloneLo = createItem(rLo);
-            row.parentNode.insertBefore(cloneLo, row);
-            allItems.push(cloneLo);
+        container.style.cssText =
+            "position: fixed !important; " +
+            "top: " + topPos + "px !important; " +
+            "left: " + leftPos + "px !important; " +
+            "width: " + widthPos + "px !important; " +
+            "max-height: " + maxHeightPos + "px !important; " +
+            "display: flex !important; " +
+            "flex-direction: column !important; " +
+            "gap: 10px !important; " +
+            "overflow-y: auto !important; " +
+            "overflow-x: hidden !important; " +
+            "z-index: 2147483647 !important; " +
+            "box-sizing: border-box !important; " +
+            "padding: 4px 6px 40px 0 !important; " +
+            "outline: none !important; " +
+            "scrollbar-width: none !important;";
+
+        function onSelectRate(rate) {
+            try {
+                localStorage.setItem(STORAGE_PREFIX + speedKey, JSON.stringify(String(rate)));
+            } catch (e) {}
+            lastSpeedRate = rate;
+            applyAllTweaks(true);
+            updateSettingsMenuSubtitle(rate);
+            youtv.report("speed: applied " + rate + "x from custom menu");
+
+            closeSpeedMenu();
+
+            setTimeout(function () { applyAllTweaks(true); }, 100);
+            setTimeout(function () { applyAllTweaks(true); }, 300);
         }
 
-        allItems.push(row);
+        var itemsList = [];
+        var activeItem = null;
 
-        // Insert higher rates (1.25, 1.5, ... 4) AFTER the Normal row
-        var insertAnchor = row;
-        for (var hi = 0; hi < SPEED_RATES.length; hi++) {
-            var rHi = SPEED_RATES[hi];
-            if (rHi <= 1) continue;
-            var cloneHi = createItem(rHi);
-            row.parentNode.insertBefore(cloneHi, insertAnchor.nextSibling);
-            insertAnchor = cloneHi;
-            allItems.push(cloneHi);
-        }
-
-        // Wire up keyboard D-pad navigation for smooth 1-to-1 TV list navigation
-        for (var b = 0; b < allItems.length; b++) {
+        for (var i = 0; i < SPEED_RATES.length; i++) {
             (function (idx) {
-                var currentEl = allItems[idx];
-                currentEl.onkeydown = function (ev) {
+                var rate = SPEED_RATES[idx];
+                var isSelected = Math.abs(rate - currentRate) < 0.01;
+
+                var item = document.createElement("div");
+                item.className = "birdy-speed-item";
+                item.setAttribute("role", "menuitemradio");
+                item.setAttribute("aria-checked", isSelected ? "true" : "false");
+                item.setAttribute("tabindex", "0");
+                item.setAttribute("data-rate", String(rate));
+
+                var labelSpan = document.createElement("span");
+                labelSpan.textContent = (rate === 1 ? "Normal" : (rate + "x"));
+
+                var checkSvg = createCheckSvg(isSelected);
+
+                item.appendChild(labelSpan);
+                item.appendChild(checkSvg);
+
+                item.onfocus = function () {
+                    item.classList.add("focused");
+                    if (typeof item.scrollIntoView === "function") {
+                        item.scrollIntoView({ block: "nearest", behavior: "smooth" });
+                    }
+                };
+                item.onblur = function () {
+                    item.classList.remove("focused");
+                };
+
+                item.onclick = function (e) {
+                    if (e && e.stopPropagation) e.stopPropagation();
+                    onSelectRate(rate);
+                };
+
+                container.appendChild(item);
+                itemsList.push(item);
+                if (isSelected) activeItem = item;
+            })(i);
+        }
+
+        // Wire D-pad navigation across all speed pills
+        for (var k = 0; k < itemsList.length; k++) {
+            (function (idx) {
+                var el = itemsList[idx];
+                el.onkeydown = function (ev) {
                     var code = ev.keyCode || ev.which;
-                    if (code === 13 || code === 23) { // Enter / OK
-                        if (ev && ev.stopPropagation) ev.stopPropagation();
-                        var rV = parseFloat(currentEl.getAttribute("data-birdy-rate"));
-                        applyRate(rV);
-                    } else if (code === 40 || code === 20) { // Down
-                        if (idx < allItems.length - 1) {
+                    if (code === 40 || code === 20) { // Down
+                        if (idx < itemsList.length - 1) {
                             if (ev && ev.preventDefault) ev.preventDefault();
                             if (ev && ev.stopPropagation) ev.stopPropagation();
-                            allItems[idx + 1].focus();
-                            if (typeof allItems[idx + 1].scrollIntoView === "function") {
-                                allItems[idx + 1].scrollIntoView({ block: "nearest", behavior: "smooth" });
-                            }
+                            itemsList[idx + 1].focus();
                         }
                     } else if (code === 38 || code === 19) { // Up
                         if (idx > 0) {
                             if (ev && ev.preventDefault) ev.preventDefault();
                             if (ev && ev.stopPropagation) ev.stopPropagation();
-                            allItems[idx - 1].focus();
-                            if (typeof allItems[idx - 1].scrollIntoView === "function") {
-                                allItems[idx - 1].scrollIntoView({ block: "nearest", behavior: "smooth" });
-                            }
+                            itemsList[idx - 1].focus();
                         }
+                    } else if (code === 13 || code === 23 || code === 66) { // Enter / OK
+                        if (ev && ev.preventDefault) ev.preventDefault();
+                        if (ev && ev.stopPropagation) ev.stopPropagation();
+                        var r = parseFloat(el.getAttribute("data-rate"));
+                        onSelectRate(r);
+                    } else if (code === 4 || code === 27 || code === 37) { // Back / Escape / Left
+                        if (ev && ev.preventDefault) ev.preventDefault();
+                        if (ev && ev.stopPropagation) ev.stopPropagation();
+                        closeSpeedMenu();
                     }
                 };
-                currentEl.onfocus = function () {
-                    if (typeof currentEl.scrollIntoView === "function") {
-                        currentEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+            })(k);
+        }
+
+        // Initial focus on the currently selected rate
+        var targetToFocus = activeItem || itemsList[0];
+        if (targetToFocus && typeof targetToFocus.focus === "function") {
+            setTimeout(function () {
+                try {
+                    targetToFocus.focus();
+                    if (typeof targetToFocus.scrollIntoView === "function") {
+                        targetToFocus.scrollIntoView({ block: "center", behavior: "instant" });
                     }
-                };
-            })(b);
+                } catch (e) {}
+            }, 30);
         }
 
-        // Focus current active rate item
-        var activeItem = null;
-        for (var a = 0; a < allItems.length; a++) {
-            var rateCheck = parseFloat(allItems[a].getAttribute("data-birdy-rate"));
-            if (Math.abs(rateCheck - currentRate) < 0.01) {
-                activeItem = allItems[a];
-                break;
-            }
-        }
-        if (activeItem && typeof activeItem.focus === "function") {
-            try { activeItem.focus(); } catch (e) {}
-        }
-
-        youtv.report("speed: native container populated with " + SPEED_RATES.length + " rates");
+        youtv.report("speed: 1-to-1 menu populated with " + SPEED_RATES.length + " rates");
     }
 
     // Instant observation of DOM mutations so the menu opens with all rates immediately
     if (typeof window !== "undefined" && typeof MutationObserver !== "undefined") {
         try {
             var speedObserver = new MutationObserver(function () {
-                enhanceNativeSpeedContainer();
+                renderSpeedMenu();
             });
             var targetRoot = document.body || document.documentElement;
             if (targetRoot) {
@@ -1145,15 +1102,15 @@
 
     if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
         window.addEventListener("focusin", function () {
-            enhanceNativeSpeedContainer();
+            renderSpeedMenu();
         }, true);
 
         window.addEventListener("keydown", function (e) {
             var code = e.keyCode || e.which;
             if (code === 13 || code === 23 || code === 38 || code === 40 || code === 37 || code === 39) {
-                enhanceNativeSpeedContainer();
-                setTimeout(enhanceNativeSpeedContainer, 40);
-                setTimeout(enhanceNativeSpeedContainer, 150);
+                renderSpeedMenu();
+                setTimeout(renderSpeedMenu, 40);
+                setTimeout(renderSpeedMenu, 150);
             }
         }, true);
     }
@@ -1163,7 +1120,7 @@
             if (typeof document !== "undefined" && document.hidden) return;
             bindVideoListeners();
             applyAllTweaks(false);
-            enhanceNativeSpeedContainer();
+            renderSpeedMenu();
         }, 400);
     }
 })();
