@@ -1,3 +1,9 @@
+## [1.22.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.0...v1.22.1) (2026-11-27)
+
+### 🔧 Improvements
+
+* **quality,dearrow:** cache decoded settings, consolidate polling timers, and skip hidden tabs ([a4a3da6](https://github.com/BIRDY141/Birdy-Patches/commit/a4a3da6ae67322dd8ca9d6e0fe84b20cd1da5c8f))
+
 ## [1.22.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.21.1...v1.22.0) (2026-11-27)
 
 ### ✨ New Features

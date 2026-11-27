@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-27T13:45:20",
-  "description": "## [1.22.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.21.1...v1.22.0) (2026-11-27)\n\n### ✨ New Features\n\n* update patches ([39e96d9](https://github.com/BIRDY141/Birdy-Patches/commit/39e96d9c6d3fc93ae918e9d62820ded0515340aa))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.0/patches-1.22.0.mpp",
+  "created_at": "2026-11-27T13:53:01",
+  "description": "## [1.22.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.0...v1.22.1) (2026-11-27)\n\n### 🔧 Improvements\n\n* **quality,dearrow:** cache decoded settings, consolidate polling timers, and skip hidden tabs ([a4a3da6](https://github.com/BIRDY141/Birdy-Patches/commit/a4a3da6ae67322dd8ca9d6e0fe84b20cd1da5c8f))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.1/patches-1.22.1.mpp",
   "signature_download_url": "",
-  "version": "1.22.0"
+  "version": "1.22.1"
 }
