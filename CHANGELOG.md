@@ -1,3 +1,9 @@
+## [1.18.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.17.2...v1.18.0) (2026-11-27)
+
+### ✨ New Features
+
+* **player:** add Hide Join button and strengthen Subscribe button matching ([5d36d30](https://github.com/BIRDY141/Birdy-Patches/commit/5d36d30e0fc92c0109ae4518cd9701f402915242))
+
 ## [1.17.2](https://github.com/BIRDY141/Birdy-Patches/compare/v1.17.1...v1.17.2) (2026-11-27)
 
 ### 🐛 Bug Fixes
