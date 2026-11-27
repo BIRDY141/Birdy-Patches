@@ -41,9 +41,9 @@ This repository does **not** distribute YouTube APKs, neither original nor modif
 ## 🩹 Lista de parches
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.18.0](https://github.com/BIRDY141/Birdy-Patches/releases/tag/v1.18.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;9 patches total
+> **[v1.19.0](https://github.com/BIRDY141/Birdy-Patches/releases/tag/v1.19.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;10 patches total
 <details open>
-<summary>📦 YouTube for Android TV&nbsp;&nbsp;•&nbsp;&nbsp;8 patches</summary>
+<summary>📦 YouTube for Android TV&nbsp;&nbsp;•&nbsp;&nbsp;9 patches</summary>
 <br>
 
 **Package name:** `com.google.android.youtube.tv`
@@ -61,6 +61,7 @@ This repository does **not** distribute YouTube APKs, neither original nor modif
 | [Fix volume keys](#fix-volume-keys) | Lets Android handle short presses and held volume keys instead of sending them to the web input method. |  |
 | [GmsCore support](#gmscore-support) | Redirects the app's Google Play Services calls to GmsCore (MicroG-RE). Requires MicroG-RE to be installed. Without it, YouTube for Android TV crashes because Google Play Services rejects DroidGuard for the new package name. |  |
 | [Performance diagnostics](#performance-diagnostics) | Logs aggregate script timings, resource durations and supported long tasks for troubleshooting. Disabled by default; does not log video URLs or response contents. |  |
+| [Picture-in-Picture (PiP)](#picture-in-picture-pip) | Enables Android TV Picture-in-Picture mode when pressing Home while a video is playing. |  |
 | [Run without Google Play Services](#run-without-google-play-services) | Changes the package name so the patched app installs next to the original one, and keeps it running when Google Play Services rejects the new package name. Sign in with an activation code (yt.be/activate). |  |
 | [Spoof device](#spoof-device) | Reports another TV model to YouTube, so it runs on TVs it calls "not compatible". Default: Google Chromecast. | • Brand<br>• Model<br>• Manufacturer<br>• Chipset |
 

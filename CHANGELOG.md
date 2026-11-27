@@ -1,3 +1,9 @@
+## [1.19.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.18.0...v1.19.0) (2026-11-27)
+
+### ✨ New Features
+
+* **pip,speed,branding:** add PiP patch, unlock playback speed (0.25x-4x), and BirdyTV branding icons ([ada700a](https://github.com/BIRDY141/Birdy-Patches/commit/ada700a4b6099243f66f7b34ae3f3a15015d5666))
+
 ## [1.18.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.17.2...v1.18.0) (2026-11-27)
 
 ### ✨ New Features
