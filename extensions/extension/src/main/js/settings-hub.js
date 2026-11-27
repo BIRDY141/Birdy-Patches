@@ -336,7 +336,7 @@
             " min-height: 84px; padding: 1.1rem 1.6rem; border-radius: 20px; background: rgba(255, 255, 255, 0.08); border: none;" +
             " margin-bottom: 8px; color: #f5f5f5; flex-shrink: 0; cursor: pointer; transition: background 0.12s, color 0.12s, box-shadow 0.12s; box-sizing: border-box; }" +
             ".birdy-yt-row.birdy-focus { background: #ffffff !important; color: #0f0f0f !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important; transform: none !important; }" +
-            ".birdy-yt-row[data-type='3way'].birdy-focus { background: rgba(255, 255, 255, 0.14) !important; border: 2px solid #ffffff !important; color: #ffffff !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35); }" +
+            ".birdy-yt-row[data-type='3way'].birdy-focus { background: #ffffff !important; color: #0f0f0f !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important; }" +
             ".birdy-yt-row-left { display: flex; flex-direction: column; gap: 0.22rem; flex: 1; min-width: 0; }" +
             ".birdy-yt-row-title-wrap { display: flex; align-items: center; gap: 0.7rem; }" +
             ".birdy-yt-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }" +
@@ -344,7 +344,7 @@
             ".birdy-yt-row.birdy-focus .birdy-yt-row-title { font-weight: 700; color: #0f0f0f !important; }" +
             ".birdy-yt-row-summary { font-size: 0.92rem; color: rgba(255, 255, 255, 0.55); line-height: 1.35; }" +
             ".birdy-yt-row.birdy-focus .birdy-yt-row-summary { color: #383838 !important; }" +
-            ".birdy-yt-row[data-type='3way'].birdy-focus .birdy-yt-row-summary { color: #bbbbbb !important; }" +
+            ".birdy-yt-row[data-type='3way'].birdy-focus .birdy-yt-row-summary { color: #383838 !important; }" +
             ".birdy-yt-switch-wrap { display: flex; align-items: center; gap: 0.85rem; flex-shrink: 0; }" +
             ".birdy-yt-switch-state { font-size: 0.94rem; font-weight: 500; color: rgba(255, 255, 255, 0.55); min-width: 64px; text-align: right; }" +
             ".birdy-yt-switch-state.on { color: #ffffff; font-weight: 600; }" +
@@ -364,9 +364,11 @@
             ".birdy-yt-pills { display: flex; align-items: center; gap: 0.55rem; flex-shrink: 0; }" +
             ".birdy-yt-pill {" +
             " padding: 0.55rem 1.25rem; border-radius: 9999px; font-size: 0.94rem; font-weight: 600;" +
-            " background: rgba(255, 255, 255, 0.08); color: #b8b8b8; border: none; cursor: pointer; outline: none; }" +
-            ".birdy-yt-pill.selected { background: #3ea6ff; color: #0f0f0f; font-weight: 700; }" +
-            ".birdy-yt-pill.birdy-focus { background: #ffffff !important; color: #0f0f0f !important; font-weight: 700 !important; transform: none !important; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35); }" +
+            " background: rgba(255, 255, 255, 0.08); color: #d0d0d0; border: 1px solid rgba(255, 255, 255, 0.18); cursor: pointer; outline: none; transition: background 0.12s, color 0.12s, border-color 0.12s; }" +
+            ".birdy-yt-pill.selected { background: #ffffff !important; color: #0f0f0f !important; font-weight: 700 !important; border-color: #ffffff !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-pill { background: rgba(0, 0, 0, 0.08) !important; color: #222222 !important; border-color: rgba(0, 0, 0, 0.22) !important; }" +
+            ".birdy-yt-row.birdy-focus .birdy-yt-pill.selected { background: #0f0f0f !important; color: #ffffff !important; border-color: #0f0f0f !important; font-weight: 700 !important; }" +
+            ".birdy-yt-pill.birdy-focus { background: #0f0f0f !important; color: #ffffff !important; font-weight: 700 !important; border-color: #0f0f0f !important; box-shadow: 0 0 0 2px #ffffff, 0 4px 14px rgba(0, 0, 0, 0.4) !important; transform: none !important; }" +
             ".birdy-yt-btn {" +
             " padding: 0.95rem 1.85rem; border-radius: 18px; font-size: 1.06rem; font-weight: 600;" +
             " background: rgba(255, 255, 255, 0.1); color: #f5f5f5; border: none; cursor: pointer;" +
@@ -1487,7 +1489,7 @@
 
         var applied = false;
         var attempts = 0;
-        var maxAttempts = 35; // poll over ~12 seconds on startup
+        var maxAttempts = 120; // poll every 400ms over ~48 seconds so account picking is covered
         var timer = setInterval(function () {
             attempts++;
             if (attempts > maxAttempts || applied) {
@@ -1495,22 +1497,25 @@
                 return;
             }
 
+            // Only attempt navigation when the main guide rail is rendered (past the account picker)
+            var guideEntries = document.querySelectorAll("ytlr-guide-entry-renderer, .ytlr-guide-entry-renderer");
+            if (!guideEntries || guideEntries.length < 3) return;
+
             var curHash = window.location.hash || "";
             var targetHash = (tabKey === "shorts") ? "#/shorts" : ("#/browse?browseId=" + primaryBrowseId);
 
-            // 1. Try URL hash navigation once initial boot starts
-            if (attempts >= 2 && (!curHash || curHash === "#/" || curHash === "#/browse" || curHash.indexOf("FEwhat_to_watch") !== -1)) {
+            // 1. Deep link hash navigation
+            if (!curHash || curHash === "#/" || curHash === "#/browse" || curHash.indexOf("FEwhat_to_watch") !== -1) {
                 try {
                     window.location.hash = targetHash;
                     window.dispatchEvent(new Event("hashchange"));
                 } catch (e) {}
             }
 
-            // 2. Query any matching DOM entry in the guide or sidebar
-            var entries = document.querySelectorAll("ytlr-guide-entry-renderer, ytlr-compact-guide-entry-renderer, yt-guide-entry-renderer, [role='menuitem'], [role='tab'], a[href*='browseId'], [data-browse-id]");
-            for (var i = 0; i < entries.length; i++) {
-                var entry = entries[i];
-                var txt = (entry.textContent || "").trim();
+            // 2. Click the matching guide rail entry
+            for (var i = 0; i < guideEntries.length; i++) {
+                var entry = guideEntries[i];
+                var txt = (entry.textContent || entry.getAttribute("aria-label") || "").trim();
                 var href = entry.getAttribute ? (entry.getAttribute("href") || entry.getAttribute("data-browse-id") || "") : "";
                 var matched = false;
                 if (href && (href.indexOf(primaryBrowseId) !== -1 || (tabKey === "shorts" && href.indexOf("shorts") !== -1))) {
@@ -1529,26 +1534,28 @@
                 if (matched) {
                     applied = true;
                     clearInterval(timer);
-                    youtv.report("startup: navigated via DOM entry to " + tabKey);
+                    youtv.report("startup: clicked guide entry for " + tabKey);
+                    try { entry.click(); } catch (e) {}
                     try {
-                        entry.click();
-                    } catch (e) {
-                        try {
-                            entry.focus();
-                            var ev = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, keyCode: 13, which: 13 });
-                            entry.dispatchEvent(ev);
-                        } catch (e2) {}
-                    }
+                        var inner = entry.querySelector("a, button, [role='button'], [role='tab'], .ytlr-guide-entry-renderer-content");
+                        if (inner) inner.click();
+                    } catch (e2) {}
+                    try {
+                        entry.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+                    } catch (e3) {}
+                    try {
+                        entry.dispatchEvent(new CustomEvent("tap", { bubbles: true, cancelable: true }));
+                    } catch (e4) {}
                     return;
                 }
             }
 
-            // 3. Verify if hash navigation successfully locked onto target
+            // 3. Verify if URL hash has reached target
             if (window.location.hash && window.location.hash.indexOf(primaryBrowseId) !== -1) {
                 applied = true;
                 clearInterval(timer);
-                youtv.report("startup: verified hash route for " + tabKey);
+                youtv.report("startup: locked onto hash route " + tabKey);
             }
-        }, 350);
+        }, 400);
     })();
 })();

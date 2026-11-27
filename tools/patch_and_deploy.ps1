@@ -51,7 +51,7 @@ $installOut = (& $adbExe install -r $outApk 2>&1)
 Write-Host $installOut
 
 Write-Host "Refreshing Android TV Launcher cache..."
-& $adbExe shell am force-stop com.google.android.tvlauncher
+& $adbExe shell pm clear com.google.android.tvlauncher
 
 Write-Host "Launching BirdyTV on TV..."
 & $adbExe shell monkey -p app.tvpatches.android.youtube.tv 1

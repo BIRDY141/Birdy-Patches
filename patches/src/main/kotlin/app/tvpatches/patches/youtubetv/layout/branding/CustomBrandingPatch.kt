@@ -57,7 +57,7 @@ private val brandingResourcePatch = resourcePatch {
         }
 
         // Turn off Cobalt's built-in splash (YouTube logo); SplashOverlay shows FaroTV's instead.
-        // Also point AndroidManifest.xml icon/banner to un-obfuscated birdy_* resources so aapt
+        // Also point AndroidManifest.xml icon/banner to un-obfuscated birdy_red_* resources so aapt
         // compiles and links them into resources.arsc even when the base APK uses obfuscated res/ filenames.
         resourceXml("AndroidManifest.xml").use { manifest ->
             manifest.root.elements("meta-data")
@@ -65,28 +65,28 @@ private val brandingResourcePatch = resourcePatch {
                 .forEach { it.setAttribute("android:value", "false") }
 
             manifest.root.elements("application").forEach { app ->
-                app.setAttribute("android:icon", "@mipmap/birdy_launcher")
+                app.setAttribute("android:icon", "@mipmap/birdy_red_launcher")
                 if (app.attribute("android:roundIcon") != null) {
-                    app.setAttribute("android:roundIcon", "@mipmap/birdy_launcher")
+                    app.setAttribute("android:roundIcon", "@mipmap/birdy_red_launcher")
                 }
-                app.setAttribute("android:banner", "@drawable/birdy_banner")
+                app.setAttribute("android:banner", "@drawable/birdy_red_banner")
                 app.elements("activity").forEach { act ->
-                    act.setAttribute("android:icon", "@mipmap/birdy_launcher")
+                    act.setAttribute("android:icon", "@mipmap/birdy_red_launcher")
                     if (act.attribute("android:roundIcon") != null) {
-                        act.setAttribute("android:roundIcon", "@mipmap/birdy_launcher")
+                        act.setAttribute("android:roundIcon", "@mipmap/birdy_red_launcher")
                     }
-                    act.setAttribute("android:banner", "@drawable/birdy_banner")
+                    act.setAttribute("android:banner", "@drawable/birdy_red_banner")
                 }
             }
         }
 
         val iconTargets = mapOf(
-            "mipmap-mdpi/ic_launcher.png" to "mipmap-mdpi/birdy_launcher.png",
-            "mipmap-hdpi/ic_launcher.png" to "mipmap-hdpi/birdy_launcher.png",
-            "mipmap-xhdpi/ic_launcher.png" to "mipmap-xhdpi/birdy_launcher.png",
-            "mipmap-xxhdpi/ic_launcher.png" to "mipmap-xxhdpi/birdy_launcher.png",
-            "mipmap-xxxhdpi/ic_launcher.png" to "mipmap-xxxhdpi/birdy_launcher.png",
-            "drawable/app_banner.png" to "drawable/birdy_banner.png",
+            "mipmap-mdpi/ic_launcher.png" to "mipmap-mdpi/birdy_red_launcher.png",
+            "mipmap-hdpi/ic_launcher.png" to "mipmap-hdpi/birdy_red_launcher.png",
+            "mipmap-xhdpi/ic_launcher.png" to "mipmap-xhdpi/birdy_red_launcher.png",
+            "mipmap-xxhdpi/ic_launcher.png" to "mipmap-xxhdpi/birdy_red_launcher.png",
+            "mipmap-xxxhdpi/ic_launcher.png" to "mipmap-xxxhdpi/birdy_red_launcher.png",
+            "drawable/app_banner.png" to "drawable/birdy_red_banner.png",
         )
 
         IMAGES.forEach { image ->
