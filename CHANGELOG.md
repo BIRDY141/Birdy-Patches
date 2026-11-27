@@ -1,3 +1,9 @@
+## [1.24.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.23.2...v1.24.0) (2026-11-27)
+
+### ✨ New Features
+
+* **speed,ui:** overhaul settings hub UI, per-video speed, default speed setting, startup tab, and smooth speed drawer scrolling ([4c4a767](https://github.com/BIRDY141/Birdy-Patches/commit/4c4a76716b431e44b484f5709a7bcadc8a8ff7fe))
+
 ## [1.23.2](https://github.com/BIRDY141/Birdy-Patches/compare/v1.23.1...v1.23.2) (2026-11-27)
 
 ### 🐛 Bug Fixes
