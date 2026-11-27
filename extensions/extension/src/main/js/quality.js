@@ -784,15 +784,43 @@
         try {
             speedSheet = new CSSStyleSheet();
             speedSheet.replaceSync(
+                "@keyframes birdyDrawerSlideIn {\n" +
+                "  from { transform: translateX(100%); opacity: 0.8; }\n" +
+                "  to { transform: translateX(0); opacity: 1; }\n" +
+                "}\n" +
+                "@keyframes birdyDrawerSlideOut {\n" +
+                "  from { transform: translateX(0); opacity: 1; }\n" +
+                "  to { transform: translateX(100%); opacity: 0.8; }\n" +
+                "}\n" +
+                "@keyframes birdyBackdropFadeIn {\n" +
+                "  from { opacity: 0; }\n" +
+                "  to { opacity: 1; }\n" +
+                "}\n" +
+                "@keyframes birdyBackdropFadeOut {\n" +
+                "  from { opacity: 1; }\n" +
+                "  to { opacity: 0; }\n" +
+                "}\n" +
+                ".birdy-speed-drawer {\n" +
+                "  animation: birdyDrawerSlideIn 0.22s cubic-bezier(0.05, 0.7, 0.1, 1.0) forwards !important;\n" +
+                "}\n" +
+                ".birdy-speed-drawer.closing {\n" +
+                "  animation: birdyDrawerSlideOut 0.16s cubic-bezier(0.3, 0.0, 0.8, 0.15) forwards !important;\n" +
+                "}\n" +
+                ".birdy-speed-backdrop {\n" +
+                "  animation: birdyBackdropFadeIn 0.2s ease-out forwards !important;\n" +
+                "}\n" +
+                ".birdy-speed-backdrop.closing {\n" +
+                "  animation: birdyBackdropFadeOut 0.16s ease-in forwards !important;\n" +
+                "}\n" +
                 ".birdy-speed-item {\n" +
                 "  display: flex !important;\n" +
                 "  align-items: center !important;\n" +
                 "  justify-content: space-between !important;\n" +
-                "  min-height: 76px !important;\n" +
-                "  height: 76px !important;\n" +
-                "  border-radius: 16px !important;\n" +
-                "  padding: 0 28px !important;\n" +
-                "  font-size: 24px !important;\n" +
+                "  min-height: 88px !important;\n" +
+                "  height: 88px !important;\n" +
+                "  border-radius: 20px !important;\n" +
+                "  padding: 0 34px !important;\n" +
+                "  font-size: 26px !important;\n" +
                 "  font-weight: 500 !important;\n" +
                 "  font-family: Roboto, 'YouTube Sans', sans-serif !important;\n" +
                 "  background: rgba(255, 255, 255, 0.08) !important;\n" +
@@ -857,8 +885,8 @@
     function createCheckSvg(visible) {
         var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.setAttribute("viewBox", "0 0 24 24");
-        svg.style.width = "28px";
-        svg.style.height = "28px";
+        svg.style.width = "32px";
+        svg.style.height = "32px";
         svg.style.fill = "currentColor";
         svg.style.flexShrink = "0";
         svg.style.visibility = visible ? "visible" : "hidden";
@@ -870,9 +898,26 @@
 
     function closeCustomSpeedDrawer() {
         var drawer = document.getElementById("birdy-custom-speed-drawer");
-        if (drawer && drawer.parentNode) drawer.parentNode.removeChild(drawer);
         var backdrop = document.getElementById("birdy-speed-backdrop");
-        if (backdrop && backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+        if (!drawer && !backdrop) return;
+
+        if (drawer) drawer.classList.add("closing");
+        if (backdrop) backdrop.classList.add("closing");
+
+        // Restore visibility of any native dialogs
+        var nativeDialogs = document.querySelectorAll("ytlr-dialog-renderer, [role='dialog'], .ytlr-dialog-renderer");
+        for (var nd = 0; nd < nativeDialogs.length; nd++) {
+            if (nativeDialogs[nd] !== drawer) {
+                nativeDialogs[nd].style.removeProperty("opacity");
+                nativeDialogs[nd].style.removeProperty("pointer-events");
+            }
+        }
+
+        setTimeout(function () {
+            if (drawer && drawer.parentNode) drawer.parentNode.removeChild(drawer);
+            if (backdrop && backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+        }, 170);
+
         var old = document.getElementById("birdy-speed-container");
         if (old && old.parentNode) old.parentNode.removeChild(old);
     }
@@ -904,13 +949,11 @@
         var isShort = isCurrentShort(player);
         if (!getBoolSetting(isShort ? SHORTS_CUSTOM_SPEED_KEY : VIDEO_CUSTOM_SPEED_KEY, true)) return;
 
-        // Hide any default YouTube TV speed dialog that might be on screen
-        var nativeSpeedHeader = findSpeedHeading();
-        if (nativeSpeedHeader) {
-            var nativeDialog = nativeSpeedHeader.closest("ytlr-dialog-renderer, [role='dialog'], .ytlr-dialog-renderer") || nativeSpeedHeader.parentElement;
-            if (nativeDialog) {
-                nativeDialog.style.setProperty("display", "none", "important");
-            }
+        // Hide any default YouTube TV speed dialog or settings panel underneath
+        var nativeDialogs = document.querySelectorAll("ytlr-dialog-renderer, [role='dialog'], .ytlr-dialog-renderer");
+        for (var nd = 0; nd < nativeDialogs.length; nd++) {
+            nativeDialogs[nd].style.setProperty("opacity", "0", "important");
+            nativeDialogs[nd].style.setProperty("pointer-events", "none", "important");
         }
 
         ensureSpeedStyles();
@@ -920,7 +963,7 @@
 
         var existing = document.getElementById("birdy-custom-speed-drawer");
         if (existing) {
-            // Already open, refresh checkmarks
+            existing.classList.remove("closing");
             var existingItems = existing.querySelectorAll(".birdy-speed-item");
             for (var ei = 0; ei < existingItems.length; ei++) {
                 var eRate = parseFloat(existingItems[ei].getAttribute("data-rate"));
@@ -935,22 +978,24 @@
         // 1. Semi-transparent backdrop
         var backdrop = document.createElement("div");
         backdrop.id = "birdy-speed-backdrop";
+        backdrop.className = "birdy-speed-backdrop";
         backdrop.style.cssText =
             "position: fixed !important; " +
             "top: 0 !important; " +
             "left: 0 !important; " +
             "width: 100vw !important; " +
             "height: 100vh !important; " +
-            "background: rgba(0, 0, 0, 0.4) !important; " +
+            "background: rgba(0, 0, 0, 0.45) !important; " +
             "z-index: 2147483640 !important;";
         backdrop.onclick = function () {
             closeCustomSpeedDrawer();
         };
         (document.body || document.documentElement).appendChild(backdrop);
 
-        // 2. Custom Speed Drawer (1-to-1 match of YouTube TV right sheet)
+        // 2. Custom Speed Drawer (740px wide, 1-to-1 match of YouTube TV right sheet)
         var drawer = document.createElement("div");
         drawer.id = "birdy-custom-speed-drawer";
+        drawer.className = "birdy-speed-drawer";
         drawer.setAttribute("role", "dialog");
         drawer.setAttribute("aria-modal", "true");
         drawer.setAttribute("aria-label", "Video speed");
@@ -959,10 +1004,10 @@
             "position: fixed !important; " +
             "top: 0 !important; " +
             "right: 0 !important; " +
-            "width: 620px !important; " +
+            "width: 740px !important; " +
             "height: 100vh !important; " +
             "background: #0f0f0f !important; " +
-            "box-shadow: -12px 0 48px rgba(0, 0, 0, 0.95) !important; " +
+            "box-shadow: -16px 0 60px rgba(0, 0, 0, 0.95) !important; " +
             "z-index: 2147483645 !important; " +
             "padding: 44px 44px 32px 44px !important; " +
             "box-sizing: border-box !important; " +
@@ -970,15 +1015,18 @@
             "flex-direction: column !important; " +
             "outline: none !important;";
 
-        // 3. Header title
+        // 3. Header title: "Video speed" matching Pic 1
         var title = document.createElement("div");
         title.className = "birdy-speed-drawer-title";
-        title.textContent = (youtv && youtv.t ? youtv.t("video.speed.title") : null) || "Video speed";
+        var isArabic = document.documentElement && document.documentElement.lang && document.documentElement.lang.indexOf("ar") === 0;
+        var isSpanish = document.documentElement && document.documentElement.lang && document.documentElement.lang.indexOf("es") === 0;
+        title.textContent = isArabic ? "سرعة التشغيل" : (isSpanish ? "Velocidad de reproducción" : "Video speed");
         title.style.cssText =
-            "font-size: 28px !important; " +
+            "font-size: 32px !important; " +
             "font-weight: 700 !important; " +
-            "color: #f1f1f1 !important; " +
+            "color: #ffffff !important; " +
             "margin-bottom: 24px !important; " +
+            "padding-left: 6px !important; " +
             "font-family: Roboto, 'YouTube Sans', sans-serif !important;";
         drawer.appendChild(title);
 
@@ -989,13 +1037,13 @@
         list.style.cssText =
             "display: flex !important; " +
             "flex-direction: column !important; " +
-            "gap: 10px !important; " +
-            "max-height: calc(100vh - 120px) !important; " +
+            "gap: 12px !important; " +
+            "max-height: calc(100vh - 130px) !important; " +
             "overflow-y: auto !important; " +
             "overflow-x: hidden !important; " +
             "scrollbar-width: none !important; " +
             "outline: none !important; " +
-            "padding-bottom: 20px !important;";
+            "padding-bottom: 24px !important;";
         drawer.appendChild(list);
 
         function onSelectRate(rate) {
@@ -1109,7 +1157,7 @@
                         targetToFocus.scrollIntoView({ block: "center", behavior: "instant" });
                     }
                 } catch (e) {}
-            }, 30);
+            }, 50);
         }
 
         youtv.report("speed: custom drawer opened with " + SPEED_RATES.length + " rates");

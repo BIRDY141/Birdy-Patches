@@ -61,6 +61,15 @@ private val brandingResourcePatch = resourcePatch {
             manifest.root.elements("meta-data")
                 .filter { it.attribute("android:name") == "cobalt.ENABLE_SPLASH_SCREEN" }
                 .forEach { it.setAttribute("android:value", "false") }
+
+            manifest.root.elements("application").forEach { app ->
+                app.setAttribute("android:banner", "@drawable/app_banner")
+                app.setAttribute("android:icon", "@mipmap/ic_launcher")
+                app.elements("activity").forEach { act ->
+                    act.setAttribute("android:banner", "@drawable/app_banner")
+                    act.setAttribute("android:icon", "@mipmap/ic_launcher")
+                }
+            }
         }
 
         IMAGES.forEach { image ->
@@ -69,6 +78,30 @@ private val brandingResourcePatch = resourcePatch {
             val target = resourceFile("res/$image", false)
             target.parentFile.mkdirs()
             bundled.use { input -> target.outputStream().use { input.copyTo(it) } }
+        }
+
+        val bannerBytes = object {}.javaClass.classLoader.getResourceAsStream("youtubetv/branding/drawable/app_banner.png")
+            ?.use { it.readBytes() }
+            ?: throw IllegalStateException("Bundled image drawable/app_banner.png missing")
+
+        // Overwrite any decoded file containing 'banner' in all densities
+        listDecodableFiles("res/**").forEach { path ->
+            if (path.contains("banner", ignoreCase = true) && path.endsWith(".png", ignoreCase = true)) {
+                try {
+                    resourceFile(path, false).writeBytes(bannerBytes)
+                } catch (e: Exception) {}
+            }
+        }
+
+        listOf(
+            "drawable", "drawable-xhdpi", "drawable-hdpi", "drawable-tvdpi",
+            "drawable-mdpi", "drawable-xhdpi-v4", "drawable-v4", "drawable-xxhdpi"
+        ).forEach { dir ->
+            try {
+                val target = resourceFile("res/$dir/app_banner.png", false)
+                target.parentFile.mkdirs()
+                target.writeBytes(bannerBytes)
+            } catch (e: Exception) {}
         }
     }
 }
