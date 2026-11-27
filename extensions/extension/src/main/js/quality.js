@@ -785,54 +785,92 @@
             var st = document.createElement("style");
             st.id = "birdy-speed-styles";
             st.textContent =
-                ".birdy-speed-clone { outline: none; cursor: pointer; }" +
-                ".birdy-speed-clone.birdy-selected { color: #3ea6ff !important; font-weight: 600; }" +
-                ".birdy-speed-clone:focus, .birdy-speed-clone[focused] { background: rgba(255,255,255,0.15) !important; }";
+                ".birdy-speed-row { outline: none !important; cursor: pointer; }\n" +
+                ".birdy-speed-row:focus, .birdy-speed-row[focused], .birdy-speed-row.focused { background: #ffffff !important; color: #0f0f0f !important; }\n" +
+                ".birdy-speed-row:focus *, .birdy-speed-row[focused] *, .birdy-speed-row.focused * { color: #0f0f0f !important; fill: #0f0f0f !important; }\n";
             (document.head || document.documentElement || document.body).appendChild(st);
         } catch (e) {}
     }
 
     function findSpeedMenuContext() {
-        if (typeof document === "undefined" || !document.getElementsByTagName) return null;
-        var all = document.getElementsByTagName("*");
-        var normalItem = null;
+        if (typeof document === "undefined") return null;
+
+        var normalEl = null;
         var isSpeedMenu = false;
 
-        for (var i = 0; i < all.length; i++) {
-            var el = all[i];
-            if (el.children && el.children.length > 2) continue;
-            var t = (el.textContent || "").trim();
-            if (t === "Normal" || t === "عادي") {
-                // Walk up to find if an ancestor contains "Video speed" / "Playback speed"
-                var anc = el;
-                for (var d = 0; d < 8 && anc && anc !== document.body; d++) {
-                    var at = anc.textContent || "";
-                    if (/Video speed|Playback speed|Velocidad|سرعة التشغيل/i.test(at)) {
-                        isSpeedMenu = true;
-                        normalItem = el;
-                        break;
-                    }
-                    anc = anc.parentElement;
-                }
-                if (isSpeedMenu) break;
+        // Method 1: Find heading "Video speed" or localized equivalents
+        var headers = document.querySelectorAll("h1, h2, h3, h4, div, span, ytlr-dialog-title");
+        var speedHeader = null;
+        for (var h = 0; h < headers.length; h++) {
+            var head = headers[h];
+            if (head.children && head.children.length > 2) continue;
+            var ht = (head.textContent || "").trim();
+            if (/^(Video speed|Playback speed|سرعة التشغيل|Velocidad de reproducción|Velocidad)$/i.test(ht)) {
+                speedHeader = head;
+                break;
             }
         }
 
-        if (!isSpeedMenu || !normalItem) return null;
+        if (speedHeader) {
+            var parent = speedHeader.parentElement;
+            for (var depth = 0; depth < 6 && parent && parent !== document.body; depth++) {
+                var candidates = parent.querySelectorAll("*");
+                for (var ci = 0; ci < candidates.length; ci++) {
+                    var ce = candidates[ci];
+                    if (ce.children && ce.children.length > 3) continue;
+                    var ct = (ce.textContent || "").trim();
+                    if (/^(Normal(\s*\(1x\))?|عادي|Estándar)$/i.test(ct)) {
+                        normalEl = ce;
+                        isSpeedMenu = true;
+                        break;
+                    }
+                }
+                if (normalEl) break;
+                parent = parent.parentElement;
+            }
+        }
 
-        // Find the clickable item row
-        var row = normalItem;
+        // Method 2: Global scan for "Normal" leaf row inside speed menu container
+        if (!normalEl) {
+            var all = document.querySelectorAll("*");
+            for (var i = 0; i < all.length; i++) {
+                var el = all[i];
+                if (el.children && el.children.length > 3) continue;
+                var t = (el.textContent || "").trim();
+                if (/^(Normal(\s*\(1x\))?|عادي|Estándar)$/i.test(t)) {
+                    var anc = el;
+                    for (var d = 0; d < 8 && anc && anc !== document.body; d++) {
+                        var at = anc.textContent || "";
+                        if (/Video speed|Playback speed|Velocidad|سرعة التشغيل/i.test(at)) {
+                            isSpeedMenu = true;
+                            normalEl = el;
+                            break;
+                        }
+                        anc = anc.parentElement;
+                    }
+                    if (isSpeedMenu) break;
+                }
+            }
+        }
+
+        if (!isSpeedMenu || !normalEl) return null;
+
+        // Find the clickable item row container
+        var row = normalEl;
         while (row && row.parentElement && row.parentElement !== document.body) {
             var role = row.getAttribute ? (row.getAttribute("role") || "") : "";
             var tag = (row.tagName || "").toUpperCase();
-            if (/BUTTON|MENUITEM|RADIO/.test(role) || /BUTTON|YTLR-/.test(tag) || row.tabIndex >= 0 || (row.parentElement.children && row.parentElement.children.length > 1)) {
+            if (/BUTTON|MENUITEM|RADIO|OPTION/i.test(role) || /BUTTON|YTLR-/i.test(tag) || row.tabIndex >= 0) {
+                break;
+            }
+            if (row.parentElement && row.parentElement.getAttribute && /listbox|menu/i.test(row.parentElement.getAttribute("role") || "")) {
                 break;
             }
             row = row.parentElement;
         }
         if (!row || !row.parentElement) return null;
 
-        return { normalEl: normalItem, normalRow: row, container: row.parentElement };
+        return { normalEl: normalEl, normalRow: row, container: row.parentElement };
     }
 
     function enhanceNativeSpeedContainer() {
@@ -847,21 +885,34 @@
 
         var container = ctx.container;
         var row = ctx.normalRow;
-        var normalEl = ctx.normalEl;
 
-        // If container already has our custom speeds injected, don't duplicate
-        if (container.getAttribute("data-birdy-speed-injected") === "1" && container.children.length > 3) {
+        // Already populated
+        if (container.getAttribute("data-birdy-speed-injected") === "1" && container.children.length >= SPEED_RATES.length) {
             return;
         }
         container.setAttribute("data-birdy-speed-injected", "1");
 
         ensureSpeedStyles();
 
+        // Enable smooth TV scrolling for all speed options
+        try {
+            container.style.maxHeight = "75vh";
+            container.style.overflowY = "auto";
+            container.style.overflowX = "hidden";
+        } catch (e) {}
+
         var speedKey = isShort ? SHORTS_SPEED_KEY : VIDEO_SPEED_KEY;
         var currentRate = parseFloat(getStringSetting(speedKey, "1")) || 1;
 
-        // Label native normal item
-        normalEl.textContent = "Normal (1x)";
+        // Clean template row
+        var template = row.cloneNode(true);
+        template.removeAttribute("focused");
+        template.removeAttribute("aria-checked");
+        template.classList.remove("focused");
+        if (template.style) {
+            template.style.background = "";
+            template.style.color = "";
+        }
 
         function applyRate(rateVal) {
             try {
@@ -869,87 +920,113 @@
             } catch (e) {}
             applyAllTweaks(true);
             youtv.report("speed: applied " + rateVal + "x from native menu");
-            try {
-                row.click();
-            } catch (e) {}
+
+            // Update checkmarks in container
+            var rows = container.querySelectorAll(".birdy-speed-row");
+            for (var k = 0; k < rows.length; k++) {
+                var rVal = parseFloat(rows[k].getAttribute("data-birdy-rate"));
+                var isSel = Math.abs(rVal - rateVal) < 0.01;
+                var chks = rows[k].querySelectorAll("svg, ytlr-icon, [class*='check'], [class*='icon']");
+                for (var ci = 0; ci < chks.length; ci++) {
+                    chks[ci].style.visibility = isSel ? "visible" : "hidden";
+                    chks[ci].style.display = isSel ? "" : "none";
+                }
+            }
+
+            // Dismiss menu smoothly
+            setTimeout(function () {
+                var escEvt = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, keyCode: 27, which: 27, key: "Escape" });
+                document.dispatchEvent(escEvt);
+            }, 80);
         }
 
-        // Attach click to Normal item
-        row.onclick = (function (origClick) {
-            return function (ev) {
-                applyRate(1);
-                if (typeof origClick === "function") origClick.call(row, ev);
-            };
-        })(row.onclick);
+        // Remove old children in container and rebuild in exact numerical order
+        container.innerHTML = "";
+        var activeFocusRow = null;
 
-        // Remove any previously injected clone elements in container
-        var oldClones = container.querySelectorAll(".birdy-speed-clone");
-        for (var c = 0; c < oldClones.length; c++) {
-            oldClones[c].parentNode.removeChild(oldClones[c]);
-        }
-
-        // Create clones for all other rates
-        var fragment = document.createDocumentFragment();
         for (var r = 0; r < SPEED_RATES.length; r++) {
-            var rate = SPEED_RATES[r];
-            if (rate === 1) continue;
-
             (function (rateVal) {
-                var clone = row.cloneNode(true);
-                clone.className = (clone.className || "") + " birdy-speed-clone";
-                clone.setAttribute("data-birdy-rate", String(rateVal));
-                clone.tabIndex = 0;
+                var item = template.cloneNode(true);
+                item.className = (template.className || "") + " birdy-speed-row";
+                item.setAttribute("data-birdy-rate", String(rateVal));
+                item.tabIndex = 0;
 
-                // Update text element
-                var subEls = clone.getElementsByTagName("*");
+                var label = rateVal === 1 ? "Normal (1x)" : (rateVal + "x");
+                var subEls = item.getElementsByTagName("*");
                 var textUpdated = false;
                 for (var si = 0; si < subEls.length; si++) {
                     var se = subEls[si];
-                    if (se.children.length === 0 && (se.textContent || "").indexOf("Normal") !== -1) {
-                        se.textContent = rateVal + "x";
+                    if (se.children.length === 0 && (se.textContent || "").trim().length > 0) {
+                        se.textContent = label;
                         textUpdated = true;
                         break;
                     }
                 }
-                if (!textUpdated) clone.textContent = rateVal + "x";
+                if (!textUpdated) item.textContent = label;
 
                 var isSelected = Math.abs(rateVal - currentRate) < 0.01;
-                clone.classList.toggle("birdy-selected", isSelected);
-
-                // Checkmark visibility: if this clone is NOT selected, hide checkmark icons/spans
-                if (!isSelected) {
-                    var chkCandidates = clone.querySelectorAll("svg, [class*='check'], [class*='icon'], ytlr-icon");
-                    for (var ci = 0; ci < chkCandidates.length; ci++) {
-                        chkCandidates[ci].style.display = "none";
-                    }
+                var chkCandidates = item.querySelectorAll("svg, ytlr-icon, [class*='check'], [class*='icon']");
+                for (var ci = 0; ci < chkCandidates.length; ci++) {
+                    chkCandidates[ci].style.visibility = isSelected ? "visible" : "hidden";
+                    chkCandidates[ci].style.display = isSelected ? "" : "none";
                 }
 
-                clone.onclick = function (ev) {
+                item.onclick = function (ev) {
                     if (ev && ev.stopPropagation) ev.stopPropagation();
                     applyRate(rateVal);
                 };
-                clone.onkeydown = function (ev) {
+                item.onkeydown = function (ev) {
                     var code = ev.keyCode || ev.which;
-                    if (code === 13 || code === 23) { // Enter / OK
+                    if (code === 13 || code === 23) {
                         if (ev && ev.stopPropagation) ev.stopPropagation();
                         applyRate(rateVal);
                     }
                 };
+                item.onfocus = function () {
+                    if (typeof item.scrollIntoView === "function") {
+                        item.scrollIntoView({ block: "nearest", behavior: "smooth" });
+                    }
+                };
 
-                fragment.appendChild(clone);
-            })(rate);
+                if (isSelected) {
+                    activeFocusRow = item;
+                }
+
+                container.appendChild(item);
+            })(SPEED_RATES[r]);
         }
 
-        container.appendChild(fragment);
+        if (activeFocusRow && typeof activeFocusRow.focus === "function") {
+            try { activeFocusRow.focus(); } catch (e) {}
+        }
+
         youtv.report("speed: native container populated with " + SPEED_RATES.length + " rates");
     }
 
+    // Instant observation of DOM mutations so the menu opens with all rates immediately
+    if (typeof window !== "undefined" && typeof MutationObserver !== "undefined") {
+        try {
+            var speedObserver = new MutationObserver(function () {
+                enhanceNativeSpeedContainer();
+            });
+            var targetRoot = document.body || document.documentElement;
+            if (targetRoot) {
+                speedObserver.observe(targetRoot, { childList: true, subtree: true });
+            }
+        } catch (e) {}
+    }
+
     if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+        window.addEventListener("focusin", function () {
+            enhanceNativeSpeedContainer();
+        }, true);
+
         window.addEventListener("keydown", function (e) {
             var code = e.keyCode || e.which;
-            if (code === 13 || code === 23 || code === 38 || code === 40) {
-                setTimeout(enhanceNativeSpeedContainer, 100);
-                setTimeout(enhanceNativeSpeedContainer, 300);
+            if (code === 13 || code === 23 || code === 38 || code === 40 || code === 37 || code === 39) {
+                enhanceNativeSpeedContainer();
+                setTimeout(enhanceNativeSpeedContainer, 40);
+                setTimeout(enhanceNativeSpeedContainer, 150);
             }
         }, true);
     }
@@ -960,6 +1037,6 @@
             bindVideoListeners();
             applyAllTweaks(false);
             enhanceNativeSpeedContainer();
-        }, 800);
+        }, 400);
     }
 })();
