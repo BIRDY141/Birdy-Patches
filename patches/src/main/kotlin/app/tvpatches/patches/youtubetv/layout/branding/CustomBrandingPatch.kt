@@ -57,11 +57,30 @@ private val brandingResourcePatch = resourcePatch {
         }
 
         // Turn off Cobalt's built-in splash (YouTube logo); SplashOverlay shows FaroTV's instead.
+        // Also point AndroidManifest.xml icon/banner to un-obfuscated birdy_* resources so aapt
+        // compiles and links them even when the base APK uses obfuscated res/ filenames.
         resourceXml("AndroidManifest.xml").use { manifest ->
             manifest.root.elements("meta-data")
                 .filter { it.attribute("android:name") == "cobalt.ENABLE_SPLASH_SCREEN" }
                 .forEach { it.setAttribute("android:value", "false") }
+            val app = manifest.root.elements("application").firstOrNull()
+            if (app != null) {
+                app.setAttribute("android:icon", "@mipmap/birdy_launcher")
+                if (app.attribute("android:roundIcon") != null) {
+                    app.setAttribute("android:roundIcon", "@mipmap/birdy_launcher")
+                }
+                app.setAttribute("android:banner", "@drawable/birdy_banner")
+            }
         }
+
+        val iconTargets = mapOf(
+            "mipmap-mdpi/ic_launcher.png" to "mipmap-mdpi/birdy_launcher.png",
+            "mipmap-hdpi/ic_launcher.png" to "mipmap-hdpi/birdy_launcher.png",
+            "mipmap-xhdpi/ic_launcher.png" to "mipmap-xhdpi/birdy_launcher.png",
+            "mipmap-xxhdpi/ic_launcher.png" to "mipmap-xxhdpi/birdy_launcher.png",
+            "mipmap-xxxhdpi/ic_launcher.png" to "mipmap-xxxhdpi/birdy_launcher.png",
+            "drawable/app_banner.png" to "drawable/birdy_banner.png",
+        )
 
         IMAGES.forEach { image ->
             val bundled = object {}.javaClass.classLoader.getResourceAsStream("youtubetv/branding/$image")
@@ -69,6 +88,14 @@ private val brandingResourcePatch = resourcePatch {
             val target = resourceFile("res/$image", false)
             target.parentFile.mkdirs()
             bundled.use { input -> target.outputStream().use { input.copyTo(it) } }
+
+            val alias = iconTargets[image]
+            if (alias != null) {
+                val aliasStream = object {}.javaClass.classLoader.getResourceAsStream("youtubetv/branding/$image")
+                val aliasTarget = resourceFile("res/$alias", true)
+                aliasTarget.parentFile.mkdirs()
+                aliasStream?.use { input -> aliasTarget.outputStream().use { input.copyTo(it) } }
+            }
         }
     }
 }

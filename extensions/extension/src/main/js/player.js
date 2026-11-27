@@ -123,8 +123,11 @@
         }, true);
         document.addEventListener("keydown", function (e) {
             var code = e.keyCode || e.which;
-            if ((code === 13 || code === 23) && isPipElement(document.activeElement)) {
-                youtv.report("@enterpip");
+            if (code === 13 || code === 23) {
+                var focusedPip = document.querySelector("[aria-label='Picture-in-Picture'].focused, .focused [aria-label='Picture-in-Picture']");
+                if (isPipElement(document.activeElement) || focusedPip) {
+                    youtv.report("@enterpip");
+                }
             }
         }, true);
     }

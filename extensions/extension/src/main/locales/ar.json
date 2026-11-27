@@ -186,6 +186,8 @@
   "video.original_audio.summary": "الاحتفاظ بالمسار الصوتي الأصلي ومنع الدبلجة التلقائية",
   "video.speed.title": "سرعة التشغيل",
   "video.speed.summary": "فرض سرعة التشغيل (من 0.25x إلى 4x)",
+  "video.custom_speed.title": "استخدام قائمة السرعة المخصصة",
+  "video.custom_speed.summary": "إظهار خيارات من 0.25x إلى 4x داخل قائمة سرعة الفيديو في المشغل",
   "video.pip.title": "صورة داخل صورة (PiP)",
   "video.pip.summary": "تشغيل وضع PiP عند الضغط على زر الرئيسية أثناء التشغيل"
 }

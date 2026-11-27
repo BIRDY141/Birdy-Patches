@@ -186,6 +186,8 @@
   "video.original_audio.summary": "Mantiene la pista de audio original y evita el doblaje automático",
   "video.speed.title": "Velocidad de reproducción",
   "video.speed.summary": "Fuerza la velocidad de reproducción (0.25x a 4x)",
+  "video.custom_speed.title": "Usar selector de velocidad personalizado",
+  "video.custom_speed.summary": "Muestra opciones de 0.25x a 4x dentro del menú de velocidad del reproductor",
   "video.pip.title": "Imagen en imagen (PiP)",
   "video.pip.summary": "Activa PiP al pulsar Inicio mientras se reproduce un video"
 }

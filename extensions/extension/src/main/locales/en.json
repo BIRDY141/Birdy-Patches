@@ -186,6 +186,8 @@
   "video.original_audio.summary": "Keep the creator's original audio track and prevent auto-dubbing",
   "video.speed.title": "Playback speed",
   "video.speed.summary": "Force playback speed (0.25x to 4x)",
+  "video.custom_speed.title": "Use custom speed picker",
+  "video.custom_speed.summary": "Show 0.25x–4x options inside the player's Video speed menu",
   "video.pip.title": "Picture-in-Picture (PiP)",
   "video.pip.summary": "Enter Picture-in-Picture when pressing Home during playback"
 }
