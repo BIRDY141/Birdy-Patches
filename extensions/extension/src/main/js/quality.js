@@ -805,37 +805,46 @@
         }
     }
 
+    function isElemVisible(el) {
+        if (!el || typeof el.getBoundingClientRect !== "function") return false;
+        var rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+    }
+
     function enhanceNativeSpeedContainer() {
         if (typeof document === "undefined" || !document.querySelectorAll) return;
+        if (!document.querySelector("video")) return;
         var player = findPlayer();
         var isShort = isCurrentShort(player);
         if (!getBoolSetting(isShort ? SHORTS_CUSTOM_SPEED_KEY : VIDEO_CUSTOM_SPEED_KEY, true)) return;
 
-        var popups = document.querySelectorAll("ytlr-popup-container, ytlr-menu-renderer, ytlr-multi-page-menu-renderer, [role='dialog']");
+        var popups = document.querySelectorAll("ytlr-popup-container, ytlr-menu-renderer, ytlr-multi-page-menu-renderer, ytlr-settings-panel, [role='dialog']");
         for (var i = 0; i < popups.length; i++) {
             var popup = popups[i];
-            if (!popup || popup.offsetParent === null) continue;
+            if (!popup || !isElemVisible(popup)) continue;
             if (popup.getAttribute("data-birdy-speed-menu") === "1") continue;
 
             var text = (popup.textContent || "").trim();
-            if (!/^(Video speed|Playback speed|Velocidad|سرعة التشغيل)/i.test(text)) continue;
-            if (text.length > 160) continue;
+            if (!/(Video speed|Playback speed|Velocidad|سرعة التشغيل)/i.test(text)) continue;
+            if (text.indexOf("Normal") === -1 && text.indexOf("عادي") === -1) continue;
+            if (text.length > 260) continue;
 
             var normalEl = null;
-            var allEls = popup.querySelectorAll("*");
-            for (var j = 0; j < allEls.length; j++) {
-                var t = (allEls[j].textContent || "").trim();
-                if (t === "Normal" && allEls[j].children.length <= 2) {
-                    normalEl = allEls[j];
+            var candidates = popup.querySelectorAll("yt-formatted-string, span, div, button, [role='button']");
+            for (var j = 0; j < candidates.length; j++) {
+                var t = (candidates[j].textContent || "").trim();
+                if ((t === "Normal" || t === "عادي") && candidates[j].children.length <= 2) {
+                    normalEl = candidates[j];
                     break;
                 }
             }
             if (!normalEl) continue;
 
             var listHost = normalEl.parentElement;
-            while (listHost && listHost !== popup && listHost.children.length < 1) {
+            while (listHost && listHost !== popup && listHost.tagName && !/LIST|MENU|ITEMS|CONTENT/i.test(listHost.tagName) && listHost.children.length <= 1) {
                 listHost = listHost.parentElement;
             }
+            if (!listHost) listHost = normalEl.parentElement;
             if (!listHost) continue;
 
             popup.setAttribute("data-birdy-speed-menu", "1");
@@ -879,7 +888,7 @@
             break;
         }
 
-        if (activeSpeedMenu && (!document.body.contains(activeSpeedMenu.popup) || activeSpeedMenu.popup.offsetParent === null)) {
+        if (activeSpeedMenu && (!document.body.contains(activeSpeedMenu.popup) || !isElemVisible(activeSpeedMenu.popup))) {
             activeSpeedMenu = null;
         }
     }
@@ -894,7 +903,7 @@
                 }
                 return;
             }
-            if (!document.body.contains(activeSpeedMenu.popup) || activeSpeedMenu.popup.offsetParent === null) {
+            if (!document.body.contains(activeSpeedMenu.popup) || !isElemVisible(activeSpeedMenu.popup)) {
                 activeSpeedMenu = null;
                 return;
             }

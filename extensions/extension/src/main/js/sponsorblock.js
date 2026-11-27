@@ -752,14 +752,9 @@
         updateButtonCheckmarks(pane, activeCat.key);
     }
 
-    try {
-        window.addEventListener("focusin", enhanceSettingsPane, true);
-        window.addEventListener("keydown", function () { setTimeout(enhanceSettingsPane, 50); }, true);
-    } catch (e) {}
-
     // ---- main playback tick -------------------------------------------------------------------
     setInterval(function () {
-        enhanceSettingsPane();
+        if (typeof document !== "undefined" && document.hidden) return;
         var id = (feature.enabled() || (seekbarFeature && seekbarFeature.enabled())) ? currentVideoId() : null;
         if (id !== videoId) {
             videoId = id;
@@ -769,6 +764,7 @@
             if (id) load(id);
         }
 
+        if (!videoId) return;
         updateSeekbarMarkers();
 
         if (!segments.length || !feature.enabled()) return;
