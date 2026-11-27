@@ -1,3 +1,9 @@
+## [1.23.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.23.0...v1.23.1) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **speed,banner:** fix drawer self-hiding loop, smooth 0.35s animation, and overwrite obfuscated res/dN.png banner ([346a7e5](https://github.com/BIRDY141/Birdy-Patches/commit/346a7e5869d7990559139806b645b25650294add))
+
 ## [1.23.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.12...v1.23.0) (2026-11-27)
 
 ### ✨ New Features
