@@ -75,7 +75,7 @@ All in-app features are configured from the **BirdyTV** section inside YouTube T
 ## 🩹 Patches
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.27.0](https://github.com/BIRDY141/Birdy-Patches/releases/tag/v1.27.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;10 patches total
+> **[v1.28.0](https://github.com/BIRDY141/Birdy-Patches/releases/tag/v1.28.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;8 patches total
 <details open>
 <summary>📦 YouTube for Android TV&nbsp;&nbsp;•&nbsp;&nbsp;7 patches</summary>
 <br>

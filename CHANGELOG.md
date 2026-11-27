@@ -1,3 +1,9 @@
+## [1.28.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.27.0...v1.28.0) (2026-11-27)
+
+### ✨ New Features
+
+* **release:** clean up repo, integrate PiP into settings, remove diagnostics, and update README ([a32dd45](https://github.com/BIRDY141/Birdy-Patches/commit/a32dd4563b2288d89b42f6823e283e3dd0cf32c2))
+
 ## [1.27.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.26.0...v1.27.0) (2026-11-27)
 
 ### ✨ New Features
