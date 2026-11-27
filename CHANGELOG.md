@@ -1,3 +1,9 @@
+## [1.23.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.12...v1.23.0) (2026-11-27)
+
+### ✨ New Features
+
+* **speed,branding:** add slide animation, 740px width, larger pills, and universal launcher banner ([c76d10f](https://github.com/BIRDY141/Birdy-Patches/commit/c76d10f1fcbbfd6e720e427b23e11886ff6627c0))
+
 ## [1.22.12](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.11...v1.22.12) (2026-11-27)
 
 ### 🐛 Bug Fixes
