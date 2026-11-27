@@ -1,3 +1,9 @@
+## [1.22.7](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.6...v1.22.7) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **speed:** preserve native drawer layout and enable full D-pad list navigation ([98f9985](https://github.com/BIRDY141/Birdy-Patches/commit/98f998537fac1bd823e8d15c95ecc301c44b135a))
+
 ## [1.22.6](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.5...v1.22.6) (2026-11-27)
 
 ### 🐛 Bug Fixes

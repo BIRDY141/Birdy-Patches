@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-27T17:37:16",
-  "description": "## [1.22.6](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.5...v1.22.6) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **speed:** avoid TrustedHTML violation when rebuilding speed menu container ([6ab2c26](https://github.com/BIRDY141/Birdy-Patches/commit/6ab2c26dc02ad1b04b6ed86f98c9cf16800e1371))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.6/patches-1.22.6.mpp",
+  "created_at": "2026-11-27T17:44:16",
+  "description": "## [1.22.7](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.6...v1.22.7) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **speed:** preserve native drawer layout and enable full D-pad list navigation ([98f9985](https://github.com/BIRDY141/Birdy-Patches/commit/98f998537fac1bd823e8d15c95ecc301c44b135a))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.22.7/patches-1.22.7.mpp",
   "signature_download_url": "",
-  "version": "1.22.6"
+  "version": "1.22.7"
 }
