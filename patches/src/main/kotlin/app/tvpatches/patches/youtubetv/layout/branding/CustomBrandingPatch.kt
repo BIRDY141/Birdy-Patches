@@ -58,7 +58,7 @@ private val brandingResourcePatch = resourcePatch {
 
         // Turn off Cobalt's built-in splash (YouTube logo); SplashOverlay shows FaroTV's instead.
         // Also point AndroidManifest.xml icon/banner to un-obfuscated birdy_* resources so aapt
-        // compiles and links them even when the base APK uses obfuscated res/ filenames.
+        // compiles and links them even when the base APK uses obfuscated res/ filenames (red branding).
         resourceXml("AndroidManifest.xml").use { manifest ->
             manifest.root.elements("meta-data")
                 .filter { it.attribute("android:name") == "cobalt.ENABLE_SPLASH_SCREEN" }
