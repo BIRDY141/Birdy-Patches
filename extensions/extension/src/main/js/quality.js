@@ -816,11 +816,11 @@
                 "  display: flex !important;\n" +
                 "  align-items: center !important;\n" +
                 "  justify-content: space-between !important;\n" +
-                "  min-height: 88px !important;\n" +
-                "  height: 88px !important;\n" +
-                "  border-radius: 20px !important;\n" +
-                "  padding: 0 34px !important;\n" +
-                "  font-size: 26px !important;\n" +
+                "  min-height: 98px !important;\n" +
+                "  height: 98px !important;\n" +
+                "  border-radius: 22px !important;\n" +
+                "  padding: 0 36px !important;\n" +
+                "  font-size: 28px !important;\n" +
                 "  font-weight: 500 !important;\n" +
                 "  font-family: Roboto, 'YouTube Sans', sans-serif !important;\n" +
                 "  background: rgba(255, 255, 255, 0.08) !important;\n" +
@@ -885,8 +885,8 @@
     function createCheckSvg(visible) {
         var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.setAttribute("viewBox", "0 0 24 24");
-        svg.style.width = "32px";
-        svg.style.height = "32px";
+        svg.style.width = "36px";
+        svg.style.height = "36px";
         svg.style.fill = "currentColor";
         svg.style.flexShrink = "0";
         svg.style.visibility = visible ? "visible" : "hidden";
@@ -1006,12 +1006,12 @@
             "position: fixed !important; " +
             "top: 0 !important; " +
             "right: 0 !important; " +
-            "width: 740px !important; " +
+            "width: 680px !important; " +
             "height: 100vh !important; " +
             "background: #0f0f0f !important; " +
             "box-shadow: -16px 0 60px rgba(0, 0, 0, 0.95) !important; " +
             "z-index: 2147483645 !important; " +
-            "padding: 44px 44px 32px 44px !important; " +
+            "padding: 44px 38px 32px 38px !important; " +
             "box-sizing: border-box !important; " +
             "display: flex !important; " +
             "flex-direction: column !important; " +
@@ -1024,11 +1024,11 @@
         var isSpanish = document.documentElement && document.documentElement.lang && document.documentElement.lang.indexOf("es") === 0;
         title.textContent = isArabic ? "سرعة التشغيل" : (isSpanish ? "Velocidad de reproducción" : "Video speed");
         title.style.cssText =
-            "font-size: 32px !important; " +
+            "font-size: 38px !important; " +
             "font-weight: 700 !important; " +
             "color: #ffffff !important; " +
-            "margin-bottom: 24px !important; " +
-            "padding-left: 6px !important; " +
+            "margin-bottom: 26px !important; " +
+            "padding-left: 4px !important; " +
             "font-family: Roboto, 'YouTube Sans', sans-serif !important;";
         drawer.appendChild(title);
 
@@ -1040,7 +1040,7 @@
             "display: flex !important; " +
             "flex-direction: column !important; " +
             "gap: 12px !important; " +
-            "max-height: calc(100vh - 130px) !important; " +
+            "max-height: calc(100vh - 140px) !important; " +
             "overflow-y: auto !important; " +
             "overflow-x: hidden !important; " +
             "scrollbar-width: none !important; " +
