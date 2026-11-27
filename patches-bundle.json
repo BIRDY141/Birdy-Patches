@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-27T12:02:47",
-  "description": "## [1.17.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.17.0...v1.17.1) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **quality:** use youtv.rawParse to prevent JSON.parse recursion freeze ([6763c33](https://github.com/BIRDY141/Birdy-Patches/commit/6763c337e7174e2e5dce0321b55ba24d2b8caf7b))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.17.1/patches-1.17.1.mpp",
+  "created_at": "2026-11-27T12:10:03",
+  "description": "## [1.17.2](https://github.com/BIRDY141/Birdy-Patches/compare/v1.17.1...v1.17.2) (2026-11-27)\n\n### 🐛 Bug Fixes\n\n* **captions:** force ON_REQUIRED, update captionTrackIndices, and toggleSubtitlesOn ([3f9298e](https://github.com/BIRDY141/Birdy-Patches/commit/3f9298e8d8ca6d41ac11ed38494e7b240fcc7fcb))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v1.17.2/patches-1.17.2.mpp",
   "signature_download_url": "",
-  "version": "1.17.1"
+  "version": "1.17.2"
 }

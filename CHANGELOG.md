@@ -1,3 +1,9 @@
+## [1.17.2](https://github.com/BIRDY141/Birdy-Patches/compare/v1.17.1...v1.17.2) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **captions:** force ON_REQUIRED, update captionTrackIndices, and toggleSubtitlesOn ([3f9298e](https://github.com/BIRDY141/Birdy-Patches/commit/3f9298e8d8ca6d41ac11ed38494e7b240fcc7fcb))
+
 ## [1.17.1](https://github.com/BIRDY141/Birdy-Patches/compare/v1.17.0...v1.17.1) (2026-11-27)
 
 ### 🐛 Bug Fixes
