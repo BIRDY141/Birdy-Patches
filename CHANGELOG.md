@@ -1,3 +1,9 @@
+## [1.22.9](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.8...v1.22.9) (2026-11-27)
+
+### 🐛 Bug Fixes
+
+* **speed:** remove ancestor clipping boundaries to display full speed list ([f4ff296](https://github.com/BIRDY141/Birdy-Patches/commit/f4ff2960425a50098bd8ce1edd26fddb82d3307d))
+
 ## [1.22.8](https://github.com/BIRDY141/Birdy-Patches/compare/v1.22.7...v1.22.8) (2026-11-27)
 
 ### 🐛 Bug Fixes
