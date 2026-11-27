@@ -1,3 +1,9 @@
+## [1.26.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.25.0...v1.26.0) (2026-11-27)
+
+### ✨ New Features
+
+* **branding,settings:** switch to birdy_red_banner, white pills without grey row, and robust startup guide navigation ([fa3fc17](https://github.com/BIRDY141/Birdy-Patches/commit/fa3fc1732da7b4ea4e9c8840004d7e3b5efbadba))
+
 ## [1.25.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.24.0...v1.25.0) (2026-11-27)
 
 ### ✨ New Features
