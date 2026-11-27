@@ -1,3 +1,9 @@
+## [1.17.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.16.0...v1.17.0) (2026-11-27)
+
+### ✨ New Features
+
+* **video,shorts:** add caption language, auto-translate, original title, and original audio settings ([377a7ea](https://github.com/BIRDY141/Birdy-Patches/commit/377a7ea379e8c6efe5019f2731bf92d0cb786126))
+
 ## [1.16.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.15.1...v1.16.0) (2026-11-27)
 
 ### ✨ New Features
