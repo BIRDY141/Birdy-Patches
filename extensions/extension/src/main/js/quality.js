@@ -175,7 +175,7 @@
         var cap = response && response.captions && response.captions.playerCaptionsTracklistRenderer;
         if (!cap || !Array.isArray(cap.captionTracks) || !cap.captionTracks.length) return;
 
-        if (moreAutoTranslate) {
+        if (moreAutoTranslate || (captionLang && captionLang !== "auto" && captionLang !== "video")) {
             for (var i = 0; i < cap.captionTracks.length; i++) {
                 if (cap.captionTracks[i]) cap.captionTracks[i].isTranslatable = true;
             }
@@ -184,15 +184,22 @@
             for (var e = 0; e < existing.length; e++) {
                 if (existing[e] && existing[e].languageCode) seen[existing[e].languageCode] = true;
             }
-            for (var l = 0; l < TRANSLATION_LANGUAGES.length; l++) {
-                var tl = TRANSLATION_LANGUAGES[l];
-                if (!seen[tl.code]) {
-                    existing.push({
-                        languageCode: tl.code,
-                        languageName: { runs: [{ text: tl.name }] }
-                    });
-                    seen[tl.code] = true;
+            if (moreAutoTranslate) {
+                for (var l = 0; l < TRANSLATION_LANGUAGES.length; l++) {
+                    var tl = TRANSLATION_LANGUAGES[l];
+                    if (!seen[tl.code]) {
+                        existing.push({
+                            languageCode: tl.code,
+                            languageName: { runs: [{ text: tl.name }] }
+                        });
+                        seen[tl.code] = true;
+                    }
                 }
+            } else if (!seen[captionLang]) {
+                existing.push({
+                    languageCode: captionLang,
+                    languageName: { runs: [{ text: findLangName(captionLang) }] }
+                });
             }
             cap.translationLanguages = existing;
         }
@@ -605,10 +612,22 @@
                 }
                 if (!chosen) {
                     var base = tracklist[0];
+                    var tObj = null;
+                    try {
+                        var tLangs = (typeof player.getOption === "function") ? player.getOption("captions", "translationLanguages") : null;
+                        if (Array.isArray(tLangs)) {
+                            for (var tlIdx = 0; tlIdx < tLangs.length; tlIdx++) {
+                                if (tLangs[tlIdx] && langMatches(tLangs[tlIdx].languageCode, desiredLang)) {
+                                    tObj = tLangs[tlIdx];
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (e) {}
                     chosen = {
                         languageCode: base.languageCode,
                         vssId: base.vssId,
-                        translationLanguage: {
+                        translationLanguage: tObj || {
                             languageCode: desiredLang,
                             languageName: findLangName(desiredLang)
                         }
