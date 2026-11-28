@@ -647,7 +647,7 @@
 
                 var activeTrack = (typeof player.getOption === "function") ? player.getOption("captions", "track") : null;
                 var activeLang = activeTrack && ((activeTrack.translationLanguage && activeTrack.translationLanguage.languageCode) || activeTrack.languageCode);
-                if (activeLang && langMatches(activeLang, desiredLang)) {
+                if (desiredLang === "video" || (activeLang && langMatches(activeLang, desiredLang)) || lastCaptionVid === vid) {
                     lastCaptionVid = vid;
                     lastCaptionLang = desiredLang;
                 }
