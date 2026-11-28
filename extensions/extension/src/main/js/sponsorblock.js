@@ -341,6 +341,33 @@
         if (icon && prompt.appendChild) prompt.appendChild(icon);
     }
 
+    function syncPromptPosition() {
+        if (!prompt || !isPromptShowing()) return;
+        try {
+            var focused = isVideoPlayerFocused();
+            prompt.style.zIndex = focused ? "2147483647" : "1";
+
+            var videoEl = document.querySelector ? document.querySelector("video") : null;
+            if (videoEl && typeof videoEl.getBoundingClientRect === "function") {
+                var vRect = videoEl.getBoundingClientRect();
+                var winW = window.innerWidth || 1920;
+                var winH = window.innerHeight || 1080;
+                if (vRect && vRect.width > 100 && vRect.height > 100) {
+                    var padX = Math.max(16, Math.round(vRect.width * 0.03));
+                    var padY = Math.max(20, Math.round(vRect.height * 0.06));
+                    if (prompt.dir === "rtl") {
+                        prompt.style.left = Math.max(16, Math.round(vRect.left + padX)) + "px";
+                        prompt.style.right = "auto";
+                    } else {
+                        prompt.style.right = Math.max(16, Math.round(winW - vRect.right + padX)) + "px";
+                        prompt.style.left = "auto";
+                    }
+                    prompt.style.bottom = Math.max(20, Math.round(winH - vRect.bottom + padY)) + "px";
+                }
+            }
+        } catch (e) {}
+    }
+
     function showPrompt(s) {
         if (!document.body) return;
         if (!prompt) {
@@ -365,6 +392,7 @@
 
         updatePromptView();
         prompt.className = "birdy-skip-prompt farotv-skip-prompt show";
+        syncPromptPosition();
 
         window.removeEventListener("keydown", onPromptKeyDown, true);
         window.addEventListener("keydown", onPromptKeyDown, true);
@@ -502,7 +530,7 @@
                 if (pb && typeof pb.matches === "function" && pb.matches(":focus, :focus-within")) isFocused = true;
             }
         } catch (e) {}
-        var height = isFocused ? Math.max(6, Math.min(10, Math.round(rect.height * 10) / 10)) : 4;
+        var height = isFocused ? Math.max(8, Math.min(12, Math.round(rect.height * 10) / 10)) : 6;
         var roundedOpacity = Math.round(opacity * 100) / 100;
 
         if (!lastBox.visible) {
@@ -794,6 +822,7 @@
 
         if (!videoId) return;
         updateSeekbarMarkers();
+        if (isPromptShowing()) syncPromptPosition();
 
         if (!segments.length || !feature.enabled()) return;
         var video = document.querySelector("video");
