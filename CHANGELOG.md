@@ -1,3 +1,9 @@
+## [2.0.2](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.1...v2.0.2) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **captions:** reliably enforce caption language after player init ([6eb3c9a](https://github.com/BIRDY141/Birdy-Patches/commit/6eb3c9a36a48bb3e6ff172016440837eab387e68))
+
 ## [2.0.1](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.0...v2.0.1) (2026-11-28)
 
 ### 🐛 Bug Fixes
