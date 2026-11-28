@@ -2,6 +2,13 @@
 
 ### 🐛 Bug Fixes
 
+* **sponsorblock:** publish release v2.0.8 ([27a51a7](https://github.com/BIRDY141/Birdy-Patches/commit/27a51a72a1b56f894632456f729483d962dc4419))
+* **sponsorblock:** thicker unfocused seekbar and anchor skip prompt to video frame behind controls ([54021b2](https://github.com/BIRDY141/Birdy-Patches/commit/54021b2184ead1964bafdf92cb0ca4557d99edd2))
+
+## [2.0.8](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.7...v2.0.8) (2026-11-28)
+
+### 🐛 Bug Fixes
+
 * **sponsorblock:** thicker unfocused seekbar and anchor skip prompt to video frame behind controls ([54021b2](https://github.com/BIRDY141/Birdy-Patches/commit/54021b2184ead1964bafdf92cb0ca4557d99edd2))
 
 ## [2.0.7](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.6...v2.0.7) (2026-11-28)
