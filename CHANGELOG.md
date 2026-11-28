@@ -1,3 +1,9 @@
+## [2.0.3](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.2...v2.0.3) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **captions:** use video's defaultCaptionTrackIndex when caption language is set to video ([a0a37c4](https://github.com/BIRDY141/Birdy-Patches/commit/a0a37c41229c2ae8e325e5da2c07a8a343f221af))
+
 ## [2.0.2](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.1...v2.0.2) (2026-11-28)
 
 ### 🐛 Bug Fixes
