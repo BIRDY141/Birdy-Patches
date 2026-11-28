@@ -547,9 +547,9 @@
                 if (pb && typeof pb.matches === "function" && pb.matches(":focus, :focus-within")) isFocused = true;
             }
         } catch (e) {}
-        var centerY = Math.round((rect.top + rect.height / 2 + (isFocused ? 0 : 1.5)) * 10) / 10;
+        var centerY = Math.round((rect.top + rect.height / 2 + (isFocused ? 0 : 2.5)) * 10) / 10;
         var width = Math.round(rect.width * 10) / 10;
-        var height = isFocused ? Math.max(8, Math.min(12, Math.round(rect.height * 10) / 10)) : 6;
+        var height = isFocused ? Math.max(8, Math.min(12, Math.round(rect.height * 10) / 10)) : 4;
         var roundedOpacity = Math.round(opacity * 100) / 100;
 
         if (!lastBox.visible) {
