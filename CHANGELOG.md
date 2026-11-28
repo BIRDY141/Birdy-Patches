@@ -1,3 +1,9 @@
+## [2.0.10](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.9...v2.0.10) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **player:** align unfocused seekbar, fix auto-translated captions, and block Shorts ads ([d608604](https://github.com/BIRDY141/Birdy-Patches/commit/d60860411baa01e13a30eec6e4264eafb7e42328))
+
 ## [2.0.9](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.8...v2.0.9) (2026-11-28)
 
 ### 🐛 Bug Fixes
