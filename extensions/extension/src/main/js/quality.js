@@ -952,12 +952,6 @@
                         subFound = true;
                     }
                 }
-                if (!subFound && it.lastElementChild && it.lastElementChild !== it.firstElementChild) {
-                    var lastTxt = (it.lastElementChild.textContent || "").trim();
-                    if (!/Speed|سرعة|Velocidad/i.test(lastTxt)) {
-                        it.lastElementChild.textContent = label;
-                    }
-                }
             }
         }
     }
