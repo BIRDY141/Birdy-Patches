@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.0...v2.0.1) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **speed:** avoid overwriting chevron element on Speed settings row ([c5c9a60](https://github.com/BIRDY141/Birdy-Patches/commit/c5c9a60918f5d345d9cfbe19ac3e64e963960354))
+
 ## [2.0.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.28.0...v2.0.0) (2026-11-28)
 
 ### ⚠ BREAKING CHANGES
