@@ -198,8 +198,10 @@
             ".birdy-skip-icon { width: 1.4rem; height: 1.4rem; fill: #ffffff; margin-left: 0.6rem; vertical-align: middle; flex-shrink: 0; }" +
             "[dir='rtl'] .birdy-skip-icon { margin-left: 0; margin-right: 0.6rem; transform: scaleX(-1); }" +
             ".birdy-sb-track-markers { position: fixed; left: 0; top: 0; width: 0; height: 4px; -webkit-transform: translateY(-50%); transform: translateY(-50%);" +
-            " pointer-events: none; z-index: 2147483640; overflow: hidden; border-radius: 2px; display: none; }" +
-            ".birdy-sb-marker { position: absolute; top: 0; bottom: 0; height: 100%; border-radius: 1px; opacity: 0.95; pointer-events: none; }" +
+            " pointer-events: none; z-index: 2147483640; overflow: hidden; border-radius: 9999px; display: none;" +
+            " transition: height 120ms ease, opacity 120ms ease; }" +
+            ".birdy-sb-marker { position: absolute; top: 0; bottom: 0; height: 100%; border-radius: 0; opacity: 0.88;" +
+            " box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22); pointer-events: none; }" +
             ".birdy-setting-prompt-button { outline: none; cursor: pointer; }");
         document.adoptedStyleSheets = document.adoptedStyleSheets.concat([sheet]);
     } catch (e) {}
@@ -465,16 +467,7 @@
         var left = Math.round(rect.left * 10) / 10;
         var centerY = Math.round((rect.top + rect.height / 2) * 10) / 10;
         var width = Math.round(rect.width * 10) / 10;
-        var isFocused = false;
-        try {
-            if (typeof bar.matches === "function" && bar.matches(":focus, :focus-within")) {
-                isFocused = true;
-            } else {
-                var pb = bar.closest ? bar.closest("ytlr-progress-bar, .ytlr-progress-bar") : null;
-                if (pb && typeof pb.matches === "function" && pb.matches(":focus, :focus-within")) isFocused = true;
-            }
-        } catch (e) {}
-        var height = isFocused ? 8 : 4;
+        var height = Math.max(3, Math.min(12, Math.round(rect.height * 10) / 10));
         var roundedOpacity = Math.round(opacity * 100) / 100;
 
         if (!lastBox.visible) {
