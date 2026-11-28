@@ -1,3 +1,9 @@
+## [2.0.4](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.3...v2.0.4) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **captions:** allow manual caption changes when default caption language is video ([8ea4a86](https://github.com/BIRDY141/Birdy-Patches/commit/8ea4a8638cf931aedb3ccfffb2bf08051477afe0))
+
 ## [2.0.3](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.2...v2.0.3) (2026-11-28)
 
 ### 🐛 Bug Fixes

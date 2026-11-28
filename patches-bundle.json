@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-28T01:04:53",
-  "description": "## [2.0.3](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.2...v2.0.3) (2026-11-28)\n\n### 🐛 Bug Fixes\n\n* **captions:** use video's defaultCaptionTrackIndex when caption language is set to video ([a0a37c4](https://github.com/BIRDY141/Birdy-Patches/commit/a0a37c41229c2ae8e325e5da2c07a8a343f221af))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v2.0.3/patches-2.0.3.mpp",
+  "created_at": "2026-11-28T01:14:57",
+  "description": "## [2.0.4](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.3...v2.0.4) (2026-11-28)\n\n### 🐛 Bug Fixes\n\n* **captions:** allow manual caption changes when default caption language is video ([8ea4a86](https://github.com/BIRDY141/Birdy-Patches/commit/8ea4a8638cf931aedb3ccfffb2bf08051477afe0))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v2.0.4/patches-2.0.4.mpp",
   "signature_download_url": "",
-  "version": "2.0.3"
+  "version": "2.0.4"
 }
