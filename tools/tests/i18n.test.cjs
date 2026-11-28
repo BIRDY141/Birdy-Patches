@@ -296,7 +296,9 @@ test('Arabic regional settings, restart and direction preserve saved settings', 
 test('app language wins over browser; regional locales and English fallback work', () => {
     assert.equal(page('es-PE', 'en-US').youtv.t('restart.confirm'), 'Reiniciar');
     assert.equal(page('en-GB', 'es-ES').youtv.t('restart.confirm'), 'Restart');
-    assert.equal(page('fr-FR', 'es-ES').youtv.t('restart.confirm'), 'Restart');
+    assert.equal(page('fr-FR', 'es-ES').youtv.t('restart.confirm'), 'Redémarrer');
+    assert.equal(page('fr-CA', 'es-ES').youtv.locale(), 'fr');
+    assert.equal(page('de-DE', 'es-ES').youtv.t('restart.confirm'), 'Restart');
     assert.equal(page('', 'es-MX').youtv.locale(), 'es');
     const p = page('es');
     p.ytcfg = { get: key => key === 'INNERTUBE_CONTEXT' ? { client: { hl: 'en-US' } } : null };
