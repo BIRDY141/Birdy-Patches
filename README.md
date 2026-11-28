@@ -75,7 +75,7 @@ All in-app features are configured from the **BirdyTV** section inside YouTube T
 ## 🩹 Patches
 
 <!-- PATCHES_START EXPANDED -->
-> **[v2.0.5](https://github.com/BIRDY141/Birdy-Patches/releases/tag/v2.0.5)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;8 patches total
+> **[v2.0.6](https://github.com/BIRDY141/Birdy-Patches/releases/tag/v2.0.6)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;8 patches total
 <details open>
 <summary>📦 YouTube for Android TV&nbsp;&nbsp;•&nbsp;&nbsp;7 patches</summary>
 <br>
@@ -99,6 +99,14 @@ All in-app features are configured from the **BirdyTV** section inside YouTube T
 
 </details>
 
+<details open>
+<summary>🌐 Universal&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
 
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Clone app](#clone-app) | Changes the app package name to allow installing the same app multiple times. By default ".morphe" is appended to the package name. Each cloned install must use a unique package name. Cloning does not work with all apps and using this patch may cause app crashes or other unexpected behavior. | • Package name<br>• Update permissions<br>• Update providers |
+
+</details>
 
 <!-- PATCHES_END -->

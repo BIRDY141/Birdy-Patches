@@ -1,3 +1,9 @@
+## [2.0.6](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.5...v2.0.6) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** match unfocused seekbar thickness and only intercept OK when video is focused ([e13d09a](https://github.com/BIRDY141/Birdy-Patches/commit/e13d09a081148dcb1456d0c96d0246802b1ee785))
+
 ## [2.0.5](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.4...v2.0.5) (2026-11-28)
 
 ### 🐛 Bug Fixes
