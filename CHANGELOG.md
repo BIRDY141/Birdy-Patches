@@ -1,3 +1,11 @@
+## [2.0.13](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.12...v2.0.13) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **ads:** filter Shorts ad endpoints and auto-skip active Shorts ads ([46dc2ee](https://github.com/BIRDY141/Birdy-Patches/commit/46dc2eebb6e4c6da0303dccd7181bd888959b94b))
+* **captions:** stop overwriting Video Settings auto-translate when default is video ([d8e813d](https://github.com/BIRDY141/Birdy-Patches/commit/d8e813da421f015a47b25fe0ac48b51fdd358b77))
+* **sponsorblock:** center 6px unfocused seekbar markers cleanly on track ([4816aa2](https://github.com/BIRDY141/Birdy-Patches/commit/4816aa2d5100d35bf4829f0f31d3bd19e8263459))
+
 ## [2.0.12](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.11...v2.0.12) (2026-11-28)
 
 ### 🐛 Bug Fixes
