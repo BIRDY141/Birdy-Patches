@@ -279,8 +279,34 @@
         window.removeEventListener("keydown", onPromptKeyDown, true);
     }
 
+    function isVideoPlayerFocused() {
+        if (typeof document === "undefined") return true;
+        try {
+            var hub = document.getElementById("birdytv-settings-hub");
+            if (hub && hub.style && hub.style.display !== "none") return false;
+            var speedDrawer = document.getElementById("birdy-custom-speed-drawer");
+            if (speedDrawer && speedDrawer.style && speedDrawer.style.display !== "none") return false;
+
+            var active = document.activeElement;
+            if (active && active !== document.body && active !== document.documentElement) {
+                if (active.closest) {
+                    if (active.closest("#birdytv-settings-hub, #birdy-custom-speed-drawer, ytlr-popup-container, [role='dialog'], [role='menu'], [role='menuitem'], ytlr-transport-controls-renderer, ytlr-progress-bar, .ytlr-progress-bar, ytlr-button-renderer, [role='button'], [role='slider'], button")) {
+                        return false;
+                    }
+                }
+                var tag = (active.tagName || "").toUpperCase();
+                if (tag === "BUTTON" || tag === "INPUT" || tag === "A") return false;
+            }
+
+            var bar = findProgressBar();
+            if (bar && getBarVisibilityAndOpacity(bar) > 0.15) return false;
+        } catch (e) {}
+        return true;
+    }
+
     function onPromptKeyDown(e) {
         if (!isPromptShowing() || !activePromptSegment) return;
+        if (!isVideoPlayerFocused()) return;
         var code = e.keyCode || e.which;
         if (code === 13 || code === 23 || e.key === "Enter" || e.key === "Select") {
             e.preventDefault();
@@ -467,7 +493,16 @@
         var left = Math.round(rect.left * 10) / 10;
         var centerY = Math.round((rect.top + rect.height / 2) * 10) / 10;
         var width = Math.round(rect.width * 10) / 10;
-        var height = Math.max(3, Math.min(12, Math.round(rect.height * 10) / 10));
+        var isFocused = false;
+        try {
+            if (typeof bar.matches === "function" && bar.matches(":focus, :focus-within")) {
+                isFocused = true;
+            } else {
+                var pb = bar.closest ? bar.closest("ytlr-progress-bar, .ytlr-progress-bar") : null;
+                if (pb && typeof pb.matches === "function" && pb.matches(":focus, :focus-within")) isFocused = true;
+            }
+        } catch (e) {}
+        var height = isFocused ? Math.max(6, Math.min(10, Math.round(rect.height * 10) / 10)) : 4;
         var roundedOpacity = Math.round(opacity * 100) / 100;
 
         if (!lastBox.visible) {
