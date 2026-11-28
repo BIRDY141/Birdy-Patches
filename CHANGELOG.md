@@ -1,3 +1,16 @@
+## [2.0.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.28.0...v2.0.0) (2026-11-28)
+
+### ⚠ BREAKING CHANGES
+
+* Official release
+* Official release
+
+### ✨ New Features
+
+* official release ([f675292](https://github.com/BIRDY141/Birdy-Patches/commit/f675292f257c2c1bb4109c82cc2737c48418ed1c))
+* official release ([9f5623e](https://github.com/BIRDY141/Birdy-Patches/commit/9f5623e6c4b0f30ba1ea7e9b41306aa1b4cbd23f))
+* **patches:** remove universal Clone app patch ([28a7162](https://github.com/BIRDY141/Birdy-Patches/commit/28a7162a16ce00050a04b60747e52f5fadfd7cc7))
+
 ## [1.28.0](https://github.com/BIRDY141/Birdy-Patches/compare/v1.27.0...v1.28.0) (2026-11-27)
 
 ### ✨ New Features
