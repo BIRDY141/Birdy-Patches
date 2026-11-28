@@ -1,3 +1,9 @@
+## [2.0.9](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.8...v2.0.9) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** align seekbar markers to inner bar and keep original skip prompt position ([a446ed6](https://github.com/BIRDY141/Birdy-Patches/commit/a446ed68027a9e57503e709a1046640c762cc3a7))
+
 ## [2.0.8](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.7...v2.0.8) (2026-11-28)
 
 ### 🐛 Bug Fixes
