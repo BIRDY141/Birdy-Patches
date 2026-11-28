@@ -617,18 +617,28 @@
             }
 
             if (chosen) {
+                var trackObj = {
+                    languageCode: chosen.languageCode
+                };
+                if (chosen.vssId) trackObj.vssId = chosen.vssId;
+                if (chosen.translationLanguage) trackObj.translationLanguage = chosen.translationLanguage;
+
+                if (typeof player.setOption === "function") {
+                    player.setOption("captions", "track", trackObj);
+                }
                 if (typeof player.toggleSubtitlesOn === "function") {
                     try { player.toggleSubtitlesOn(); } catch (e) {}
                 }
                 if (typeof player.setOption === "function") {
-                    player.setOption("captions", "track", {
-                        languageCode: chosen.languageCode,
-                        vssId: chosen.vssId,
-                        translationLanguage: chosen.translationLanguage
-                    });
+                    player.setOption("captions", "track", trackObj);
                 }
-                lastCaptionVid = vid;
-                lastCaptionLang = desiredLang;
+
+                var activeTrack = (typeof player.getOption === "function") ? player.getOption("captions", "track") : null;
+                var activeLang = activeTrack && ((activeTrack.translationLanguage && activeTrack.translationLanguage.languageCode) || activeTrack.languageCode);
+                if (activeLang && langMatches(activeLang, desiredLang)) {
+                    lastCaptionVid = vid;
+                    lastCaptionLang = desiredLang;
+                }
                 youtv.report("captions: set " + (isShort ? "shorts" : "video") + " to " + desiredLang);
             }
         } catch (e) {}
