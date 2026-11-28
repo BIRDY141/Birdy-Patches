@@ -1,3 +1,11 @@
+## [2.0.11](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.10...v2.0.11) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **ads:** block Shorts reelWatchEndpoint adParams and shortsAdRenderer ([13c64bd](https://github.com/BIRDY141/Birdy-Patches/commit/13c64bdca733c8f23303489a1858f4bf5ad4f8bf))
+* **captions:** populate translationLanguages and match player translation object ([bebf4ab](https://github.com/BIRDY141/Birdy-Patches/commit/bebf4ab38a5e0973ef29bb9a19d0f527d24e4b93))
+* **sponsorblock:** center unfocused seekbar markers on 4px track ([2dfd0ba](https://github.com/BIRDY141/Birdy-Patches/commit/2dfd0ba2eef246867aacb9a87508aff1dcfc5ba9))
+
 ## [2.0.10](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.9...v2.0.10) (2026-11-28)
 
 ### 🐛 Bug Fixes
