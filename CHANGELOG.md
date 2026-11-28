@@ -1,3 +1,9 @@
+## [2.0.5](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.4...v2.0.5) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** release seekbar segment styling ([0dc9f5b](https://github.com/BIRDY141/Birdy-Patches/commit/0dc9f5b782c4fb3f1ac638188eee07d8f7642824))
+
 ## [2.0.4](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.3...v2.0.4) (2026-11-28)
 
 ### 🐛 Bug Fixes
