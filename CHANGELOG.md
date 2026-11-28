@@ -1,3 +1,9 @@
+## [2.0.7](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.6...v2.0.7) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** publish release with seekbar thickness and focus-gated skip prompt ([85ced04](https://github.com/BIRDY141/Birdy-Patches/commit/85ced042be7b4e8c35ee99d503117372dd44602b))
+
 ## [2.0.6](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.5...v2.0.6) (2026-11-28)
 
 ### 🐛 Bug Fixes
