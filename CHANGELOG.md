@@ -1,3 +1,9 @@
+## [2.0.8](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.7...v2.0.8) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **sponsorblock:** thicker unfocused seekbar and anchor skip prompt to video frame behind controls ([54021b2](https://github.com/BIRDY141/Birdy-Patches/commit/54021b2184ead1964bafdf92cb0ca4557d99edd2))
+
 ## [2.0.7](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.6...v2.0.7) (2026-11-28)
 
 ### 🐛 Bug Fixes

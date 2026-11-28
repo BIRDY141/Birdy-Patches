@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-28T01:46:55",
-  "description": "## [2.0.7](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.6...v2.0.7) (2026-11-28)\n\n### 🐛 Bug Fixes\n\n* **sponsorblock:** publish release with seekbar thickness and focus-gated skip prompt ([85ced04](https://github.com/BIRDY141/Birdy-Patches/commit/85ced042be7b4e8c35ee99d503117372dd44602b))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v2.0.7/patches-2.0.7.mpp",
+  "created_at": "2026-11-28T01:56:36",
+  "description": "## [2.0.8](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.7...v2.0.8) (2026-11-28)\n\n### 🐛 Bug Fixes\n\n* **sponsorblock:** thicker unfocused seekbar and anchor skip prompt to video frame behind controls ([54021b2](https://github.com/BIRDY141/Birdy-Patches/commit/54021b2184ead1964bafdf92cb0ca4557d99edd2))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v2.0.8/patches-2.0.8.mpp",
   "signature_download_url": "",
-  "version": "2.0.7"
+  "version": "2.0.8"
 }
