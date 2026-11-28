@@ -588,10 +588,22 @@
 
             var chosen = null;
             if (desiredLang === "video") {
-                for (var i = 0; i < tracklist.length; i++) {
-                    if (tracklist[i] && tracklist[i].kind !== "asr") {
-                        chosen = tracklist[i];
-                        break;
+                var prCap = (typeof player.getPlayerResponse === "function") ? player.getPlayerResponse() : null;
+                var capR = prCap && prCap.captions && prCap.captions.playerCaptionsTracklistRenderer;
+                if (capR && Array.isArray(capR.audioTracks) && capR.audioTracks.length && Array.isArray(capR.captionTracks)) {
+                    var daIdx = typeof capR.defaultAudioTrackIndex === "number" ? capR.defaultAudioTrackIndex : 0;
+                    var daTrack = capR.audioTracks[daIdx] || capR.audioTracks[0];
+                    if (daTrack && typeof daTrack.defaultCaptionTrackIndex === "number") {
+                        var defCap = capR.captionTracks[daTrack.defaultCaptionTrackIndex];
+                        if (defCap) chosen = defCap;
+                    }
+                }
+                if (!chosen) {
+                    for (var i = 0; i < tracklist.length; i++) {
+                        if (tracklist[i] && tracklist[i].kind !== "asr") {
+                            chosen = tracklist[i];
+                            break;
+                        }
                     }
                 }
                 if (!chosen) chosen = tracklist[0];
