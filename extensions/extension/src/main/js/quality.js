@@ -218,21 +218,9 @@
                     if (tr.kind !== "asr") break;
                 }
             }
-            // If no native track exists, synthesize an auto-translated track via &tlang=
-            if (chosenIdx === -1) {
-                var base = cap.captionTracks[0];
-                if (base && base.baseUrl) {
-                    var sep = base.baseUrl.indexOf("?") !== -1 ? "&" : "?";
-                    var transTrack = {
-                        baseUrl: base.baseUrl + sep + "tlang=" + encodeURIComponent(captionLang),
-                        name: { runs: [{ text: findLangName(captionLang) + " (Auto)" }] },
-                        vssId: "." + captionLang + ".tlang",
-                        languageCode: captionLang,
-                        isTranslatable: false
-                    };
-                    cap.captionTracks.push(transTrack);
-                    chosenIdx = cap.captionTracks.length - 1;
-                }
+            // Let enforceCaptions() apply translationLanguage on the real base track.
+            if (chosenIdx === -1 && cap.captionTracks.length > 0) {
+                chosenIdx = 0;
             }
         }
 

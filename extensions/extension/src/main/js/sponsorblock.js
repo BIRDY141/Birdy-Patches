@@ -538,8 +538,6 @@
         }
 
         var left = Math.round(rect.left * 10) / 10;
-        var centerY = Math.round((rect.top + rect.height / 2) * 10) / 10;
-        var width = Math.round(rect.width * 10) / 10;
         var isFocused = false;
         try {
             if (typeof bar.matches === "function" && bar.matches(":focus, :focus-within")) {
@@ -549,6 +547,8 @@
                 if (pb && typeof pb.matches === "function" && pb.matches(":focus, :focus-within")) isFocused = true;
             }
         } catch (e) {}
+        var centerY = Math.round((rect.top + rect.height / 2 + (isFocused ? 0 : 1.5)) * 10) / 10;
+        var width = Math.round(rect.width * 10) / 10;
         var height = isFocused ? Math.max(8, Math.min(12, Math.round(rect.height * 10) / 10)) : 6;
         var roundedOpacity = Math.round(opacity * 100) / 100;
 

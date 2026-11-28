@@ -11,7 +11,7 @@
     // Feed items that are ads. Seen on Home (7.32.300): adSlotRenderer wrapping an
     // inFeedAdLayoutRenderer, as the first tile of the first shelf.
     var AD_ITEM_KEYS = ["adSlotRenderer", "inFeedAdLayoutRenderer", "promotedVideoRenderer",
-        "compactPromotedVideoRenderer", "promotedSparklesWebRenderer"];
+        "compactPromotedVideoRenderer", "promotedSparklesWebRenderer", "reelAdRenderer"];
 
     function stripAds(value) {
         var hit = false;
@@ -45,7 +45,7 @@
         treeFilter: {
             markers: AD_ITEM_KEYS,
             eligible: function (response) {
-                return !!(response.contents || response.onResponseReceivedActions || response.continuationContents);
+                return !!(response.contents || response.onResponseReceivedActions || response.continuationContents || response.entries);
             },
             item: isAdItem,
             report: function (removed) { youtv.report("ads: removed " + removed + " sponsored item(s)"); }
