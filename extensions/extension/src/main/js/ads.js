@@ -11,7 +11,7 @@
     // Feed items that are ads. Seen on Home (7.32.300): adSlotRenderer wrapping an
     // inFeedAdLayoutRenderer, as the first tile of the first shelf.
     var AD_ITEM_KEYS = ["adSlotRenderer", "inFeedAdLayoutRenderer", "promotedVideoRenderer",
-        "compactPromotedVideoRenderer", "promotedSparklesWebRenderer", "reelAdRenderer"];
+        "compactPromotedVideoRenderer", "promotedSparklesWebRenderer", "reelAdRenderer", "shortsAdRenderer", "adParams"];
 
     function stripAds(value) {
         var hit = false;
@@ -31,6 +31,7 @@
         for (var i = 0; i < AD_ITEM_KEYS.length; i++) {
             if (Object.prototype.hasOwnProperty.call(item, AD_ITEM_KEYS[i])) return true;
         }
+        if (item.command && item.command.reelWatchEndpoint && item.command.reelWatchEndpoint.adParams) return true;
         return false;
     }
 
