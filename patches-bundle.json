@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-28T10:07:32",
-  "description": "## [2.0.11](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.10...v2.0.11) (2026-11-28)\n\n### 🐛 Bug Fixes\n\n* **ads:** block Shorts reelWatchEndpoint adParams and shortsAdRenderer ([13c64bd](https://github.com/BIRDY141/Birdy-Patches/commit/13c64bdca733c8f23303489a1858f4bf5ad4f8bf))\n* **captions:** populate translationLanguages and match player translation object ([bebf4ab](https://github.com/BIRDY141/Birdy-Patches/commit/bebf4ab38a5e0973ef29bb9a19d0f527d24e4b93))\n* **sponsorblock:** center unfocused seekbar markers on 4px track ([2dfd0ba](https://github.com/BIRDY141/Birdy-Patches/commit/2dfd0ba2eef246867aacb9a87508aff1dcfc5ba9))",
-  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v2.0.11/patches-2.0.11.mpp",
+  "created_at": "2026-11-28T10:17:35",
+  "description": "## [2.0.12](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.11...v2.0.12) (2026-11-28)\n\n### 🐛 Bug Fixes\n\n* **ads:** block Shorts adBreakServiceRenderer, adBreakParams, and ad overlay ([5446c11](https://github.com/BIRDY141/Birdy-Patches/commit/5446c119e679d6ac2529bd0379447a6c91122d0a))\n* **captions:** wait for captions module tracklist and normalize translationLanguage ([9ef38d7](https://github.com/BIRDY141/Birdy-Patches/commit/9ef38d7219318e53289d8ff3ec512e3275d6642f))\n* **sponsorblock:** match 6px unfocused seekbar height ([c7d4069](https://github.com/BIRDY141/Birdy-Patches/commit/c7d4069aef41434f6d22e56a0b8523e12ab68b6a))",
+  "download_url": "https://github.com/BIRDY141/Birdy-Patches/releases/download/v2.0.12/patches-2.0.12.mpp",
   "signature_download_url": "",
-  "version": "2.0.11"
+  "version": "2.0.12"
 }

@@ -1,3 +1,11 @@
+## [2.0.12](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.11...v2.0.12) (2026-11-28)
+
+### 🐛 Bug Fixes
+
+* **ads:** block Shorts adBreakServiceRenderer, adBreakParams, and ad overlay ([5446c11](https://github.com/BIRDY141/Birdy-Patches/commit/5446c119e679d6ac2529bd0379447a6c91122d0a))
+* **captions:** wait for captions module tracklist and normalize translationLanguage ([9ef38d7](https://github.com/BIRDY141/Birdy-Patches/commit/9ef38d7219318e53289d8ff3ec512e3275d6642f))
+* **sponsorblock:** match 6px unfocused seekbar height ([c7d4069](https://github.com/BIRDY141/Birdy-Patches/commit/c7d4069aef41434f6d22e56a0b8523e12ab68b6a))
+
 ## [2.0.11](https://github.com/BIRDY141/Birdy-Patches/compare/v2.0.10...v2.0.11) (2026-11-28)
 
 ### 🐛 Bug Fixes
