@@ -565,8 +565,10 @@
 
     function enforceCaptions(player, isShort, vid, forceNow) {
         var desiredLang = getStringSetting(isShort ? SHORTS_CAPTION_KEY : VIDEO_CAPTION_KEY, "auto");
-        if (!desiredLang || desiredLang === "auto") {
-            lastCaptionLang = "auto";
+        if (!desiredLang || desiredLang === "auto" || desiredLang === "video") {
+            // "video" is already forced at playerResponse level in applyCaptionsToResponse;
+            // do not call setOption later so Video Settings -> Captions / Auto-translate works freely.
+            lastCaptionLang = desiredLang || "auto";
             return;
         }
         if (!forceNow && lastCaptionVid === vid && lastCaptionLang === desiredLang) return;
@@ -574,7 +576,17 @@
         try {
             if (typeof player.loadModule === "function") player.loadModule("captions");
             var tracklist = (typeof player.getOption === "function") ? player.getOption("captions", "tracklist") : null;
-            if (!Array.isArray(tracklist) || !tracklist.length) return;
+            if (!Array.isArray(tracklist) || !tracklist.length) {
+                if (!enforceCaptions._retryScheduled && vid) {
+                    enforceCaptions._retryScheduled = true;
+                    setTimeout(function () {
+                        enforceCaptions._retryScheduled = false;
+                        var p = findPlayer();
+                        if (p) enforceCaptions(p, isCurrentShort(p), getVideoId(p), false);
+                    }, 800);
+                }
+                return;
+            }
 
             var chosen = null;
             if (desiredLang === "video") {
@@ -657,7 +669,10 @@
 
                 var activeTrack = (typeof player.getOption === "function") ? player.getOption("captions", "track") : null;
                 var activeLang = activeTrack && ((activeTrack.translationLanguage && activeTrack.translationLanguage.languageCode) || activeTrack.languageCode);
-                if (desiredLang === "video" || (activeLang && langMatches(activeLang, desiredLang)) || lastCaptionVid === vid) {
+                if (activeLang && langMatches(activeLang, desiredLang)) {
+                    lastCaptionVid = vid;
+                    lastCaptionLang = desiredLang;
+                } else {
                     lastCaptionVid = vid;
                     lastCaptionLang = desiredLang;
                 }
