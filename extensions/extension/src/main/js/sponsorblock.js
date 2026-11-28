@@ -352,7 +352,7 @@
                 var vRect = videoEl.getBoundingClientRect();
                 var winW = window.innerWidth || 1920;
                 var winH = window.innerHeight || 1080;
-                if (vRect && vRect.width > 100 && vRect.height > 100) {
+                if (vRect && vRect.width > 100 && vRect.height > 100 && vRect.width < winW * 0.92) {
                     var padX = Math.max(16, Math.round(vRect.width * 0.03));
                     var padY = Math.max(20, Math.round(vRect.height * 0.06));
                     if (prompt.dir === "rtl") {
@@ -363,6 +363,10 @@
                         prompt.style.left = "auto";
                     }
                     prompt.style.bottom = Math.max(20, Math.round(winH - vRect.bottom + padY)) + "px";
+                } else {
+                    prompt.style.left = "";
+                    prompt.style.right = "";
+                    prompt.style.bottom = "";
                 }
             }
         } catch (e) {}
@@ -410,15 +414,30 @@
 
     function findProgressBar() {
         if (!document || typeof document.querySelector !== "function") return null;
-        // 1. Direct multi-markers player bar element or inner slider
-        var inner = document.querySelector("ytlr-multi-markers-player-bar-renderer") ||
-                    document.querySelector("[idomkey='multi-markers-player-bar']") ||
-                    document.querySelector("[idomkey='player-bar']") ||
-                    document.querySelector(".ytlr-multi-markers-player-bar-renderer-bar") ||
+        // 1. Prefer the inner visual bar track (avoids outer wrapper padding offset)
+        var inner = document.querySelector(".ytlr-multi-markers-player-bar-renderer-bar") ||
                     document.querySelector(".progress-bar-line") ||
-                    document.querySelector(".ytp-progress-bar-container") ||
                     document.querySelector(".ytp-progress-bar");
         if (inner && inner.tagName !== "VIDEO" && typeof inner.querySelector === "function") return inner;
+
+        var multi = document.querySelector("ytlr-multi-markers-player-bar-renderer") ||
+                    document.querySelector("[idomkey='multi-markers-player-bar']") ||
+                    document.querySelector("[idomkey='player-bar']") ||
+                    document.querySelector(".ytp-progress-bar-container");
+        if (multi && multi.tagName !== "VIDEO" && typeof multi.getBoundingClientRect === "function") {
+            var mRect = multi.getBoundingClientRect();
+            if (multi.children && mRect && mRect.width > 0) {
+                for (var m = 0; m < multi.children.length; m++) {
+                    var mc = multi.children[m];
+                    if (!mc || typeof mc.getBoundingClientRect !== "function") continue;
+                    var mcRect = mc.getBoundingClientRect();
+                    if (mcRect && mcRect.width >= mRect.width * 0.85 && mcRect.height >= 2 && mcRect.height <= 14) {
+                        return mc;
+                    }
+                }
+            }
+            return multi;
+        }
 
         // 2. Look inside ytlr-progress-bar for the middle child (between current time and duration labels)
         var pb = document.querySelector("ytlr-progress-bar, .ytlr-progress-bar");
