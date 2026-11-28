@@ -190,7 +190,7 @@
                     if (!seen[tl.code]) {
                         existing.push({
                             languageCode: tl.code,
-                            languageName: { runs: [{ text: tl.name }] }
+                            languageName: { simpleText: tl.name }
                         });
                         seen[tl.code] = true;
                     }
@@ -198,7 +198,7 @@
             } else if (!seen[captionLang]) {
                 existing.push({
                     languageCode: captionLang,
-                    languageName: { runs: [{ text: findLangName(captionLang) }] }
+                    languageName: { simpleText: findLangName(captionLang) }
                 });
             }
             cap.translationLanguages = existing;
@@ -574,11 +574,6 @@
         try {
             if (typeof player.loadModule === "function") player.loadModule("captions");
             var tracklist = (typeof player.getOption === "function") ? player.getOption("captions", "tracklist") : null;
-            if (!Array.isArray(tracklist) || !tracklist.length) {
-                var pr = (typeof player.getPlayerResponse === "function") ? player.getPlayerResponse() : null;
-                var cap = pr && pr.captions && pr.captions.playerCaptionsTracklistRenderer;
-                if (cap && Array.isArray(cap.captionTracks)) tracklist = cap.captionTracks;
-            }
             if (!Array.isArray(tracklist) || !tracklist.length) return;
 
             var chosen = null;
@@ -624,12 +619,20 @@
                             }
                         }
                     } catch (e) {}
+                    var tName = findLangName(desiredLang);
+                    if (tObj && typeof tObj.languageName === "string") {
+                        tName = tObj.languageName;
+                    } else if (tObj && tObj.languageName && tObj.languageName.simpleText) {
+                        tName = tObj.languageName.simpleText;
+                    } else if (tObj && tObj.languageName && Array.isArray(tObj.languageName.runs) && tObj.languageName.runs[0]) {
+                        tName = tObj.languageName.runs[0].text || tName;
+                    }
                     chosen = {
                         languageCode: base.languageCode,
                         vssId: base.vssId,
-                        translationLanguage: tObj || {
+                        translationLanguage: {
                             languageCode: desiredLang,
-                            languageName: findLangName(desiredLang)
+                            languageName: tName
                         }
                     };
                 }
